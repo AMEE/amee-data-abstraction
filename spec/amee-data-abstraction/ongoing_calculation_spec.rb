@@ -25,52 +25,68 @@ def drill_mocks
       ))
 end
 describe AMEE::DataAbstraction::Calculation do
-  before :all do
-    @c=Electricity
-    @t=Transport
+  it 'can return set and unset inputs' do
+    d=Electricity.begin_calculation
+    d.chosen_inputs.keys.should eql [:country]
+    d.unset_inputs.keys.should eql [:energy_used]
+    d[:energy_used].value :somevalue
+    d.chosen_inputs.keys.should eql [:country,:energy_used]
+    d.unset_inputs.keys.should eql []
+  end
+  it 'can return set and unset terms' do
+    d=Electricity.begin_calculation
+    d.chosen_terms.keys.should eql [:country]
+    d.unset_terms.keys.should eql [:energy_used,:co2]
+    d[:energy_used].value :somevalue
+    d.chosen_terms.keys.should eql [:country,:energy_used]
+    d.unset_terms.keys.should eql [:co2]
+  end
+  it 'can return set and unset outputs' do
+    d=Electricity.begin_calculation
+    d.chosen_outputs.keys.should eql []
+    d.unset_outputs.keys.should eql [:co2]
+    d[:co2].value 5
+    d.chosen_outputs.keys.should eql [:co2]
+    d.unset_outputs.keys.should eql []
   end
   it 'can have values chosen' do
     drill_mocks
-    @c.inputs.values.map(&:label).should eql [:country,:energy_used]
-    @c.inputs[:energy_used].path.should eql 'energyPerTime'
-    @c.inputs[:energy_used].value.should eql nil
-   
-    @c[:energy_used].value.should eql nil
-    d=@c.begin_calculation
     
+    d=Electricity.begin_calculation
+
+    d.chosen_inputs.values.map(&:value).should eql ['argentina']
+    d.unset_inputs.values.map(&:value).should eql [nil]
+
     d.choose!(:energy_used=>5)
+
     d.chosen_inputs.values.map(&:value).should eql ['Argentina',5]
     d.unset_inputs.values.should be_empty
-    d.inputs[:energy_used].path.should eql 'energyPerTime'
-    d.inputs[:energy_used].value.should eql 5
-
-    # Original should be unaffected by the choosing - clone generates a deep copy instance
-    @c.inputs[:energy_used].path.should eql 'energyPerTime'
-    @c.inputs[:energy_used].value.should eql nil
   end
   it 'knows when it is satisfied' do
     drill_mocks
-    d=@c.begin_calculation
+    d=Electricity.begin_calculation
     d.satisfied?.should be_false
     d.choose!(:energy_used=>5)
     d.satisfied?.should be_true
   end
-  it 'knows when its drills are satisfied' do
+  it 'knows which drills are set, and whether it is satisfied' do
     drill_mocks
-    @t.terms.values.map(&:label).should eql [:fuel,:size,:distance,:co2]
-    t=@t.begin_calculation
-    t.terms.values.map(&:label).should eql [:fuel,:size,:distance,:co2]
+    t=Transport.begin_calculation
+    t.terms.keys.should eql [:fuel,:size,:distance,:co2]
     t.satisfied?.should be_false
+
     t.choose!('fuel'=>'diesel')
     t.chosen_inputs.values.map(&:label).should eql [:fuel]
     t.unset_inputs.values.map(&:label).should eql [:size,:distance]
     t.satisfied?.should be_false
-    t2=@t.begin_calculation
+
+    t2=Transport.begin_calculation
     t2.choose!('fuel'=>'diesel','size'=>'large')
     t2.chosen_inputs.values.map(&:label).should eql [:fuel,:size]
     t2.unset_inputs.values.map(&:label).should eql [:distance]
     t2.satisfied?.should be_false
-    t3=@t.begin_calculation
+
+    t3=Transport.begin_calculation
     t3.choose!('fuel'=>'diesel','size'=>'large','distance'=>5)
     t3.chosen_inputs.values.map(&:label).should eql [:fuel,:size,:distance]
     t3.unset_inputs.values.map(&:label).should eql []
@@ -95,7 +111,7 @@ describe AMEE::DataAbstraction::Calculation do
       and_return(flexmock(:amounts=>flexmock(:find=>{:value=>:somenumber})))
     flexmock(AMEE::Profile::Item).should_receive(:delete).
       with(AMEE::DataAbstraction.connection,:somelocation)
-    mycalc=@t.begin_calculation
+    mycalc=Transport.begin_calculation
     mycalc.choose!('fuel'=>'diesel','size'=>'large','distance'=>5)
     mycalc.calculate!
     mycalc.outputs.values.first.value.should eql :somenumber
