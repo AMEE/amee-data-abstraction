@@ -1,0 +1,27 @@
+<% form_id = "drill-form-#{rand(1e8)}" %>
+<% form_tag({:action=>nil},{:id=>form_id}) do%>
+  <%= hidden_field_tag 'form_id', form_id %>
+  <table>
+    <%@calculation.drills.each_value do |input|%>
+       <tr>
+        <td><%=label :entry,input.label,input.name%></td>
+        <td>
+          <%= select_tag "entry[#{input.label}]",
+            options_for_select(input.options_for_select,input.set? ? input.value : nil),:disabled=>input.disabled?%>
+        </td>
+      </tr>
+    <%end%>
+    <%@calculation.profiles.each_value do |input|%>
+      <tr><td><%=label :entry,input.label,input.name%></td><td><%= text_field :entry, input.label, "size" => 20, :value => input.value_if_given %></td></tr>
+    <%end%>
+    <%@calculation.chosen_outputs.each_value do |result|%>
+      <tr><td><%=label :entry,result.label,result.name%></td><td><%= result.value_if_given %></td></tr>
+    <%end%>
+  </table>
+<%end%>
+<%= observe_form form_id, :url => {:action => 'result'}%>
+<% javascript_tag do %>
+  $('#<%=form_id%>').submit(function() {
+  return false;
+  });
+<%end%>
