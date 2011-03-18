@@ -1,5 +1,6 @@
 require 'amee'
 require 'amee-internal'
+require 'uuidtools'
 
 require File.dirname(__FILE__) + '/core-extensions/class'
 require File.dirname(__FILE__) + '/core-extensions/ordered_hash'
