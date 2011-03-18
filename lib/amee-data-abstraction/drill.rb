@@ -16,6 +16,14 @@ module AMEE
         [nil]+choices
       end
 
+      def drop_down?
+        true
+      end
+
+      def disabled?
+        fixed? || (!set? && !next?)
+      end
+
       private
 
     end

@@ -4,7 +4,16 @@ module AMEE
 
       public
 
-     
+      #Need to make this friend to term, rather than public
+      def chosen_terms(klass=nil)
+        ActiveSupport::OrderedHash[terms(klass).stable_select{|k,v|!v.value.nil?}]
+      end
+
+      #Need to make this friend to term, rather than public
+      #Suggest using 'friend' gem https://github.com/lsegal/friend
+      def unset_terms(klass=nil)
+        ActiveSupport::OrderedHash[terms(klass).stable_select{|k,v|v.value.nil?}]
+      end
 
       def unset_inputs
         unset_terms AMEE::DataAbstraction::Input
@@ -35,7 +44,7 @@ module AMEE
         autodrill!    
       end
 
-       def retreat!(label)
+      def retreat!(label)
         found=false
         terms.each_value do |x|
           found||=(x.label==label)
@@ -79,15 +88,6 @@ module AMEE
       end
 
       private
-
-      def chosen_terms(klass=nil)
-        ActiveSupport::OrderedHash[terms(klass).stable_select{|k,v|!v.value.nil?}]
-      end
-
-      def unset_terms(klass=nil)
-        ActiveSupport::OrderedHash[terms(klass).stable_select{|k,v|v.value.nil?}]
-      end
-
       
       def unset_profiles
         unset_terms AMEE::DataAbstraction::Profile

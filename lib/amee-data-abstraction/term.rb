@@ -34,20 +34,17 @@ module AMEE
       private
             
       def siblings
-        parent.terms_class(self.class)
+        parent.terms(self.class)
       end
       def chosen_siblings
-        parent.chosen_terms_class(self.class)
+        parent.chosen_terms(self.class)
       end
       def unset_siblings
-        parent.unset_terms_class(self.class)
-      end
-      def earlier_siblings
-        parent.earlier_terms_class(self.class)
+        parent.unset_terms(self.class)
       end
       
       def unset_others
-        ActiveSupport::OrderedHash[parent.unset_terms_class(self.class).reject{|k,v|
+        ActiveSupport::OrderedHash[parent.unset_terms(self.class).reject{|k,v|
             k==label
           }]
       end   

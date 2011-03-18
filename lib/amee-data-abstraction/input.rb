@@ -22,11 +22,15 @@ module AMEE
       end
 
       def disabled?
-        fixed? || (!set? && !next?)
+        fixed?
       end
 
       def next?
         label==unset_siblings.values.first.label
+      end
+
+      def drop_down?
+        false
       end
 
       protected
