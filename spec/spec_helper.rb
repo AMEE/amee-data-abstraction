@@ -18,3 +18,34 @@ Dir.glob(File.dirname(__FILE__) + '/fixtures/*') do |filename|
 end
 
 include AMEE::DataAbstraction
+
+def drill_mocks
+  flexmock(AMEE::Data::DrillDown).
+    should_receive(:get).
+    with(connection,
+    '/data/business/energy/electricity/grid/drill?').
+    and_return(flexmock(:choices=>['argentina','mexico'],:selections=>{}))
+  flexmock(AMEE::Data::DrillDown).
+    should_receive(:get).
+    with(connection,
+    '/data/business/energy/electricity/grid/drill?country=argentina').
+    and_return(flexmock(:choices=>[],:selections=>{'country'=>'argentina'}))
+  flexmock(AMEE::Data::DrillDown).
+    should_receive(:get).
+    with(connection,
+    '/data/transport/car/generic/drill?').
+    and_return(flexmock(:choices=>['diesel','petrol'],:selections=>{}))
+  flexmock(AMEE::Data::DrillDown).
+    should_receive(:get).
+    with(connection,
+    '/data/transport/car/generic/drill?fuel=diesel').
+    and_return(flexmock(:choices=>['large','small'],:selections=>{'fuel'=>'diesel'}))
+  flexmock(AMEE::Data::DrillDown).
+    should_receive(:get).
+    with(connection,
+    '/data/transport/car/generic/drill?fuel=diesel&size=large').
+    and_return(flexmock(:choices=>[],
+      :selections=>{'fuel'=>'diesel','size'=>'large'},
+      :data_item_uid=>:somediuid
+    ))
+end

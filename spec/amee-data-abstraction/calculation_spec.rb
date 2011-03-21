@@ -29,5 +29,12 @@ describe Calculation do
     x[:co2].value.should eql :somevalue
     Transport[:co2].value.should be_nil
   end
+  it 'knows to get terms that come before or after others' do
+
+    Transport.before(:distance).values.map(&:label).
+      should eql [:fuel,:size]
+    Transport.after(:distance).values.map(&:label).
+      should eql [:co2]
+  end
 end
 
