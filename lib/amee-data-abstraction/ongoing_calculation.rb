@@ -4,7 +4,7 @@ module AMEE
 
       public
 
-      
+
 
       def unset_inputs
         unset_terms AMEE::DataAbstraction::Input
@@ -12,14 +12,6 @@ module AMEE
 
       def chosen_inputs
         chosen_terms AMEE::DataAbstraction::Input
-      end
-
-      def visible_inputs
-        visible_terms AMEE::DataAbstraction::Input
-      end
-
-      def visible_outputs
-        visible_terms AMEE::DataAbstraction::Output
       end
 
       def unset_outputs
@@ -54,7 +46,7 @@ module AMEE
           profile_options.merge(:get_item=>false,:name=>UUIDTools::UUID.timestamp_create))
         item=AMEE::Profile::Item.get(connection, location, get_options)
         # Extract default result
-        unset_outputs.values.each do |output|
+        unset_terms(Output).values.each do |output|
           res=nil
           if output.path==:default
             res= item.amounts.find{|x| x[:default] == true}
@@ -72,7 +64,7 @@ module AMEE
       end
 
       def satisfied?
-        unset_drills.values.empty? && unset_profiles.values.empty?
+        unset_terms(Input).values.empty?
       end
 
       # Friend constructor for PrototypeCalculation ONLY
@@ -82,29 +74,16 @@ module AMEE
 
       private
 
-      def unset_profiles
-        unset_terms AMEE::DataAbstraction::Profile
-      end
-
-      def unset_drills
-        unset_terms AMEE::DataAbstraction::Drill
-      end
-
-      def chosen_profiles
-        chosen_terms AMEE::DataAbstraction::Profile
-      end
-
-      def chosen_drills
-        chosen_terms AMEE::DataAbstraction::Drill
-      end
-
       def drill_options
-        chosen_drills.values.map{|x| "#{CGI.escape(x.path)}=#{CGI.escape(x.value)}"}.join("&")
+        fu=unset_terms(Drill).values.first
+        raise Exceptions::OrderEntryException unless \
+          after(fu.label,Drill).values.all?{|x|x.unset?} if fu
+        chosen_terms(Drill).values.map{|x| "#{CGI.escape(x.path)}=#{CGI.escape(x.value)}"}.join("&")
       end
 
       def profile_options
         result={}
-        chosen_profiles.values.each do |piv|
+        chosen_terms(Profile).values.each do |piv|
           result[piv.path]=piv.value
         end
         return result
@@ -136,14 +115,6 @@ module AMEE
         end
       end
 
-      def next_drill
-        unset_drills.values.first
-      end
-
-      def future_drills
-        unset_drills.values[1..-1] || []
-      end
-
       public #pretend private
       #private -- missing friend feature, and
       #'friend' gem https://github.com/lsegal/friend
@@ -155,12 +126,8 @@ module AMEE
 
       #Friend for drill term, move to private.
       def retreat!(label)
-        found=false
-        inputs.each_value do |x|
-          found||=(x.label==label)
-          next unless found
-          x.value nil unless x.fixed?
-        end
+        inputs.values.select{|x| x.after? label}.each{|x| x.value nil}
+        inputs[label].value nil
       end
 
       #Need to make this friend to term, rather than public

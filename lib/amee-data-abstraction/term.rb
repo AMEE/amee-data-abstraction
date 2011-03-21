@@ -43,6 +43,10 @@ module AMEE
         !value.nil?
       end
 
+      def unset?
+        value.nil?
+      end
+
       def disable!
         @disabled=true
       end
@@ -79,23 +83,14 @@ module AMEE
         "[#{self.class} #{label} : #{value}]"
       end
 
-      private
-            
-      def siblings
-        parent.terms(self.class)
+      def before?(lab)
+         parent.terms.keys.to_a.index(lab)>parent.terms.keys.to_a.index(label)
       end
-      def chosen_siblings
-        parent.chosen_terms(self.class)
-      end
-      def unset_siblings
-        parent.unset_terms(self.class)
+
+      def after?(lab)
+        parent.terms.keys.to_a.index(lab)<parent.terms.keys.to_a.index(label)
       end
       
-      def unset_others
-        ActiveSupport::OrderedHash[parent.unset_terms(self.class).reject{|k,v|
-            k==label
-          }]
-      end   
     end
   end
 end

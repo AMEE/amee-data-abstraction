@@ -11,12 +11,20 @@ module AMEE
       end
 
       def inputs
-        terms AMEE::DataAbstraction::Input
+        terms Input
       end
 
       
       def outputs
-        terms AMEE::DataAbstraction::Output
+        terms Output
+      end
+
+      def after(label,klass=nil)
+        ActiveSupport::OrderedHash[terms(klass).stable_select{|k,v|v.after?(label)}]
+      end
+
+      def before(label,klass=nil)
+        ActiveSupport::OrderedHash[terms(klass).stable_select{|k,v|v.before?(label)}]
       end
 
       def inspect
@@ -54,11 +62,11 @@ module AMEE
       end
 
       def profiles
-        terms AMEE::DataAbstraction::Profile
+        terms Profile
       end
 
       def drills
-        terms AMEE::DataAbstraction::Drill
+        terms Drill
       end
 
 
