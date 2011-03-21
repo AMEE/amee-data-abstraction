@@ -16,3 +16,5 @@ AMEE::DataAbstraction.connection=FlexMock.new('connection') #Global connection m
 Dir.glob(File.dirname(__FILE__) + '/fixtures/*') do |filename|
   require filename
 end
+
+include AMEE::DataAbstraction

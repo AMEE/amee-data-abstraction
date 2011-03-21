@@ -14,6 +14,14 @@ module AMEE
         chosen_terms AMEE::DataAbstraction::Input
       end
 
+      def visible_inputs
+        visible_terms AMEE::DataAbstraction::Input
+      end
+
+      def visible_outputs
+        visible_terms AMEE::DataAbstraction::Output
+      end
+
       def unset_outputs
         unset_terms AMEE::DataAbstraction::Output
       end
@@ -27,9 +35,12 @@ module AMEE
         choice.each do |k,v|
           self[k].value v unless v.blank?
         end
-        
-        drills.each_value do |d|       
-          d.value nil unless d.valid_choice?
+
+        #Clear out any invalid choices
+        inputs.each_value do |d|
+          d.validate! # Up to each kind of quantity to decide whether to unset itself
+          # or raise an exception, if it is invalid.
+          # Typical behaviour is to simply set one's value to zero.
         end
        
         autodrill!    
@@ -87,10 +98,10 @@ module AMEE
         chosen_terms AMEE::DataAbstraction::Drill
       end
 
-
       def drill_options
         chosen_drills.values.map{|x| "#{CGI.escape(x.path)}=#{CGI.escape(x.value)}"}.join("&")
       end
+
       def profile_options
         result={}
         chosen_profiles.values.each do |piv|
@@ -145,22 +156,25 @@ module AMEE
       #Friend for drill term, move to private.
       def retreat!(label)
         found=false
-        terms.each_value do |x|
+        inputs.each_value do |x|
           found||=(x.label==label)
           next unless found
-          x.value nil
+          x.value nil unless x.fixed?
         end
       end
 
       #Need to make this friend to term, rather than public
       def chosen_terms(klass=nil)
-        ActiveSupport::OrderedHash[terms(klass).stable_select{|k,v|!v.value.nil?}]
+        ActiveSupport::OrderedHash[terms(klass).stable_select{|k,v|v.set?}]
+      end
+
+      def visible_terms(klass=nil)
+        ActiveSupport::OrderedHash[terms(klass).stable_select{|k,v|v.visible?}]
       end
 
       #Need to make this friend to term, rather than public
-
       def unset_terms(klass=nil)
-        ActiveSupport::OrderedHash[terms(klass).stable_select{|k,v|v.value.nil?}]
+        ActiveSupport::OrderedHash[terms(klass).stable_select{|k,v|!v.set?}]
       end
 
     end

@@ -40,6 +40,8 @@ module AMEE
 
       def construct(klass,options={},&block)
         new_content=klass.new(options.merge(:parent=>self),&block)
+        raise AMEE::DataAbstraction::Exceptions::DSL.new(
+          "Attempt to create #{klass} without a label") unless new_content.label
         @terms[new_content.label]=new_content
       end
 

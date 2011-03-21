@@ -2,29 +2,34 @@ require File.dirname(File.dirname(__FILE__)) + '/spec_helper.rb'
 def drill_mocks
      flexmock(AMEE::Data::DrillDown).
       should_receive(:get).
-      with(AMEE::DataAbstraction.connection,
+      with(connection,
       '/data/business/energy/electricity/grid/drill?').
-      and_return(flexmock(:choices=>[],:selections=>{'country'=>'Argentina'}))
+      and_return(flexmock(:choices=>['argentina','mexico'],:selections=>{}))
     flexmock(AMEE::Data::DrillDown).
       should_receive(:get).
-      with(AMEE::DataAbstraction.connection,
+      with(connection,
+      '/data/business/energy/electricity/grid/drill?country=argentina').
+      and_return(flexmock(:choices=>[],:selections=>{'country'=>'argentina'}))
+    flexmock(AMEE::Data::DrillDown).
+      should_receive(:get).
+      with(connection,
       '/data/transport/car/generic/drill?').
       and_return(flexmock(:choices=>['diesel','petrol'],:selections=>{}))
     flexmock(AMEE::Data::DrillDown).
       should_receive(:get).
-      with(AMEE::DataAbstraction.connection,
+      with(connection,
       '/data/transport/car/generic/drill?fuel=diesel').
       and_return(flexmock(:choices=>['large','small'],:selections=>{'fuel'=>'diesel'}))
     flexmock(AMEE::Data::DrillDown).
       should_receive(:get).
-      with(AMEE::DataAbstraction.connection,
+      with(connection,
       '/data/transport/car/generic/drill?fuel=diesel&size=large').
       and_return(flexmock(:choices=>[],
         :selections=>{'fuel'=>'diesel','size'=>'large'},
         :data_item_uid=>:somediuid
       ))
 end
-describe AMEE::DataAbstraction::Calculation do
+describe OngoingCalculation do
   it 'can return set and unset inputs' do
     d=Electricity.begin_calculation
     d.chosen_inputs.keys.should eql [:country]
@@ -57,16 +62,16 @@ describe AMEE::DataAbstraction::Calculation do
     d.chosen_inputs.values.map(&:value).should eql ['argentina']
     d.unset_inputs.values.map(&:value).should eql [nil]
 
-    d.choose!(:energy_used=>5)
+    d.choose!(:energy_used=>5.0)
 
-    d.chosen_inputs.values.map(&:value).should eql ['Argentina',5]
+    d.chosen_inputs.values.map(&:value).should eql ['argentina',5.0]
     d.unset_inputs.values.should be_empty
   end
   it 'knows when it is satisfied' do
     drill_mocks
     d=Electricity.begin_calculation
     d.satisfied?.should be_false
-    d.choose!(:energy_used=>5)
+    d.choose!(:energy_used=>5.0)
     d.satisfied?.should be_true
   end
   it 'knows which drills are set, and whether it is satisfied' do
@@ -95,10 +100,10 @@ describe AMEE::DataAbstraction::Calculation do
   it 'can do a calculation' do
     drill_mocks
     flexmock(AMEE::Profile::ProfileList).should_receive(:new).
-      with(AMEE::DataAbstraction.connection).
+      with(connection).
       and_return(flexmock(:first=>flexmock(:uid=>:somecatuid)))
     flexmock(AMEE::Profile::Category).should_receive(:get).
-      with(AMEE::DataAbstraction.connection,"/profiles/somecatuid/transport/car/generic").
+      with(connection,"/profiles/somecatuid/transport/car/generic").
       and_return(:somecategory)
     flexmock(UUIDTools::UUID).should_receive(:timestamp_create).
       and_return(:sometimestamp)
@@ -107,10 +112,10 @@ describe AMEE::DataAbstraction::Calculation do
       {:get_item=>false,:name=>:sometimestamp,'distance'=>5}).
       and_return(:somelocation)
     flexmock(AMEE::Profile::Item).should_receive(:get).
-      with(AMEE::DataAbstraction.connection,:somelocation,{}).
+      with(connection,:somelocation,{}).
       and_return(flexmock(:amounts=>flexmock(:find=>{:value=>:somenumber})))
     flexmock(AMEE::Profile::Item).should_receive(:delete).
-      with(AMEE::DataAbstraction.connection,:somelocation)
+      with(connection,:somelocation)
     mycalc=Transport.begin_calculation
     mycalc.choose!('fuel'=>'diesel','size'=>'large','distance'=>5)
     mycalc.calculate!

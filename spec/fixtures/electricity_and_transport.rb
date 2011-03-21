@@ -11,7 +11,7 @@ ElectricityAndTransport=AMEE::DataAbstraction::CalculationSet.new {
     drill {
       label :country
       path 'country'
-      value 'Argentina'
+      fixed 'Argentina'
     }
     output {
       label :co2

@@ -9,40 +9,50 @@ module AMEE
         raise NotImplementedError
       end
 
+      attr_property :validation
 
       #DSL-----
       def fixed val
-        value val
+        @value= val
         @fixed=true
       end
       #------
+
+      def value(*args)
+        unless args.empty?
+          raise Exceptions::FixedValueInterference if fixed?&&args.first!=@value
+          @value=args.first
+        end
+        return @value
+      end
 
       def fixed?
         @fixed
       end
 
+      def validate!
+        #Typically, you just wipe yourself if supplied value not valid, but
+        #deriving classes might want to raise an exception
+        value nil unless fixed? || valid?
+      end
+
       def disabled?
-        fixed?
-      end
-
-      def next?
-        label==unset_siblings.values.first.label
-      end
-
-      def drop_down?
-        false
+        super || fixed?
       end
 
       protected
 
-      def valid_choice?
-        raise NotImplementedError
+      def valid?
+        validation.blank? || validation === value
       end
 
-      def calculation_with_only_earlier
+      # If this clone turns out to be nonperformant, then we can refactor
+      # by making retreat temporarily effect the calculation,
+      # giving the calculation a progress_to label.
+      def with_only_earlier(meth)
         res=parent.clone
         res.retreat!(self.label)
-        return res
+        return res.send(meth)
       end
 
     end

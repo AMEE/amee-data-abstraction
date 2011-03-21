@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.email = "help@amee.com"
   s.homepage = "http://github.com/AMEE/data-abstraction"
   s.has_rdoc = true
-  s.authors = ["James Smith"]
+  s.authors = ["James Hetherington"]
   s.files = ["README", "COPYING", "CHANGELOG"]
   s.files += FileList.new('lib/**/*.rb')
   s.files += ['init.rb', 'rails/init.rb', 'app/views/data-abstraction/_calculator_form.erb']
