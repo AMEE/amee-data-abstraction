@@ -1,7 +1,5 @@
 require File.dirname(File.dirname(__FILE__)) + '/spec_helper.rb'
 
-
-
 describe Input do
  it 'can be given a fixed value' do
    i=Input.new{fixed 6}
@@ -20,5 +18,14 @@ describe Input do
    j=Input.new{}
    j.value 'marking'
    j.value.should eql 'marking'
+ end
+ it 'is always valid if it is fixed' do
+   i=Input.new{fixed 5; validation /7/}
+   i.validate!
+   i.value.should eql 5
+ end
+ it 'is always disabled if it is fixed' do
+   i=Input.new{fixed 5}
+   i.disabled?.should eql true
  end
 end
