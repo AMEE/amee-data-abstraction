@@ -7,27 +7,27 @@ module AMEE
 
 
       def unset_inputs
-        unset_terms AMEE::DataAbstraction::Input
+        unset_terms Input
       end
 
       def chosen_inputs
-        chosen_terms AMEE::DataAbstraction::Input
+        chosen_terms Input
       end
 
       def unset_outputs
-        unset_terms AMEE::DataAbstraction::Output
+        unset_terms Output
       end
 
       def chosen_outputs
-        chosen_terms AMEE::DataAbstraction::Output
+        chosen_terms Output
       end
 
       def visible_inputs
-        visible_terms AMEE::DataAbstraction::Input
+        visible_terms Input
       end
 	 		 	
       def visible_outputs	 	
-        visible_terms AMEE::DataAbstraction::Output
+        visible_terms Output
       end
 
 
