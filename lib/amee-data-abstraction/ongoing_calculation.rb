@@ -22,6 +22,15 @@ module AMEE
         chosen_terms AMEE::DataAbstraction::Output
       end
 
+      def visible_inputs
+        visible_terms AMEE::DataAbstraction::Input
+      end
+	 		 	
+      def visible_outputs	 	
+        visible_terms AMEE::DataAbstraction::Output
+      end
+
+
       def choose!(choice)
         
         choice.each do |k,v|
