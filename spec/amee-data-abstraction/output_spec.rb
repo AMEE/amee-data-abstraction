@@ -1,8 +1,10 @@
 require File.dirname(File.dirname(__FILE__)) + '/spec_helper.rb'
 
-describe Profile do
- it 'defaults to be a text-box' do
-   i=Profile.new
-   i.text_box?.should be_true
- end
+describe Output do
+  it 'is visible only if it is set' do
+    x=Output.new
+    x.visible?.should be_false
+    x.value 5
+    x.visible?.should be_true
+  end
 end
