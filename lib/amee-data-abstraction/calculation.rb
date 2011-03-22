@@ -5,26 +5,20 @@ module AMEE
       public
       
       attr_property :label,:name,:path
+      
+      def terms
+        TermsList.new(@contents.values)
+      end
+
+      attr_accessor :contents
 
       def [](sym)
-        @terms[sym.to_sym]
+        @contents[sym.to_sym]
       end
 
-      def inputs
-        terms Input
-      end
-
-      
-      def outputs
-        terms Output
-      end
-
-      def after(label,klass=nil)
-        ActiveSupport::OrderedHash[terms(klass).stable_select{|k,v|v.after?(label)}]
-      end
-
-      def before(label,klass=nil)
-        ActiveSupport::OrderedHash[terms(klass).stable_select{|k,v|v.before?(label)}]
+      #Sugar to allow, e.g. mycalc.drills
+      TermsList::Selectors.each do |sel|
+        delegate sel,:to=>:terms
       end
 
       def inspect
@@ -33,42 +27,30 @@ module AMEE
 
       def initialize_copy(source)
         super
-        @terms=ActiveSupport::OrderedHash.new
-        source.terms.each do |k,v|
-          @terms[k]=v.clone
-          @terms[k].parent=self
+        @contents=ActiveSupport::OrderedHash.new
+        source.contents.each do |k,v|
+          @contents[k]=v.clone
+          @contents[k].parent=self
         end
       end
 
-      def terms(klass=nil)
-        return @terms unless klass
-        ActiveSupport::OrderedHash[@terms.stable_select{|k,v| v.is_a? klass}]
-      end
+      
 
       protected
 
       def initialize
-        @terms=ActiveSupport::OrderedHash.new
+        @contents=ActiveSupport::OrderedHash.new
       end
 
       private
 
       def by_path(path)
-        @terms.values.detect { |v| v.path==path }
+        terms.detect { |v| v.path==path }
       end
 
       def drill_by_path(path)
-        drills.values.detect { |v| v.path==path }
+        drills.detect { |v| v.path==path }
       end
-
-      def profiles
-        terms Profile
-      end
-
-      def drills
-        terms Drill
-      end
-
 
     end
   end

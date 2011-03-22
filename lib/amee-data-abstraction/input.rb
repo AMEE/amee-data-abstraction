@@ -46,15 +46,6 @@ module AMEE
         validation.blank? || validation === value
       end
 
-      # If this clone turns out to be nonperformant, then we can refactor
-      # by making retreat temporarily effect the calculation,
-      # giving the calculation a progress_to label.
-      def with_only_earlier(meth)
-        res=parent.clone
-        res.retreat!(self.label)
-        return res.send(meth)
-      end
-
     end
   end
 end

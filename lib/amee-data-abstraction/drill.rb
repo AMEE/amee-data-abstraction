@@ -23,9 +23,7 @@ module AMEE
       end
       
       def choices
-        raise Exceptions::EntryOrderException unless \
-          parent.before(label,Drill).values.all?{|x|x.set?}
-        c=with_only_earlier(:amee_drill).choices
+        c=parent.amee_drill(:before=>label).choices
         c.length==1 ? [value] : c #Intention is to get autodrilled, drill will result in a UID
       end
 

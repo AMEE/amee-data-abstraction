@@ -5,20 +5,20 @@ describe Calculation do
     Transport.should be_a Calculation
   end
   it 'should have ordered terms, with labels' do
-    Transport.terms.values.map(&:label).should eql [:fuel,:size,:distance,:co2]
+    Transport.terms.labels.should eql [:fuel,:size,:distance,:co2]
   end
   it 'should have amee paths for the terms' do
-    Transport.terms.values.map(&:path).should eql ['fuel','size','distance',:default]
+    Transport.terms.paths.should eql ['fuel','size','distance',:default]
   end
   it 'should have human names for the terms' do
-    Transport.terms.values.map(&:name).
+    Transport.terms.names.
       should eql ['Fuel Type','Vehicle Size','Distance Driven','Carbon Dioxide']
   end
   it 'should return the inputs' do
-    Transport.inputs.values.map(&:label).should  eql [:fuel,:size,:distance]
+    Transport.inputs.labels.should  eql [:fuel,:size,:distance]
   end
   it 'should return the outputs' do
-    Transport.outputs.values.map(&:label).should  eql [:co2]
+    Transport.outputs.labels.should  eql [:co2]
   end
   it 'can return a term via []' do
     Transport[:co2].label.should eql :co2
@@ -30,11 +30,13 @@ describe Calculation do
     Transport[:co2].value.should be_nil
   end
   it 'knows to get terms that come before or after others' do
-
-    Transport.before(:distance).values.map(&:label).
+    Transport.before(:distance).labels.
       should eql [:fuel,:size]
-    Transport.after(:distance).values.map(&:label).
+    Transport.after(:distance).map(&:label).
       should eql [:co2]
+  end
+  it 'delegates selectors to terms list' do
+    Transport.drills.labels.should eql [:fuel,:size]
   end
 end
 

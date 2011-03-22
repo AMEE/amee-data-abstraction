@@ -84,11 +84,11 @@ module AMEE
       end
 
       def before?(lab)
-         parent.terms.keys.to_a.index(lab)>parent.terms.keys.to_a.index(label)
+         parent.terms.labels.index(lab)>parent.terms.labels.index(label)
       end
 
       def after?(lab)
-        parent.terms.keys.to_a.index(lab)<parent.terms.keys.to_a.index(label)
+        parent.terms.labels.index(lab)<parent.terms.labels.index(label)
       end
       
     end

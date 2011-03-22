@@ -5,8 +5,4 @@ describe Drill do
     drill_mocks
     Transport.begin_calculation[:fuel].options_for_select.should eql [nil,'diesel','petrol']
   end
-  it 'cannot find out its choices if earlier drills are not set' do
-    drill_mocks
-    lambda{Transport.begin_calculation[:size].options_for_select}.should raise_error Exceptions::EntryOrderException
-  end
 end

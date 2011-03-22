@@ -77,10 +77,10 @@ describe Term do
     t.hidden?.should be_false
   end
   it 'knows which terms come before or after it' do
-    Transport.terms.values.
+    Transport.terms.
       select{|x|x.before?(:distance)}.map(&:label).
       should eql [:fuel,:size]
-    Transport.terms.values.
+    Transport.terms.
       select{|x|x.after?(:distance)}.map(&:label).
       should eql [:co2]
   end

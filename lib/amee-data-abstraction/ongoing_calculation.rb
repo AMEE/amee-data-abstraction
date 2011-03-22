@@ -4,33 +4,6 @@ module AMEE
 
       public
 
-
-
-      def unset_inputs
-        unset_terms Input
-      end
-
-      def chosen_inputs
-        chosen_terms Input
-      end
-
-      def unset_outputs
-        unset_terms Output
-      end
-
-      def chosen_outputs
-        chosen_terms Output
-      end
-
-      def visible_inputs
-        visible_terms Input
-      end
-	 		 	
-      def visible_outputs	 	
-        visible_terms Output
-      end
-
-
       def choose!(choice)
         
         choice.each do |k,v|
@@ -38,7 +11,7 @@ module AMEE
         end
 
         #Clear out any invalid choices
-        inputs.each_value do |d|
+        inputs.each do |d|
           d.validate! # Up to each kind of quantity to decide whether to unset itself
           # or raise an exception, if it is invalid.
           # Typical behaviour is to simply set one's value to zero.
@@ -55,7 +28,7 @@ module AMEE
           profile_options.merge(:get_item=>false,:name=>UUIDTools::UUID.timestamp_create))
         item=AMEE::Profile::Item.get(connection, location, get_options)
         # Extract default result
-        unset_terms(Output).values.each do |output|
+        outputs.unset.each do |output|
           res=nil
           if output.path==:default
             res= item.amounts.find{|x| x[:default] == true}
@@ -73,7 +46,7 @@ module AMEE
       end
 
       def satisfied?
-        unset_terms(Input).values.empty?
+        inputs.unset.empty?
       end
 
       # Friend constructor for PrototypeCalculation ONLY
@@ -83,16 +56,15 @@ module AMEE
 
       private
 
-      def drill_options
-        fu=unset_terms(Drill).values.first
-        raise Exceptions::OrderEntryException unless \
-          after(fu.label,Drill).values.all?{|x|x.unset?} if fu
-        chosen_terms(Drill).values.map{|x| "#{CGI.escape(x.path)}=#{CGI.escape(x.value)}"}.join("&")
+      def drill_options(options={})
+        to=options.delete(:before)
+        drills_to_use=to ? drills.before(to).set : drills.set
+        drills_to_use.map{|x| "#{CGI.escape(x.path)}=#{CGI.escape(x.value)}"}.join("&")
       end
 
       def profile_options
         result={}
-        chosen_terms(Profile).values.each do |piv|
+        profiles.set.each do |piv|
           result[piv.path]=piv.value
         end
         return result
@@ -129,28 +101,8 @@ module AMEE
       #'friend' gem https://github.com/lsegal/friend
       #Isn't working.
 
-      def amee_drill
-        AMEE::Data::DrillDown.get(connection,"/data#{path}/drill?#{drill_options}")
-      end
-
-      #Friend for drill term, move to private.
-      def retreat!(label)
-        inputs.values.select{|x| x.after? label}.each{|x| x.value nil}
-        inputs[label].value nil
-      end
-
-      #Need to make this friend to term, rather than public
-      def chosen_terms(klass=nil)
-        ActiveSupport::OrderedHash[terms(klass).stable_select{|k,v|v.set?}]
-      end
-
-      def visible_terms(klass=nil)
-        ActiveSupport::OrderedHash[terms(klass).stable_select{|k,v|v.visible?}]
-      end
-
-      #Need to make this friend to term, rather than public
-      def unset_terms(klass=nil)
-        ActiveSupport::OrderedHash[terms(klass).stable_select{|k,v|!v.set?}]
+      def amee_drill(options={})
+        AMEE::Data::DrillDown.get(connection,"/data#{path}/drill?#{drill_options(options)}")
       end
 
     end

@@ -25,9 +25,9 @@ module AMEE
 
       def begin_calculation
         result=OngoingCalculation.new
-        terms.each do |k,v|
-          result.terms[k]=v.clone
-          result.terms[k].parent=result
+        contents.each do |k,v|
+          result.contents[k]=v.clone
+          result.contents[k].parent=result
         end
         result.path path
         result.name name
@@ -42,7 +42,7 @@ module AMEE
         new_content=klass.new(options.merge(:parent=>self),&block)
         raise Exceptions::DSL.new(
           "Attempt to create #{klass} without a label") unless new_content.label
-        @terms[new_content.label]=new_content
+        @contents[new_content.label]=new_content
       end
 
     end
