@@ -20,32 +20,24 @@ end
 include AMEE::DataAbstraction
 
 def drill_mocks
-  flexmock(AMEE::Data::DrillDown).
+  mocks={
+    'business/energy/electricity/grid'=> [
+      [[],['argentina','mexico']],
+      [[['country','argentina']],[]]
+    ],
+    'transport/car/generic'=> [
+      [{},['diesel','petrol']],
+      [[['fuel','diesel']],['large','small']],
+      [[['fuel','diesel'],['size','large']],[],:somediuid]
+    ]}
+  mocks.each do |path,struct|
+    struct.each do |selections,choices,uid|
+ 
+      flexmock(AMEE::Data::DrillDown).
     should_receive(:get).
     with(connection,
-    '/data/business/energy/electricity/grid/drill?').
-    and_return(flexmock(:choices=>['argentina','mexico'],:selections=>{}))
-  flexmock(AMEE::Data::DrillDown).
-    should_receive(:get).
-    with(connection,
-    '/data/business/energy/electricity/grid/drill?country=argentina').
-    and_return(flexmock(:choices=>[],:selections=>{'country'=>'argentina'}))
-  flexmock(AMEE::Data::DrillDown).
-    should_receive(:get).
-    with(connection,
-    '/data/transport/car/generic/drill?').
-    and_return(flexmock(:choices=>['diesel','petrol'],:selections=>{}))
-  flexmock(AMEE::Data::DrillDown).
-    should_receive(:get).
-    with(connection,
-    '/data/transport/car/generic/drill?fuel=diesel').
-    and_return(flexmock(:choices=>['large','small'],:selections=>{'fuel'=>'diesel'}))
-  flexmock(AMEE::Data::DrillDown).
-    should_receive(:get).
-    with(connection,
-    '/data/transport/car/generic/drill?fuel=diesel&size=large').
-    and_return(flexmock(:choices=>[],
-      :selections=>{'fuel'=>'diesel','size'=>'large'},
-      :data_item_uid=>:somediuid
-    ))
+    "/data/#{path}/drill?#{selections.map{|k,v|"#{k}=#{v}"}.join('&')}").
+    and_return(flexmock(:choices=>choices,:selections=>Hash[selections],:data_item_uid=>uid))
+    end
+  end
 end
