@@ -19,7 +19,7 @@ end
 
 include AMEE::DataAbstraction
 
-def drill_mocks
+def mocks
   mocks={
     'business/energy/electricity/grid'=> [
       [[],['argentina','mexico']],
@@ -28,16 +28,37 @@ def drill_mocks
     'transport/car/generic'=> [
       [{},['diesel','petrol']],
       [[['fuel','diesel']],['large','small']],
-      [[['fuel','diesel'],['size','large']],[],:somediuid]
+      [[['fuel','diesel'],['size','large']],[]]
     ]}
   mocks.each do |path,struct|
-    struct.each do |selections,choices,uid|
- 
+    catuid=path.gsub(/\//,',').to_sym
+    flexmock(AMEE::Profile::Category).should_receive(:get).
+      with(connection,"/profiles/someprofileuid/#{path}").
+      and_return(catuid)
+    struct.each do |selections,choices|
+      dataitemuid="#{catuid},#{selections.map{|k,v|"#{k}=#{v}"}.join(',')}"
+      piuid=dataitemuid+"PI"
       flexmock(AMEE::Data::DrillDown).
-    should_receive(:get).
-    with(connection,
-    "/data/#{path}/drill?#{selections.map{|k,v|"#{k}=#{v}"}.join('&')}").
-    and_return(flexmock(:choices=>choices,:selections=>Hash[selections],:data_item_uid=>uid))
+        should_receive(:get).
+        with(connection,
+        "/data/#{path}/drill?#{selections.map{|k,v|"#{k}=#{v}"}.join('&')}").
+        and_return(flexmock(:choices=>choices,:selections=>Hash[selections],
+          :data_item_uid=>dataitemuid))
+      flexmock(AMEE::Profile::Item).should_receive(:create).
+        with(catuid,dataitemuid,
+        {:get_item=>false,:name=>:sometimestamp,'distance'=>5}).
+        and_return(piuid)
+      flexmock(AMEE::Profile::Item).should_receive(:get).
+        with(connection,piuid,{}).
+        and_return(flexmock(:amounts=>flexmock(:find=>{:value=>:somenumber})))
+      flexmock(AMEE::Profile::Item).should_receive(:delete).
+        with(connection,piuid)
     end
   end
+  flexmock(AMEE::Profile::ProfileList).should_receive(:new).
+    with(connection).
+    and_return(flexmock(:first=>flexmock(:uid=>:someprofileuid)))
+  flexmock(UUIDTools::UUID).should_receive(:timestamp_create).
+    and_return(:sometimestamp)
+  
 end

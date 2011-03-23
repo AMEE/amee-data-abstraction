@@ -26,7 +26,7 @@ describe OngoingCalculation do
     d.outputs.unset.labels.should eql []
   end
   it 'can have values chosen' do
-    drill_mocks
+    mocks
     
     d=Electricity.begin_calculation
 
@@ -39,14 +39,14 @@ describe OngoingCalculation do
     d.inputs.unset.values.should be_empty
   end
   it 'knows when it is satisfied' do
-    drill_mocks
+    mocks
     d=Electricity.begin_calculation
     d.satisfied?.should be_false
     d.choose!(:energy_used=>5.0)
     d.satisfied?.should be_true
   end
   it 'knows which drills are set, and whether it is satisfied' do
-    drill_mocks
+    mocks
     t=Transport.begin_calculation
     t.terms.labels.should eql [:fuel,:size,:distance,:co2]
     t.satisfied?.should be_false
@@ -69,24 +69,7 @@ describe OngoingCalculation do
     t3.satisfied?.should be_true
   end
   it 'can do a calculation' do
-    drill_mocks
-    flexmock(AMEE::Profile::ProfileList).should_receive(:new).
-      with(connection).
-      and_return(flexmock(:first=>flexmock(:uid=>:somecatuid)))
-    flexmock(AMEE::Profile::Category).should_receive(:get).
-      with(connection,"/profiles/somecatuid/transport/car/generic").
-      and_return(:somecategory)
-    flexmock(UUIDTools::UUID).should_receive(:timestamp_create).
-      and_return(:sometimestamp)
-    flexmock(AMEE::Profile::Item).should_receive(:create).
-      with(:somecategory,:somediuid,
-      {:get_item=>false,:name=>:sometimestamp,'distance'=>5}).
-      and_return(:somelocation)
-    flexmock(AMEE::Profile::Item).should_receive(:get).
-      with(connection,:somelocation,{}).
-      and_return(flexmock(:amounts=>flexmock(:find=>{:value=>:somenumber})))
-    flexmock(AMEE::Profile::Item).should_receive(:delete).
-      with(connection,:somelocation)
+    mocks
     mycalc=Transport.begin_calculation
     mycalc.choose!('fuel'=>'diesel','size'=>'large','distance'=>5)
     mycalc.calculate!

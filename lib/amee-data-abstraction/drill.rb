@@ -27,6 +27,10 @@ module AMEE
         c.length==1 ? [value] : c #Intention is to get autodrilled, drill will result in a UID
       end
 
+      def next?
+        unset? && parent.drills.before(label).all?(&:set?)
+      end
+
     end
   end
 end
