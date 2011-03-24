@@ -17,7 +17,7 @@ Electricity=AMEE::DataAbstraction::PrototypeCalculation.new { # The application 
     name "Energy Used" #The display name used on the form
     unit "kWh" #Default unit choice
     interface :text_box #Probably not needed, as likely to be the default for profile item value unsets
-    validation lambda{|x|x.is_a? Float} #Probably not needed, as default can be deduced from PIV TYPE in API. Here as illustrative of potential override Can be a symbol for standard validation or regexp
+    validation lambda{|x|x.is_a? Float} #Probably not needed, as default can be deduced from PIV TYPE in API. Here as illustrative.
     other_acceptable_units :any #A dropdown should appear allowing choice of energy unit - without this line only kWh allowed
   }
   

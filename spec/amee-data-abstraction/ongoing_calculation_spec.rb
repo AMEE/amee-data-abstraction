@@ -1,5 +1,14 @@
 require File.dirname(File.dirname(__FILE__)) + '/spec_helper.rb'
-
+ocks={
+    'business/energy/electricity/grid'=> [
+      [[],['argentina','mexico']],
+      [[['country','argentina']],[]]
+    ],
+    'transport/car/generic'=> [
+      [{},['diesel','petrol']],
+      [[['fuel','diesel']],['large','small']],
+      [[['fuel','diesel'],['size','large']],[],[[{'distance'=>5},:somenumber]]]
+    ]}
 describe OngoingCalculation do
   it 'can return set and unset inputs' do
     d=Electricity.begin_calculation
@@ -26,7 +35,10 @@ describe OngoingCalculation do
     d.outputs.unset.labels.should eql []
   end
   it 'can have values chosen' do
-    mocks
+    mock_amee(
+    'business/energy/electricity/grid'=> [    
+      [[['country','argentina']],[]]
+    ])
     
     d=Electricity.begin_calculation
 
@@ -39,14 +51,22 @@ describe OngoingCalculation do
     d.inputs.unset.values.should be_empty
   end
   it 'knows when it is satisfied' do
-    mocks
+    mock_amee(
+    'business/energy/electricity/grid'=> [
+      [[['country','argentina']],[]]
+    ])
     d=Electricity.begin_calculation
     d.satisfied?.should be_false
     d.choose!(:energy_used=>5.0)
     d.satisfied?.should be_true
   end
   it 'knows which drills are set, and whether it is satisfied' do
-    mocks
+    mock_amee(   
+    'transport/car/generic'=> [
+      [{},['diesel','petrol']],
+      [[['fuel','diesel']],['large','small']],
+      [[['fuel','diesel'],['size','large']],[]]
+    ])
     t=Transport.begin_calculation
     t.terms.labels.should eql [:fuel,:size,:distance,:co2]
     t.satisfied?.should be_false
@@ -69,11 +89,26 @@ describe OngoingCalculation do
     t3.satisfied?.should be_true
   end
   it 'can do a calculation' do
-    mocks
+    mock_amee(
+    'transport/car/generic'=> [
+      [{},['diesel','petrol']],
+      [[['fuel','diesel']],['large','small']],
+      [[['fuel','diesel'],['size','large']],[],[[{'distance'=>5},:somenumber]]]
+    ])
     mycalc=Transport.begin_calculation
     mycalc.choose!('fuel'=>'diesel','size'=>'large','distance'=>5)
     mycalc.calculate!
     mycalc.outputs.first.value.should eql :somenumber
+  end
+  it 'can respond appropriately to inconsistent drills' do
+    mock_amee(
+    'transport/car/generic'=> [
+      [{},['diesel','petrol']],
+      [[['fuel','diesel']],['large','small']]
+    ])
+    mycalc=Transport.begin_calculation
+    mycalc.choose!('fuel'=>'diesel','size'=>'banana','distance'=>5)
+    mycalc.drills.values.should eql ['diesel',nil]
   end
 end
 
