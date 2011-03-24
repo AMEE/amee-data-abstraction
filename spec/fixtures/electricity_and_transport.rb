@@ -1,4 +1,11 @@
 ElectricityAndTransport=AMEE::DataAbstraction::CalculationSet.new {
+  all_calculations {
+    metadatum {
+      label :department
+      choices %w{stuff things more_stuff meta_things}
+    }
+  }
+
   calculation{
     name 'electricity'
     label :electricity

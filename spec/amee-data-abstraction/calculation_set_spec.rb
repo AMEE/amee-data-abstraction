@@ -20,4 +20,16 @@ describe CalculationSet do
     CalculationSet.new {call_me}
     CalculationSet.called.should be_true
   end
+  it 'can have terms added to all calculations' do
+    cs=CalculationSet.new {
+      all_calculations {
+        drill {label :energetic}
+      }
+      calculation {
+        label :mycalc
+        drill {label :remarkably}
+      }
+    }
+    cs[:mycalc].drills.labels.should eql [:remarkably,:energetic]
+  end
 end

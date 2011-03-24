@@ -110,5 +110,22 @@ describe OngoingCalculation do
     mycalc.choose!('fuel'=>'diesel','size'=>'banana','distance'=>5)
     mycalc.drills.values.should eql ['diesel',nil]
   end
+  it 'does not send general metadata to AMEE' do
+    mock_amee(
+    'transport/car/generic'=> [
+      [{},['diesel','petrol']],
+      [[['fuel','diesel']],['large','small']],
+      [[['fuel','diesel'],['size','large']],[],[[{'distance'=>5},:somenumber]]]
+    ])
+    mycalc=ElectricityAndTransport[:transport].begin_calculation
+    mycalc.choose!('fuel'=>'diesel','size'=>'large','distance'=>5,'department'=>'stuff')
+    mycalc.calculate!
+    mycalc.outputs.first.value.should eql :somenumber
+  end
+  it 'raises exception if choice supplied for invalid term' do
+    mycalc=Transport.begin_calculation
+    lambda{mycalc.choose!('fuel'=>'diesel','banana'=>'large','distance'=>5)}.
+    should raise_exception Exceptions::NoSuchTerm   
+  end
 end
 
