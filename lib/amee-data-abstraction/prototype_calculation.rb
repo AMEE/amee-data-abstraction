@@ -20,6 +20,9 @@ module AMEE
       def output(options={},&block)
         construct(Output,options,&block)
       end
+      def metadatum(options={},&block)
+        construct(Metadatum,options,&block)
+      end
 
       #--------------------
 

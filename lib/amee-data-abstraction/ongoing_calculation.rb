@@ -5,8 +5,11 @@ module AMEE
       public
 
       def choose!(choice)
-        
+        self.profile_uid= choice.delete(:profile_uid)
+        self.profile_item_uid= choice.delete(:profile_item)
+
         choice.each do |k,v|
+          raise Exceptions::NoSuchTerm.new(k) unless self[k]
           self[k].value v unless v.blank?
         end
 
@@ -17,36 +20,11 @@ module AMEE
           # Typical behaviour is to simply set one's value to zero.
         end
        
-        autodrill!    
+        autodrill
       end
 
-      def calculate!(profile=nil)
-        return unless satisfied?
-        profile ||= AMEE::Profile::ProfileList.new(connection).first
-        profile ||= AMEE::Profile::Profile.create(connection)
-        location = AMEE::Profile::Item.create(profile_category(profile),amee_drill.data_item_uid,
-          profile_options.merge(:get_item=>false,:name=>UUIDTools::UUID.timestamp_create))
-        item=AMEE::Profile::Item.get(connection, location, get_options)
-        # Extract default result
-        outputs.unset.each do |output|
-          res=nil
-          if output.path==:default
-            res= item.amounts.find{|x| x[:default] == true}
-          else
-            res= item.amounts.find{|x| x[:type] == output.path}
-          end
-          output.value res[:value] if res
-        end
-        return self
-      ensure
-        # Tidy up
-        if location
-          AMEE::Profile::Item.delete(connection,location)
-        end
-      end
-
-      def satisfied?
-        inputs.unset.empty?
+      def calculate!
+        syncronize_with_amee
       end
 
       # Friend constructor for PrototypeCalculation ONLY
@@ -54,7 +32,60 @@ module AMEE
         super
       end
 
+      def satisfied?
+        inputs.unset.empty?
+      end
+
+
       private
+
+      def load_outputs
+        outputs.each do |output|
+          res=nil
+          if output.path==:default
+            res= profile_item.amounts.find{|x| x[:default] == true}
+          else
+            res= profile_item.amounts.find{|x| x[:type] == output.path}
+          end
+          output.value res[:value] if res
+        end
+      end
+
+      def load_metadata
+        # Load any metadata stored in the AMEE profile which can be used to
+        # set the metadata for this calculation
+      end
+
+      def load_profile_item_values
+        # For any unset profile item values, load the corresponding values from
+        # amee
+      end
+
+      def set_profile_item_values
+        # Set the profile item values for the profile item.
+      end
+
+      def syncronize_with_amee
+        if drilled?
+          load_profile_item_values
+          load_metadata
+        end
+        if satisfied?
+          load_outputs
+        end
+      ensure
+        # Tidy up
+        if profile_item_uid
+          AMEE::Profile::Item.delete(connection,profile_item_uid)
+        end
+      end
+
+      attr_accessor :profile_uid,:profile_item_uid
+
+      
+      def drilled?
+        drills.unset.empty?
+      end
 
       def drill_options(options={})
         to=options.delete(:before)
@@ -76,7 +107,31 @@ module AMEE
         #getopts[:returnPerUnit] = params[:perUnit] if params[:perUnit]
         return {}
       end
-      
+
+      def profile
+        # Return the AMEE::Profile::Profile to which the PI for this calculation
+        # belongs.
+        prof = AMEE::Profile::Profile.load(profile_uid) if profile_uid
+        prof ||= AMEE::Profile::ProfileList.new(connection).first
+        prof ||= AMEE::Profile::Profile.create(connection)
+        return prof
+      end
+
+      def amee_name
+        #Generate a unique name for the profile item.
+        #Later, by interrogating metadata according to specifications of
+        #Organisational model.
+        UUIDTools::UUID.timestamp_create
+      end
+
+      def profile_item
+        unless profile_item_uid
+          self.profile_item_uid = AMEE::Profile::Item.create(profile_category(profile),
+            amee_drill.data_item_uid,
+            profile_options.merge(:get_item=>false,:name=>amee_name))
+        end
+        AMEE::Profile::Item.get(connection, profile_item_uid, get_options)
+      end
       
       def profile_category(profile)
         AMEE::Profile::Category.get(connection, "/profiles/#{profile.uid}#{path}")
@@ -86,7 +141,7 @@ module AMEE
         AMEE::DataAbstraction.connection
       end
 
-      def autodrill!
+      def autodrill
         #Sometimes when a bunch of drills are specified,
         #this is enough to specify values for some more of them
         # list drills given in params, merged with values autopicked by amee driller

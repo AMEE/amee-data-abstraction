@@ -3,10 +3,6 @@ module AMEE
     class Drill < Input
       public
 
-      def options_for_select
-        [nil]+choices
-      end
-
       def disabled?
         super || (!set? && !next?)
       end

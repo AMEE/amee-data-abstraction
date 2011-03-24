@@ -6,7 +6,7 @@ module AMEE
       end
 
       def options_for_select
-        raise NotImplementedError
+        [nil]+choices
       end
 
       attr_property :validation

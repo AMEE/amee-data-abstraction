@@ -1,7 +1,7 @@
 module AMEE
   module DataAbstraction
     class TermsList < Array
-      TermClasses= [:profiles,:drills,:inputs,:outputs]
+      TermClasses= [:profiles,:drills,:inputs,:outputs,:metadata]
       TermClasses.each do |term|
         define_method(term) do
           TermsList.new select{|x|x.is_a? term.to_s.singularize.classify.constantize}

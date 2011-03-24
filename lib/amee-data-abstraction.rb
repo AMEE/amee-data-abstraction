@@ -16,6 +16,7 @@ require File.dirname(__FILE__) + '/amee-data-abstraction/input'
 require File.dirname(__FILE__) + '/amee-data-abstraction/drill'
 require File.dirname(__FILE__) + '/amee-data-abstraction/profile'
 require File.dirname(__FILE__) + '/amee-data-abstraction/output'
+require File.dirname(__FILE__) + '/amee-data-abstraction/metadatum'
 
 module AMEE::DataAbstraction
   mattr_accessor :connection
