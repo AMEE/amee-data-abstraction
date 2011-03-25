@@ -191,5 +191,56 @@ describe OngoingCalculation do
     mycalc.calculate!
     mycalc[:distance].value.should eql 9
   end
+  it 'can be calculated, then recalculated, loading from AMEE the second time' do
+    mocker=AMEEMocker.new(self,:path=>'transport/car/generic',
+      :selections=>[],
+      :choices=>['diesel','petrol'],
+      :result=>:somenumber,
+      :params=>{'distance'=>5})
+    mocker.drill
+    mocker.select('fuel'=>'diesel')
+    mocker.choices=['large','small']
+    mocker.drill
+    mocker.select('size'=>'large')
+    mocker.choices=[]
+    mocker.drill
+    mocker.profile_list.profile_category.timestamp.create
+   
+    mocker.existing={'distance'=>5}
+    mocker.params={'distance'=>9}
+    mocker.update.get(true)
+
+    mycalc=Transport.begin_calculation
+    mycalc.choose!('fuel'=>'diesel','size'=>'large','distance'=>5)
+    mycalc.calculate!
+    mycalc.choose!('fuel'=>'diesel','size'=>'large','distance'=>9)
+    mycalc.calculate!
+    mycalc[:distance].value.should eql 9
+  end
+  it 'can be calculated, then change drill, recreating the second time' do
+    mocker=AMEEMocker.new(self,:path=>'transport/car/generic',
+      :selections=>[],
+      :choices=>['diesel','petrol'],
+      :result=>:somenumber,
+      :params=>{'distance'=>5})
+    mocker.drill
+    mocker.select('fuel'=>'diesel')
+    mocker.choices=['large','small']
+    mocker.drill
+    mocker.select('size'=>'large')
+    mocker.choices=[]
+    mocker.drill
+    mocker.profile_list.profile_category.timestamp.create.get(true,true).delete
+
+    mocker.selections=[['fuel','diesel'],['size','small']]
+    mocker.drill.create.get
+
+    mycalc=Transport.begin_calculation
+    mycalc.choose!('fuel'=>'diesel','size'=>'large','distance'=>5)
+    mycalc.calculate!
+    mycalc.choose!('fuel'=>'diesel','size'=>'small')
+    mycalc.calculate!
+    mycalc[:distance].value.should eql 5
+  end
 end
 
