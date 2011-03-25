@@ -72,27 +72,30 @@ def mock_existing_amee(mocks)
     with(connection).
     at_least.once.
     and_return(flexmock(:first=>flexmock(:uid=>:someprofileuid)))
-  flexmock(UUIDTools::UUID).should_receive(:timestamp_create).at_least.once.
-    and_return(:sometimestamp)
   mocks.each do |path,struct1|
     struct1.each do |uid,struct|
       selections=struct.first
       pivs=struct[1]
       result=struct[2]
+      failing=(struct.last==:failing) if struct.length>3
       catuid=path.gsub(/\//,'-').to_sym
       dataitemuid="#{catuid}:#{selections.map{|k,v|"#{k}-#{v}"}.join('-')}"
       pipath="/profiles/someprofileuid/#{path}/#{uid}"
       dipath="/data/#{path}/#{dataitemuid}"
       flexmock(AMEE::Profile::Item).should_receive(:update).
         with(connection,pipath,
-        {:get_item=>false,:name=>:sometimestamp}.merge(pivs)).
-        at_least.once
+        {:get_item=>false}.merge(pivs)).
+        at_least.once unless failing
       mock_pi=flexmock(
         :amounts=>flexmock(:find=>{:value=>result}),
         :data_item_uid=>dataitemuid
       )
       pivs.each do |k,v|
-        mock_pi.should_receive(:value).with(k).and_return(v).once
+        if failing
+          mock_pi.should_receive(:value).with(k).and_return(v)
+        else
+          mock_pi.should_receive(:value).with(k).and_return(v).once
+        end
       end
       flexmock(AMEE::Profile::Item).should_receive(:get).
         with(connection,pipath,{}).
@@ -100,7 +103,11 @@ def mock_existing_amee(mocks)
         and_return(mock_pi)
       mock_di=flexmock
       selections.each do |k,v|
-        mock_di.should_receive(:value).with(k).and_return(v).once
+        if failing
+          mock_di.should_receive(:value).with(k).and_return(v)
+        else
+          mock_di.should_receive(:value).with(k).and_return(v).once
+        end
       end
       flexmock(AMEE::Data::Item).should_receive(:get).
         with(connection,dipath,{}).

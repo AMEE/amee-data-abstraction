@@ -108,7 +108,7 @@ module AMEE
         profiles.set.each do |piv|
           result[piv.path]=piv.value
         end
-        return result.merge(:get_item=>false,:name=>amee_name)
+        return result
       end
       def get_options
         # Specify unit options here based on the contents
@@ -141,7 +141,7 @@ module AMEE
           amee_drill.data_item_uid,
           # Don't call data_item_uid,
           # cos we haven't got a profile to get the uid from, get it from the drill
-          profile_options)
+          profile_options.merge(:get_item=>false,:name=>amee_name))
         self.profile_item_uid=location.split('/').last
       end
 
@@ -151,7 +151,8 @@ module AMEE
 
       def set_profile_item_values
         # Set the profile item values for the profile item.
-        AMEE::Profile::Item.update(connection,profile_item_path, profile_options)
+        AMEE::Profile::Item.update(connection,profile_item_path, 
+          profile_options.merge(:get_item=>false))
       end
 
       def delete_profile_item
