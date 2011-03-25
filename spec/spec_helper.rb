@@ -52,9 +52,10 @@ def mock_amee(mocks)
             with(connection,piuid,{}).
             at_least.once.
             and_return(flexmock(:amounts=>flexmock(:find=>{:value=>result})))
-          flexmock(AMEE::Profile::Item).should_receive(:delete).
-            at_least.once.
-            with(connection,piuid)
+          # Removing delete, PIs persisted for now.
+#          flexmock(AMEE::Profile::Item).should_receive(:delete).
+#            at_least.once.
+#            with(connection,piuid)
         end
       end
     end

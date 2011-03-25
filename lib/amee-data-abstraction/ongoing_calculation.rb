@@ -58,35 +58,42 @@ module AMEE
 
       def load_profile_item_values
         # For any unset profile item values, load the corresponding values from
-        # amee
+        # amee, if we have been given a profile uid
+        return unless profile_item
+        profiles.each do |term|
+          ameeval=profile_item.value(term.path)
+          raise Exceptions::Syncronization if term.set? && ameeval!=term.value
+          term.value ameeval
+        end
+        profile_item.get
       end
 
       def set_profile_item_values
         # Set the profile item values for the profile item.
+        AMEE::Profile::Item.update(connection,
+          "/profiles/#{profile_uid}/#{path}/#{profile_item_uid}", profile_options)
       end
 
       def syncronize_with_amee
-        if drilled?
-          load_profile_item_values
-          load_metadata
-        end
+        load_profile_item_values
+        load_metadata
         if satisfied?
+          if profile_item
+            set_profile_item_values
+          else
+            create_profile_item
+          end
           load_outputs
         end
-      ensure
-        # Tidy up
-        if profile_item_uid
-          AMEE::Profile::Item.delete(connection,profile_item_uid)
-        end
+      rescue AMEE::UnknownError
+        # Tidy up, only if we created a "Bad" profile item. Need to check this condition
+        AMEE::Profile::Item.delete(connection,profile_item_uid)
+        self.profile_item_uid=false
+        raise DidNotCreateProfileItem
       end
 
-      attr_accessor :profile_uid,:profile_item_uid
-
+      attr_accessor :profile_uid,:profile_item_uid,:created_this_pass
       
-      def drilled?
-        drills.unset.empty?
-      end
-
       def drill_options(options={})
         to=options.delete(:before)
         drills_to_use=to ? drills.before(to).set : drills.set
@@ -98,7 +105,7 @@ module AMEE
         profiles.set.each do |piv|
           result[piv.path]=piv.value
         end
-        return result
+        return result.merge(:get_item=>false,:name=>amee_name)
       end
       def get_options
         # Specify unit options here based on the contents
@@ -114,6 +121,7 @@ module AMEE
         prof = AMEE::Profile::Profile.load(profile_uid) if profile_uid
         prof ||= AMEE::Profile::ProfileList.new(connection).first
         prof ||= AMEE::Profile::Profile.create(connection)
+        self.profile_uid=prof.uid
         return prof
       end
 
@@ -124,13 +132,16 @@ module AMEE
         UUIDTools::UUID.timestamp_create
       end
 
+      def create_profile_item
+        raise Exceptions::AlreadyHaveProfileItem if profile_item_uid
+        self.profile_item_uid = AMEE::Profile::Item.create(profile_category(profile),
+          amee_drill.data_item_uid,
+          profile_options)
+        self.created_this_pass=true
+      end
+
       def profile_item
-        unless profile_item_uid
-          self.profile_item_uid = AMEE::Profile::Item.create(profile_category(profile),
-            amee_drill.data_item_uid,
-            profile_options.merge(:get_item=>false,:name=>amee_name))
-        end
-        AMEE::Profile::Item.get(connection, profile_item_uid, get_options)
+        AMEE::Profile::Item.get(connection, profile_item_uid, get_options) if profile_item_uid
       end
       
       def profile_category(profile)

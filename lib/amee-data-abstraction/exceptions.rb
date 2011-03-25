@@ -6,6 +6,9 @@ module AMEE
       #class PrototypeInterference < Exception; end
       class FixedValueInterference < Exception; end
       class NoSuchTerm < Exception; end
+      class AlreadyHaveProfileItem < Exception; end
+      class Syncronization < Exception; end
+      class DidNotCreateProfileItem < Exception; end
       #class EntryOrderException < Exception; end
     end
   end
