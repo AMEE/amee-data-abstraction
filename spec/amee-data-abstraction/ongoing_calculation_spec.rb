@@ -159,7 +159,7 @@ describe OngoingCalculation do
     mycalc.calculate!
     mycalc.outputs.first.value.should eql :somenumber
   end
-  it 'can refuses to load parameters from AMEE which conflict with local values' do
+  it 'refuses to load parameters from AMEE which conflict with local values' do
     mycalc=Transport.begin_calculation
     mock_amee(
     'transport/car/generic'=> [
