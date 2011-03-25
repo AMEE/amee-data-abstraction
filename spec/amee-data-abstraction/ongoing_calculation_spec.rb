@@ -50,7 +50,6 @@ describe OngoingCalculation do
   end
   it 'knows which drills are set, and whether it is satisfied' do
     mocker=AMEEMocker.new(self,:path=>'transport/car/generic',
-      :selections=>[],
       :choices=>['diesel','petrol'])
     mocker.drill
     mocker.select('fuel'=>'diesel')
@@ -82,7 +81,6 @@ describe OngoingCalculation do
   end
   it 'can do a calculation' do
     mocker=AMEEMocker.new(self,:path=>'transport/car/generic',
-      :selections=>[],
       :choices=>['diesel','petrol'],
       :result=>:somenumber,
       :params=>{'distance'=>5})
@@ -101,7 +99,6 @@ describe OngoingCalculation do
   end
   it 'can respond appropriately to inconsistent drills' do
     mocker=AMEEMocker.new(self,:path=>'transport/car/generic',
-      :selections=>[],
       :choices=>['diesel','petrol'])
     mocker.drill
     mocker.select('fuel'=>'diesel')
@@ -113,7 +110,6 @@ describe OngoingCalculation do
   end
   it 'does not send general metadata to AMEE' do
     mocker=AMEEMocker.new(self,:path=>'transport/car/generic',
-      :selections=>[],
       :choices=>['diesel','petrol'],
       :result=>:somenumber,
       :params=>{'distance'=>5})
@@ -165,7 +161,7 @@ describe OngoingCalculation do
     mocker.choices=[]
     mocker.profile_list.get(true,true).delete
     existing_uid=mocker.uid
-    mocker.selections=[['fuel','diesel'],['size','small']]
+    mocker.select('size'=>'small')
     mocker.drill.profile_category.timestamp.create.get
     mycalc.choose!(:profile_item_uid=>existing_uid,'fuel'=>'diesel','size'=>'small','distance'=>7)
     mycalc.calculate!
@@ -193,7 +189,6 @@ describe OngoingCalculation do
   end
   it 'can be calculated, then recalculated, loading from AMEE the second time' do
     mocker=AMEEMocker.new(self,:path=>'transport/car/generic',
-      :selections=>[],
       :choices=>['diesel','petrol'],
       :result=>:somenumber,
       :params=>{'distance'=>5})
@@ -219,7 +214,6 @@ describe OngoingCalculation do
   end
   it 'can be calculated, then change drill, recreating the second time' do
     mocker=AMEEMocker.new(self,:path=>'transport/car/generic',
-      :selections=>[],
       :choices=>['diesel','petrol'],
       :result=>:somenumber,
       :params=>{'distance'=>5})
@@ -232,7 +226,7 @@ describe OngoingCalculation do
     mocker.drill
     mocker.profile_list.profile_category.timestamp.create.get(true,true).delete
 
-    mocker.selections=[['fuel','diesel'],['size','small']]
+    mocker.select('size'=>'small')
     mocker.drill.create.get
 
     mycalc=Transport.begin_calculation

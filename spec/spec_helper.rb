@@ -22,7 +22,8 @@ include AMEE::DataAbstraction
 class AMEEMocker
   def initialize(test,options)
     @path=options[:path]
-    @selections=options[:selections]||[]
+    sel=options[:selections]||[]
+    @selections=ActiveSupport::OrderedHash[sel]
     @choices=options[:choices]||[]
     @result=options[:result]
     @params=options[:params]||{}
@@ -37,7 +38,7 @@ class AMEEMocker
   def select(opts)
     # Like an array of pairs, not a hash, for ordering reasons.
     opts.each do |k,v|
-      selections.push [k,v]
+      @selections[k]=v
     end
   end
   def connection
