@@ -4,7 +4,7 @@ module AMEE
       TermClasses= [:profiles,:drills,:inputs,:outputs,:metadata]
       TermClasses.each do |term|
         define_method(term) do
-          TermsList.new select{|x|x.is_a? term.to_s.singularize.classify.constantize}
+          TermsList.new select{|x|x.is_a? AMEE::DataAbstraction::const_get(term.to_s.singularize.classify)}
         end
       end
       TermFlags=[:set,:unset,:visible,:hidden,:fixed]

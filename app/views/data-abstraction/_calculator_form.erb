@@ -2,7 +2,8 @@
 <% form_tag({:action=>nil},{:id=>form_id}) do%>
   <%= hidden_field_tag 'form_id', form_id %>
   <table>
-    <%@calculation.visible_inputs.each_value do |input|%>
+    <%@calculation.inputs.visible.each do |input|%>
+
       <% if input.drop_down? %>
         <tr>
           <td><%=label :entry,input.label,input.name%></td>
@@ -12,11 +13,11 @@
           </td>
         </tr>
       <%else%>
-        <tr><td><%=label :entry,input.label,input.name%></td><td><%= text_field :entry, input.label, "size" => 20, :value => input.value_if_given,:disabled=>input.disabled? %></td></tr>
+        <tr><td><%=label :entry,input.label,input.name%></td><td><%= text_field :entry, input.label, "size" => 20, :value => input.value,:disabled=>input.disabled? %></td></tr>
       <%end%>
     <%end%>
-    <%@calculation.visible_outputs.each_value do |result|%>
-      <tr><td><%=label :entry,result.label,result.name%></td><td><%= result.value_if_given %></td></tr>
+    <%@calculation.outputs.visible.each do |result|%>
+      <tr><td><%=label :entry,result.label,result.name%></td><td><%= result.value %></td></tr>
     <%end%>
   </table>
 <%end%>
