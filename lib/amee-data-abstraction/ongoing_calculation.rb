@@ -60,9 +60,8 @@ module AMEE
         # For any unset profile item values, load the corresponding values from
         # amee, if we have been given a profile uid
         return unless profile_item
-        profiles.each do |term|
+        profiles.unset.each do |term|
           ameeval=profile_item.value(term.path)
-          raise Exceptions::Syncronization if term.set? && ameeval!=term.value
           term.value ameeval
         end
       end
@@ -71,6 +70,8 @@ module AMEE
         return unless profile_item
         drills.each do |term|
           ameeval=data_item.value(term.path)
+          # Inconsistent drills would mean we'd need to delete the PI and start again
+          # Need to think about how to handle this.
           raise Exceptions::Syncronization if term.set? && ameeval!=term.value
           term.value ameeval
         end

@@ -144,29 +144,13 @@ describe OngoingCalculation do
     mycalc[:distance].value.should eql 5
     mycalc.outputs.first.value.should eql :somenumber
   end
-  it 'can load parameters from AMEE which agree with local values' do
-    mycalc=Transport.begin_calculation
-    mock_amee(
-    'transport/car/generic'=> [
-      [{},['diesel','petrol']]
-    ])
-    mock_existing_amee(
-      'transport/car/generic'=>{
-        :myuid=>[ [['fuel','diesel'],['size','large']] , {'distance'=>5} , :somenumber ]
-      }
-    )
-    mycalc.choose!(:profile_item_uid=>:myuid,'size'=>'large','distance'=>5)
-    mycalc.calculate!
-    mycalc.outputs.first.value.should eql :somenumber
-  end
-  it 'refuses to load parameters from AMEE which conflict with local values' do
+  it 'refuses to load values from AMEE which conflict with local drill values' do
     mycalc=Transport.begin_calculation
     mock_amee(
     'transport/car/generic'=> [
       [{},['diesel','petrol']],
       [[['fuel','diesel']],['large','small']],
       [[['fuel','diesel'],['size','small']]],
-      [[['fuel','diesel'],['size','large']]]
     ])
     mock_existing_amee(
       'transport/car/generic'=>{
@@ -175,8 +159,24 @@ describe OngoingCalculation do
     )
     mycalc.choose!(:profile_item_uid=>:myuid,'fuel'=>'diesel','size'=>'small','distance'=>5)
     lambda{mycalc.calculate!}.should raise_error Exceptions::Syncronization
+  end
+  it 'lets local profile values replace and update those in amee' do
+    ycalc=Transport.begin_calculation
+    mock_amee(
+    'transport/car/generic'=> [
+      [{},['diesel','petrol']],
+      [[['fuel','diesel']],['large','small']],
+      [[['fuel','diesel'],['size','large']]]
+    ])
+    mock_existing_amee(
+      'transport/car/generic'=>{
+        :myuid=>[ [['fuel','diesel'],['size','large']] , {'distance'=>5} , :somenumber, {'distance'=>9} ]
+      }
+    )
+    mycalc=Transport.begin_calculation
     mycalc.choose!(:profile_item_uid=>:myuid,'fuel'=>'diesel','size'=>'large','distance'=>9)
-    lambda{mycalc.calculate!}.should raise_error Exceptions::Syncronization
+    mycalc.calculate!
+    mycalc[:distance].value.should eql 9
   end
 end
 

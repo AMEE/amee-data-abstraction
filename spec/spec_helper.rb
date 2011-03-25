@@ -76,6 +76,13 @@ def mock_existing_amee(mocks)
     struct1.each do |uid,struct|
       selections=struct.first
       pivs=struct[1]
+      new_pivs=struct.last if struct.length>3 and struct.last.is_a? Hash
+      pivs_from_amee=pivs.clone
+      new_pivs||={}
+      new_pivs.each_key do |k|
+        pivs_from_amee.delete(k)
+      end
+     
       result=struct[2]
       failing=(struct.last==:failing) if struct.length>3
       catuid=path.gsub(/\//,'-').to_sym
@@ -84,13 +91,13 @@ def mock_existing_amee(mocks)
       dipath="/data/#{path}/#{dataitemuid}"
       flexmock(AMEE::Profile::Item).should_receive(:update).
         with(connection,pipath,
-        {:get_item=>false}.merge(pivs)).
+        {:get_item=>false}.merge(pivs).merge(new_pivs)).
         at_least.once unless failing
       mock_pi=flexmock(
         :amounts=>flexmock(:find=>{:value=>result}),
         :data_item_uid=>dataitemuid
       )
-      pivs.each do |k,v|
+      pivs_from_amee.each do |k,v|
         if failing
           mock_pi.should_receive(:value).with(k).and_return(v)
         else
