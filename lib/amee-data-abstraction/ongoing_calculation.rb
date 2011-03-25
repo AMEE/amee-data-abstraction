@@ -6,7 +6,7 @@ module AMEE
 
       def choose!(choice)
         self.profile_uid= choice.delete(:profile_uid)
-        self.profile_item_uid= choice.delete(:profile_item)
+        self.profile_item_uid= choice.delete(:profile_item_uid)
 
         choice.each do |k,v|
           raise Exceptions::NoSuchTerm.new(k) unless self[k]
@@ -65,19 +65,23 @@ module AMEE
           raise Exceptions::Syncronization if term.set? && ameeval!=term.value
           term.value ameeval
         end
-        profile_item.get
       end
 
-      def set_profile_item_values
-        # Set the profile item values for the profile item.
-        AMEE::Profile::Item.update(connection,
-          "/profiles/#{profile_uid}/#{path}/#{profile_item_uid}", profile_options)
+      def load_drills
+        return unless profile_item
+        drills.each do |term|
+          ameeval=data_item.value(term.path)
+          raise Exceptions::Syncronization if term.set? && ameeval!=term.value
+          term.value ameeval
+        end
       end
 
       def syncronize_with_amee
+        find_profile
         load_profile_item_values
+        load_drills
         load_metadata
-        if satisfied?
+        if satisfied? # We could create an unsatisfied PI, and just check drilled? here
           if profile_item
             set_profile_item_values
           else
@@ -87,12 +91,11 @@ module AMEE
         end
       rescue AMEE::UnknownError
         # Tidy up, only if we created a "Bad" profile item. Need to check this condition
-        AMEE::Profile::Item.delete(connection,profile_item_uid)
-        self.profile_item_uid=false
+        delete_profile_item
         raise DidNotCreateProfileItem
       end
 
-      attr_accessor :profile_uid,:profile_item_uid,:created_this_pass
+      attr_accessor :profile_uid,:profile_item_uid
       
       def drill_options(options={})
         to=options.delete(:before)
@@ -115,9 +118,9 @@ module AMEE
         return {}
       end
 
-      def profile
+      def find_profile
         # Return the AMEE::Profile::Profile to which the PI for this calculation
-        # belongs.
+        # belongs, and update our stored UID to match.
         prof = AMEE::Profile::Profile.load(profile_uid) if profile_uid
         prof ||= AMEE::Profile::ProfileList.new(connection).first
         prof ||= AMEE::Profile::Profile.create(connection)
@@ -134,18 +137,50 @@ module AMEE
 
       def create_profile_item
         raise Exceptions::AlreadyHaveProfileItem if profile_item_uid
-        self.profile_item_uid = AMEE::Profile::Item.create(profile_category(profile),
+        location = AMEE::Profile::Item.create(profile_category,
           amee_drill.data_item_uid,
+          # Don't call data_item_uid,
+          # cos we haven't got a profile to get the uid from, get it from the drill
           profile_options)
-        self.created_this_pass=true
+        self.profile_item_uid=location.split('/').last
       end
 
       def profile_item
-        AMEE::Profile::Item.get(connection, profile_item_uid, get_options) if profile_item_uid
+        AMEE::Profile::Item.get(connection, profile_item_path, get_options) if profile_item_uid
       end
-      
-      def profile_category(profile)
-        AMEE::Profile::Category.get(connection, "/profiles/#{profile.uid}#{path}")
+
+      def set_profile_item_values
+        # Set the profile item values for the profile item.
+        AMEE::Profile::Item.update(connection,profile_item_path, profile_options)
+      end
+
+      def delete_profile_item
+        AMEE::Profile::Item.delete(connection,profile_item_path)
+        self.profile_item_uid=false
+      end
+
+      def profile_category_path
+        "/profiles/#{profile_uid}#{path}"
+      end
+
+      def profile_item_path
+        "#{profile_category_path}/#{profile_item_uid}"
+      end
+
+      def data_item_path
+        "/data#{path}/#{data_item_uid}"
+      end
+
+      def data_item_uid
+        profile_item.data_item_uid
+      end
+
+      def data_item
+        AMEE::Data::Item.get(connection, data_item_path, get_options)
+      end
+
+      def profile_category
+        AMEE::Profile::Category.get(connection, profile_category_path)
       end
       
       def connection

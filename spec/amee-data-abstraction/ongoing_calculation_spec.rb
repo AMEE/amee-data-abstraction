@@ -127,5 +127,20 @@ describe OngoingCalculation do
     lambda{mycalc.choose!('fuel'=>'diesel','banana'=>'large','distance'=>5)}.
     should raise_exception Exceptions::NoSuchTerm   
   end
+  it 'can be supplied just a UID, and recover PIVs and drill values from AMEE' do
+    mycalc=Transport.begin_calculation
+    mock_amee(
+    'transport/car/generic'=> [
+      [{},['diesel','petrol']]
+    ])
+    mock_existing_amee(
+      'transport/car/generic'=>{
+        :myuid=>[ [['fuel','diesel'],['size','large']] , {'distance'=>5} , :somenumber ]
+      }
+    )
+    mycalc.choose!(:profile_item_uid=>:myuid)
+    mycalc.calculate!
+    mycalc.outputs.first.value.should eql :somenumber
+  end
 end
 

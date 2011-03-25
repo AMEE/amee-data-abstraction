@@ -21,10 +21,10 @@ include AMEE::DataAbstraction
 
 def mock_amee(mocks)
   mocks.each do |path,struct|
-    catuid=path.gsub(/\//,',').to_sym
+    catuid=path.gsub(/\//,'-').to_sym
     struct.each do |selections,choices,answers|
-      dataitemuid="#{catuid},#{selections.map{|k,v|"#{k}=#{v}"}.join(',')}"
-      piuid=dataitemuid+"PI"
+      dataitemuid="#{catuid}:#{selections.map{|k,v|"#{k}-#{v}"}.join('-')}"
+      pipath="/profiles/someprofileuid/#{path}/#{dataitemuid+"PI"}"
       flexmock(AMEE::Data::DrillDown).
         should_receive(:get).
         with(connection,
@@ -47,20 +47,66 @@ def mock_amee(mocks)
             with(catuid,dataitemuid,
             {:get_item=>false,:name=>:sometimestamp}.merge(params)).
             at_least.once.
-            and_return(piuid)         
+            and_return(pipath)
           flexmock(AMEE::Profile::Item).should_receive(:get).
-            with(connection,piuid,{}).
+            with(connection,pipath,{}).
             at_least.once.
             and_return(flexmock(:amounts=>flexmock(:find=>{:value=>result})))
           # Removing delete, PIs persisted for now.
-#          flexmock(AMEE::Profile::Item).should_receive(:delete).
-#            at_least.once.
-#            with(connection,piuid)
+          #          flexmock(AMEE::Profile::Item).should_receive(:delete).
+          #            at_least.once.
+          #            with(connection,piuid)
         end
       end
     end
+  end 
+end
+
+def mock_existing_amee(mocks)
+  #  mock_existing_amee(
+  #      'transport/car/generic'=>{
+  #        :myuid=>[ [['fuel','diesel'],['size','large']] , {'distance'=>5}, :somenumber ]
+  #      }
+  #    )
+  flexmock(AMEE::Profile::ProfileList).should_receive(:new).
+    with(connection).
+    at_least.once.
+    and_return(flexmock(:first=>flexmock(:uid=>:someprofileuid)))
+  flexmock(UUIDTools::UUID).should_receive(:timestamp_create).at_least.once.
+    and_return(:sometimestamp)
+  mocks.each do |path,struct1|
+    struct1.each do |uid,struct|
+      selections=struct.first
+      pivs=struct[1]
+      result=struct[2]
+      catuid=path.gsub(/\//,'-').to_sym
+      dataitemuid="#{catuid}:#{selections.map{|k,v|"#{k}-#{v}"}.join('-')}"
+      pipath="/profiles/someprofileuid/#{path}/#{uid}"
+      dipath="/data/#{path}/#{dataitemuid}"
+      flexmock(AMEE::Profile::Item).should_receive(:update).
+        with(connection,pipath,
+        {:get_item=>false,:name=>:sometimestamp}.merge(pivs)).
+        at_least.once
+      mock_pi=flexmock(
+        :amounts=>flexmock(:find=>{:value=>result}),
+        :data_item_uid=>dataitemuid
+      )
+      pivs.each do |k,v|
+        mock_pi.should_receive(:value).with(k).and_return(v).once
+      end
+      flexmock(AMEE::Profile::Item).should_receive(:get).
+        with(connection,pipath,{}).
+        at_least.once.
+        and_return(mock_pi)
+      mock_di=flexmock
+      selections.each do |k,v|
+        mock_di.should_receive(:value).with(k).and_return(v).once
+      end
+      flexmock(AMEE::Data::Item).should_receive(:get).
+        with(connection,dipath,{}).
+        at_least.once.
+        and_return(mock_di)
+
+    end
   end
-  
-  
-  
 end
