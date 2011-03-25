@@ -80,7 +80,11 @@ module AMEE
       def syncronize_with_amee
         find_profile
         load_profile_item_values
-        load_drills
+        begin
+          load_drills
+        rescue Exceptions::Syncronization
+          delete_profile_item
+        end
         load_metadata
         if satisfied? # We could create an unsatisfied PI, and just check drilled? here
           if profile_item

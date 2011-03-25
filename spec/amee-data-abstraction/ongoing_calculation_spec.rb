@@ -150,7 +150,7 @@ describe OngoingCalculation do
     'transport/car/generic'=> [
       [{},['diesel','petrol']],
       [[['fuel','diesel']],['large','small']],
-      [[['fuel','diesel'],['size','small']]],
+      [[['fuel','diesel'],['size','small']]  ,[],[[{'distance'=>5},:someothernumber]] ],
     ])
     mock_existing_amee(
       'transport/car/generic'=>{
@@ -158,7 +158,8 @@ describe OngoingCalculation do
       }
     )
     mycalc.choose!(:profile_item_uid=>:myuid,'fuel'=>'diesel','size'=>'small','distance'=>5)
-    lambda{mycalc.calculate!}.should raise_error Exceptions::Syncronization
+    mycalc.calculate!
+    mycalc.outputs.first.value.should eql :someothernumber
   end
   it 'lets local profile values replace and update those in amee' do
     ycalc=Transport.begin_calculation

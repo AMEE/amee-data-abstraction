@@ -34,8 +34,7 @@ def mock_amee(mocks)
           :data_item_uid=>dataitemuid))
       unless answers.blank? # We are to create a PID.
         flexmock(AMEE::Profile::ProfileList).should_receive(:new).
-          with(connection).
-          at_least.once.
+          with(connection).at_least.once.
           and_return(flexmock(:first=>flexmock(:uid=>:someprofileuid)))
         flexmock(AMEE::Profile::Category).should_receive(:get).
           with(connection,"/profiles/someprofileuid/#{path}").at_least.once.
@@ -70,7 +69,6 @@ def mock_existing_amee(mocks)
   #    )
   flexmock(AMEE::Profile::ProfileList).should_receive(:new).
     with(connection).
-    at_least.once.
     and_return(flexmock(:first=>flexmock(:uid=>:someprofileuid)))
   mocks.each do |path,struct1|
     struct1.each do |uid,struct|
@@ -120,7 +118,11 @@ def mock_existing_amee(mocks)
         with(connection,dipath,{}).
         at_least.once.
         and_return(mock_di)
-
+      if failing
+        flexmock(AMEE::Profile::Item).should_receive(:delete).
+                      at_least.once.
+                      with(connection,pipath)
+      end
     end
   end
 end
