@@ -5,9 +5,10 @@ module AMEE
       public
 
       def choose!(choice)
-        self.profile_uid= choice.delete(:profile_uid)
-        self.profile_item_uid= choice.delete(:profile_item_uid)
-
+        new_profile_uid= choice.delete(:profile_uid)
+        self.profile_uid=new_profile_uid if new_profile_uid
+        new_profile_item_uid= choice.delete(:profile_item_uid)
+        self.profile_item_uid=new_profile_item_uid if new_profile_item_uid
         choice.each do |k,v|
           raise Exceptions::NoSuchTerm.new(k) unless self[k]
           self[k].value v unless v.blank?

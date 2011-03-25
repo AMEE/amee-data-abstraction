@@ -1,14 +1,4 @@
 require File.dirname(File.dirname(__FILE__)) + '/spec_helper.rb'
-ocks={
-    'business/energy/electricity/grid'=> [
-      [[],['argentina','mexico']],
-      [[['country','argentina']],[]]
-    ],
-    'transport/car/generic'=> [
-      [{},['diesel','petrol']],
-      [[['fuel','diesel']],['large','small']],
-      [[['fuel','diesel'],['size','large']],[],[[{'distance'=>5},:somenumber]]]
-    ]}
 describe OngoingCalculation do
   it 'can return set and unset inputs' do
     d=Electricity.begin_calculation
@@ -35,10 +25,9 @@ describe OngoingCalculation do
     d.outputs.unset.labels.should eql []
   end
   it 'can have values chosen' do
-    mock_amee(
-    'business/energy/electricity/grid'=> [    
-      [[['country','argentina']],[]]
-    ])
+    AMEEMocker.new(self,:path=>'business/energy/electricity/grid',
+      :selections=>[['country','argentina']],
+      :choices=>[]).drill
     
     d=Electricity.begin_calculation
 
@@ -51,22 +40,25 @@ describe OngoingCalculation do
     d.inputs.unset.values.should be_empty
   end
   it 'knows when it is satisfied' do
-    mock_amee(
-    'business/energy/electricity/grid'=> [
-      [[['country','argentina']],[]]
-    ])
+    AMEEMocker.new(self,:path=>'business/energy/electricity/grid',
+      :selections=>[['country','argentina']],
+      :choices=>[]).drill
     d=Electricity.begin_calculation
     d.satisfied?.should be_false
     d.choose!(:energy_used=>5.0)
     d.satisfied?.should be_true
   end
   it 'knows which drills are set, and whether it is satisfied' do
-    mock_amee(   
-    'transport/car/generic'=> [
-      [{},['diesel','petrol']],
-      [[['fuel','diesel']],['large','small']],
-      [[['fuel','diesel'],['size','large']],[]]
-    ])
+    mocker=AMEEMocker.new(self,:path=>'transport/car/generic',
+      :selections=>[],
+      :choices=>['diesel','petrol'])
+    mocker.drill
+    mocker.select('fuel'=>'diesel')
+    mocker.choices=['large','small']
+    mocker.drill
+    mocker.select('size'=>'large')
+    mocker.choices=[]
+    mocker.drill
     t=Transport.begin_calculation
     t.terms.labels.should eql [:fuel,:size,:distance,:co2]
     t.satisfied?.should be_false
@@ -89,34 +81,50 @@ describe OngoingCalculation do
     t3.satisfied?.should be_true
   end
   it 'can do a calculation' do
-    mock_amee(
-    'transport/car/generic'=> [
-      [{},['diesel','petrol']],
-      [[['fuel','diesel']],['large','small']],
-      [[['fuel','diesel'],['size','large']],[],[[{'distance'=>5},:somenumber]]]
-    ])
+    mocker=AMEEMocker.new(self,:path=>'transport/car/generic',
+      :selections=>[],
+      :choices=>['diesel','petrol'],
+      :result=>:somenumber,
+      :params=>{'distance'=>5})
+    mocker.drill
+    mocker.select('fuel'=>'diesel')
+    mocker.choices=['large','small']
+    mocker.drill
+    mocker.select('size'=>'large')
+    mocker.choices=[]
+    mocker.drill
+    mocker.profile_list.profile_category.timestamp.create.get
     mycalc=Transport.begin_calculation
     mycalc.choose!('fuel'=>'diesel','size'=>'large','distance'=>5)
     mycalc.calculate!
     mycalc.outputs.first.value.should eql :somenumber
   end
   it 'can respond appropriately to inconsistent drills' do
-    mock_amee(
-    'transport/car/generic'=> [
-      [{},['diesel','petrol']],
-      [[['fuel','diesel']],['large','small']]
-    ])
+    mocker=AMEEMocker.new(self,:path=>'transport/car/generic',
+      :selections=>[],
+      :choices=>['diesel','petrol'])
+    mocker.drill
+    mocker.select('fuel'=>'diesel')
+    mocker.choices=['large','small']
+    mocker.drill
     mycalc=Transport.begin_calculation
     mycalc.choose!('fuel'=>'diesel','size'=>'banana','distance'=>5)
     mycalc.drills.values.should eql ['diesel',nil]
   end
   it 'does not send general metadata to AMEE' do
-    mock_amee(
-    'transport/car/generic'=> [
-      [{},['diesel','petrol']],
-      [[['fuel','diesel']],['large','small']],
-      [[['fuel','diesel'],['size','large']],[],[[{'distance'=>5},:somenumber]]]
-    ])
+    mocker=AMEEMocker.new(self,:path=>'transport/car/generic',
+      :selections=>[],
+      :choices=>['diesel','petrol'],
+      :result=>:somenumber,
+      :params=>{'distance'=>5})
+    mocker.drill
+    mocker.select('fuel'=>'diesel')
+    mocker.choices=['large','small']
+    mocker.drill
+    mocker.select('size'=>'large')
+    mocker.choices=[]
+    mocker.drill
+    mocker.profile_list.profile_category.timestamp.create.get
     mycalc=ElectricityAndTransport[:transport].begin_calculation
     mycalc.choose!('fuel'=>'diesel','size'=>'large','distance'=>5,'department'=>'stuff')
     mycalc.calculate!
@@ -125,20 +133,19 @@ describe OngoingCalculation do
   it 'raises exception if choice supplied for invalid term' do
     mycalc=Transport.begin_calculation
     lambda{mycalc.choose!('fuel'=>'diesel','banana'=>'large','distance'=>5)}.
-    should raise_exception Exceptions::NoSuchTerm   
+      should raise_exception Exceptions::NoSuchTerm
   end
   it 'can be supplied just a UID, and recover PIVs and drill values from AMEE' do
     mycalc=Transport.begin_calculation
-    mock_amee(
-    'transport/car/generic'=> [
-      [{},['diesel','petrol']]
-    ])
-    mock_existing_amee(
-      'transport/car/generic'=>{
-        :myuid=>[ [['fuel','diesel'],['size','large']] , {'distance'=>5} , :somenumber ]
-      }
-    )
-    mycalc.choose!(:profile_item_uid=>:myuid)
+    mocker=AMEEMocker.new(self,:path=>'transport/car/generic',
+      :result=>:somenumber,
+      :existing=>{'distance'=>5},:choices=>['petrol','diesel'])
+    mocker.drill
+    mocker.select('fuel'=>'diesel')
+    mocker.select('size'=>'large')
+    mocker.choices=[]
+    mocker.profile_list.update.get(true)
+    mycalc.choose!(:profile_item_uid=>mocker.uid)
     mycalc.calculate!
     mycalc[:fuel].value.should eql 'diesel'
     mycalc[:distance].value.should eql 5
@@ -146,36 +153,41 @@ describe OngoingCalculation do
   end
   it 'refuses to load values from AMEE which conflict with local drill values' do
     mycalc=Transport.begin_calculation
-    mock_amee(
-    'transport/car/generic'=> [
-      [{},['diesel','petrol']],
-      [[['fuel','diesel']],['large','small']],
-      [[['fuel','diesel'],['size','small']]  ,[],[[{'distance'=>5},:someothernumber]] ],
-    ])
-    mock_existing_amee(
-      'transport/car/generic'=>{
-        :myuid=>[ [['fuel','diesel'],['size','large']] , {'distance'=>5} , :somenumber, :failing ]
-      }
-    )
-    mycalc.choose!(:profile_item_uid=>:myuid,'fuel'=>'diesel','size'=>'small','distance'=>5)
+    mocker=AMEEMocker.new(self,:path=>'transport/car/generic',
+      :result=>:somenumber,
+      :existing=>{'distance'=>7},
+      :params=>{'distance'=>7},:choices=>['petrol','diesel'])
+    mocker.drill
+    mocker.select('fuel'=>'diesel')
+    mocker.choices=['large','small']
+    mocker.drill
+    mocker.select('size'=>'large')
+    mocker.choices=[]
+    mocker.profile_list.get(true,true).delete
+    existing_uid=mocker.uid
+    mocker.selections=[['fuel','diesel'],['size','small']]
+    mocker.drill.profile_category.timestamp.create.get
+    mycalc.choose!(:profile_item_uid=>existing_uid,'fuel'=>'diesel','size'=>'small','distance'=>7)
     mycalc.calculate!
-    mycalc.outputs.first.value.should eql :someothernumber
+    mycalc.outputs.first.value.should eql :somenumber
   end
   it 'lets local profile values replace and update those in amee' do
-    ycalc=Transport.begin_calculation
-    mock_amee(
-    'transport/car/generic'=> [
-      [{},['diesel','petrol']],
-      [[['fuel','diesel']],['large','small']],
-      [[['fuel','diesel'],['size','large']]]
-    ])
-    mock_existing_amee(
-      'transport/car/generic'=>{
-        :myuid=>[ [['fuel','diesel'],['size','large']] , {'distance'=>5} , :somenumber, {'distance'=>9} ]
-      }
+    mocker=AMEEMocker.new(self,:path=>'transport/car/generic',
+      :result=>:somenumber,
+      :choices=>['petrol','diesel'],
+      :params=>{'distance'=>9},
+      :existing=>{'distance'=>5}
     )
+    mocker.drill
+    mocker.select('fuel'=>'diesel')
+    mocker.choices=['large','small']
+    mocker.drill
+    mocker.select('size'=>'large')
+    mocker.choices=[]
+    mocker.drill
+    mocker.profile_list.update.get(true)
     mycalc=Transport.begin_calculation
-    mycalc.choose!(:profile_item_uid=>:myuid,'fuel'=>'diesel','size'=>'large','distance'=>9)
+    mycalc.choose!(:profile_item_uid=>mocker.uid,'fuel'=>'diesel','size'=>'large','distance'=>9)
     mycalc.calculate!
     mycalc[:distance].value.should eql 9
   end

@@ -1,15 +1,15 @@
 require File.dirname(File.dirname(__FILE__)) + '/spec_helper.rb'
 describe Drill do
   it 'knows its options when it is the first choice' do
-    mock_amee(
-    'transport/car/generic'=> [
-      [{},['diesel','petrol']]
-    ])
+    AMEEMocker.new(self,:path=>'transport/car/generic',
+      :selections=>{},
+      :choices=>['diesel','petrol']).drill
     Transport.begin_calculation[:fuel].options_for_select.should eql [nil,'diesel','petrol']
   end
   it 'knows its options when it is a later choice' do
-    mock_amee('transport/car/generic'=> [
-      [[['fuel','diesel']],['large','small']]])
+    AMEEMocker.new(self,:path=>'transport/car/generic',
+      :selections=>[['fuel','diesel']],
+      :choices=>['large','small']).drill
     t=Transport.begin_calculation
     t[:fuel].value 'diesel'
     t[:size].options_for_select.should eql [nil,'large','small']
@@ -26,10 +26,9 @@ describe Drill do
     t[:size].enabled?.should be_true
   end
   it 'is valid iff assigned a choice in the choices' do
-    mock_amee(
-    'transport/car/generic'=> [
-      [[],['diesel','petrol']],
-    ])
+    AMEEMocker.new(self,:path=>'transport/car/generic',
+      :selections=>[],
+      :choices=>['diesel','petrol']).drill
     t=Transport.begin_calculation
     t[:fuel].value 'diesel'
     t[:fuel].send(:valid?).should be_true
