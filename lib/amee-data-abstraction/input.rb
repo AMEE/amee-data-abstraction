@@ -15,6 +15,7 @@ module AMEE
       def fixed val
         @value= val
         @fixed=true
+        @optional=false
       end
       #------
 
@@ -28,6 +29,14 @@ module AMEE
 
       def fixed?
         @fixed
+      end
+
+      def optional?(usage=nil)
+        @optional
+      end
+
+      def compulsory?(usage=nil)
+        !optional?(usage)
       end
 
       def validate!

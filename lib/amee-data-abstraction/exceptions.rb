@@ -9,6 +9,7 @@ module AMEE
       class AlreadyHaveProfileItem < Exception; end
       class Syncronization < Exception; end
       class DidNotCreateProfileItem < Exception; end
+      class TwoUsages < Exception; end
       #class EntryOrderException < Exception; end
     end
   end

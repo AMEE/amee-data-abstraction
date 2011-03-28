@@ -34,4 +34,18 @@ describe TermsList do
     Transport.terms.after(:distance).labels.
       should eql [:co2]
  end
+ it 'can select terms by usage' do
+   mocker=AMEEMocker.new self,:path=>'transport/car/generic'
+    mocker.item_value_definitions.
+      item_definition.data_category.
+    item_value_definition('distance',['usage1'],['usage2'],['usage3'])
+   Transport.profiles.compulsory('usage1').labels.should eql [:distance]
+   Transport.profiles.optional('usage2').labels.should eql [:distance]
+   Transport.profiles.compulsory('usage2').labels.should be_empty
+   Transport.profiles.optional('usage1').labels.should be_empty
+   Transport.profiles.in_use('usage2').labels.should eql [:distance]
+   Transport.profiles.in_use('usage1').labels.should eql [:distance]
+   Transport.profiles.in_use('usage3').labels.should be_empty
+ end
+ 
 end

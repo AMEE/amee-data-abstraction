@@ -23,6 +23,28 @@ module AMEE
       def metadatum(options={},&block)
         construct(Metadatum,options,&block)
       end
+      def usage(options={},&block)
+        all_profiles
+        construct(Usage,options,&block)
+      end
+      def all_drills
+        amee_item_definition.drill_downs.each do |apath|
+          drill { path apath }
+        end
+      end
+      def all_profiles
+        amee_ivds.each do |ivd|
+          apath=ivd.path
+          profile { path apath}          
+        end
+      end
+      def profiles_from_usage(usage)
+        self.fixed_usage usage
+        amee_ivds.each do |ivd|
+          apath=ivd.path
+          profile { path apath } if ivd.compulsory?(usage) || ivd.optional?(usage)
+        end
+      end
 
       #--------------------
 
@@ -35,6 +57,7 @@ module AMEE
         result.path path
         result.name name
         result.label label
+        result.fixed_usage fixed_usage
         result
       end
 
@@ -43,8 +66,10 @@ module AMEE
 
       def construct(klass,options={},&block)
         new_content=klass.new(options.merge(:parent=>self),&block)
+        new_content.label new_content.path.to_sym unless new_content.path.blank?||new_content.label
         raise Exceptions::DSL.new(
-          "Attempt to create #{klass} without a label") unless new_content.label
+          "Attempt to create #{klass} without a label or path") unless new_content.label
+        new_content.name label.to_s.humanize unless new_content.name
         @contents[new_content.label]=new_content
       end
 

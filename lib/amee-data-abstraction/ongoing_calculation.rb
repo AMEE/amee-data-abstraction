@@ -34,7 +34,7 @@ module AMEE
       end
 
       def satisfied?
-        inputs.unset.empty?
+        inputs.compulsory.unset.empty?
       end
 
 

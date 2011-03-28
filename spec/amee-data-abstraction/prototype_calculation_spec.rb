@@ -45,5 +45,58 @@ describe PrototypeCalculation do
       Transport.begin_calculation.send(property).should eql Transport.send(property)
     end
   end
+  it 'can autogenerate drill terms for itself, based on talking to amee' do
+    mocker=AMEEMocker.new(self,:path=>'something')
+    mocker.itemdef_drills ['first','second','third']
+    mocker.item_definition.data_category
+    pc=PrototypeCalculation.new {path '/something'; all_drills}
+    pc.drills.labels.should eql [:first,:second,:third]
+  end
+  it 'can autogenerate profile terms for itself' do
+    mocker=AMEEMocker.new(self,:path=>'something')
+    mocker.item_value_definitions.
+      item_definition.data_category.
+      item_value_definition('first').
+      item_value_definition('second').
+      item_value_definition('third')
+    pc=PrototypeCalculation.new {path '/something'; all_profiles}
+    pc.profiles.labels.should eql [:first,:second,:third]
+  end
+  it 'can autogenerate profile terms for itself, based on a usage' do
+    mocker=AMEEMocker.new(self,:path=>'something')
+    mocker.item_value_definitions.
+      item_definition.data_category.
+      item_value_definition('first',['bybob']).
+      item_value_definition('second',['bybob']).
+      item_value_definition('third',[],[],['bybob'])
+    pc=PrototypeCalculation.new {path '/something'; profiles_from_usage('bybob')}
+    pc.profiles.labels.should eql [:first,:second]
+  end
+  it 'can select terms by usage with a longer list' do
+    mocker=AMEEMocker.new(self,:path=>'something')
+    mocker.item_value_definitions.
+      item_definition.data_category.
+      item_value_definition('first',['bybob'],[],'byfrank').
+      item_value_definition('second',['bybob'],[],'byfrank').
+      item_value_definition('third',['byfrank'],[],['bybob'])
+    pc=PrototypeCalculation.new {path '/something'; all_profiles ; fixed_usage 'bybob'}
+    pc.profiles.in_use.labels.should eql [:first,:second]
+    pc.profiles.out_of_use.labels.should eql [:third]
+    pc.fixed_usage 'byfrank'
+    pc.profiles.out_of_use.labels.should eql [:first,:second]
+    pc.profiles.in_use.labels.should eql [:third]
+  end
+  it 'can generate itself with dynamic usage dropdown' do
+    mocker=AMEEMocker.new(self,:path=>'something')
+    mocker.item_value_definitions.
+      item_definition.data_category.
+      item_value_definition('first',['bybob'],[],'byfrank').
+      item_value_definition('second',['bybob'],[],'byfrank').
+      item_value_definition('third',['byfrank'],[],['bybob'])
+    pc=PrototypeCalculation.new {path '/something'; usage{ value 'bybob'}}
+    pc.profiles.labels.should eql [:first,:second,:third]
+    pc.profiles.visible.labels.should eql [:first,:second]
+    
+  end
 end
 

@@ -29,8 +29,11 @@ class AMEEMocker
     @params=options[:params]||{}
     @existing=options[:existing]||{}
     @test=test
+    @mock_dc=test.flexmock(:path=>"/data/#{path}")
+    @mock_id=test.flexmock
+    @mock_ivds=[]
   end
-  attr_accessor :path,:selections,:choices,:result,:params,:existing
+  attr_accessor :path,:selections,:choices,:result,:params,:existing,:mock_dc,:mock_id,:mock_ivds
   attr_reader :test
   def catuid
     path.gsub(/\//,'-').to_sym
@@ -81,6 +84,41 @@ class AMEEMocker
     test.flexmock(AMEE::Profile::Category).should_receive(:get).
       with(connection,"/profiles/someprofileuid/#{path}").at_least.once.
       and_return(catuid)
+    return self
+  end
+  def itemdef_drills(some_drills)
+    mock_id.should_receive(:drill_downs).and_return(some_drills)
+  end
+  def item_value_definition(path,compulsories=[],optionals=[],forbiddens=[])
+    ivd=test.flexmock :path=>path
+    compulsories.each do |compulsory|
+      ivd.should_receive(:compulsory?).with(compulsory).and_return(true)
+      ivd.should_receive(:optional?).with(compulsory).and_return(false)
+    end
+    optionals.each do |optional|
+      ivd.should_receive(:optional?).with(optional).and_return(true)
+      ivd.should_receive(:compulsory?).with(optional).and_return(false)
+    end
+    forbiddens.each do |forbidden|
+      ivd.should_receive(:optional?).with(forbidden).and_return(false)
+      ivd.should_receive(:compulsory?).with(forbidden).and_return(false)
+    end
+    mock_ivds.push ivd
+    return self
+  end
+  def item_value_definitions
+    mock_id.should_receive(:item_value_definition_list).at_least.once.and_return(mock_ivds)
+    return self
+  end
+  def item_definition(name=:itemdef_name)
+    mock_id.should_receive(:name).and_return(name)
+    mock_dc.should_receive(:item_definition).at_least.once.and_return(mock_id)
+    return self
+  end
+  def data_category
+    test.flexmock(AMEE::Data::Category).should_receive(:get).
+      with(connection,"/data/#{path}").at_least.once.
+      and_return(mock_dc)
     return self
   end
   def create
