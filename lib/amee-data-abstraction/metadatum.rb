@@ -6,6 +6,9 @@ module AMEE
         interface :drop_down unless interface
       end
       attr_property :choices
+      def compulsory?(usage=nil)
+        false
+      end
     end
   end
 end

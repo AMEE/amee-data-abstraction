@@ -115,11 +115,11 @@ module AMEE
         profiles.set.each do |piv|
           result[piv.path]=piv.value
         end
-        if contents[:start_date]
-          result[:start_date]=contents[:start_date].value
+        if contents[:start_date]&&contents[:start_date].value
+          result[:start_date]=Date.parse contents[:start_date].value
         end
-        if contents[:end_date]
-          result[:end_date]=contents[:end_date].value
+        if contents[:end_date]&&contents[:end_date].value
+          result[:end_date]=Date.parse contents[:end_date].value
         end
         return result
       end

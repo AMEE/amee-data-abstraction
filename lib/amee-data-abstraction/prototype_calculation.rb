@@ -75,10 +75,26 @@ module AMEE
         metadatum {
           path 'start_date'
           interface :date
+          validation lambda{|value|
+            begin
+              Date.parse(value)
+              true
+            rescue
+              false
+            end
+          }
         }
         metadatum {
           path 'end_date'
           interface :date
+          validation lambda{|value|
+            begin
+              Date.parse(value)
+              true
+            rescue
+              false
+            end
+          }
         }
       end
 

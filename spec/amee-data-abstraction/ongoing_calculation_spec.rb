@@ -28,7 +28,7 @@ describe OngoingCalculation do
     AMEEMocker.new(self,:path=>'business/energy/electricity/grid',
       :selections=>[['country','argentina']],
       :choices=>[]).drill
-    
+
     d=Electricity.begin_calculation
 
     d.inputs.set.values.should eql ['argentina']
@@ -200,7 +200,7 @@ describe OngoingCalculation do
     mocker.choices=[]
     mocker.drill
     mocker.profile_list.profile_category.timestamp.create
-   
+
     mocker.existing={'distance'=>5}
     mocker.params={'distance'=>9}
     mocker.update.get(true)
@@ -257,7 +257,9 @@ describe OngoingCalculation do
     mocker=AMEEMocker.new(self,:path=>'transport/car/generic',
       :choices=>['diesel','petrol'],
       :result=>:somenumber,
-      :params=>{'distance'=>5,:start_date=>:start,:end_date=>:end})
+      :params=>{'distance'=>5,
+        :start_date=>Date.parse("1976-10-19"),
+        :end_date=>Date.parse("2011-1-1")})
     mocker.drill
     mocker.select('fuel'=>'diesel')
     mocker.choices=['large','small']
@@ -271,7 +273,30 @@ describe OngoingCalculation do
       start_and_end_dates
     }
     mycalc=myproto.begin_calculation
-    mycalc.choose!('fuel'=>'diesel','size'=>'large','distance'=>5,'start_date'=>:start,'end_date'=>:end)
+    mycalc.choose!('fuel'=>'diesel','size'=>'large','distance'=>5,'start_date'=>"1976-10-19",'end_date'=>"2011-1-1")
+    mycalc.calculate!
+    mycalc.outputs.first.value.should eql :somenumber
+  end
+  it 'does not pass start end dates if inappropriate value provided' do
+    mocker=AMEEMocker.new(self,:path=>'transport/car/generic',
+      :choices=>['diesel','petrol'],
+      :result=>:somenumber,
+      :params=>{'distance'=>5,
+        :end_date=>Date.parse("2011-1-1")})
+    mocker.drill
+    mocker.select('fuel'=>'diesel')
+    mocker.choices=['large','small']
+    mocker.drill
+    mocker.select('size'=>'large')
+    mocker.choices=[]
+    mocker.drill
+    mocker.profile_list.profile_category.timestamp.create.get
+    myproto=Transport.clone
+    myproto.instance_eval{
+      start_and_end_dates
+    }
+    mycalc=myproto.begin_calculation
+    mycalc.choose!('fuel'=>'diesel','size'=>'large','distance'=>5,'start_date'=>"banana",'end_date'=>"2011-1-1")
     mycalc.calculate!
     mycalc.outputs.first.value.should eql :somenumber
   end
