@@ -115,6 +115,12 @@ module AMEE
         profiles.set.each do |piv|
           result[piv.path]=piv.value
         end
+        if contents[:start_date]
+          result[:start_date]=contents[:start_date].value
+        end
+        if contents[:end_date]
+          result[:end_date]=contents[:end_date].value
+        end
         return result
       end
       def get_options

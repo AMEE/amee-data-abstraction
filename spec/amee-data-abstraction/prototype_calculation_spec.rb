@@ -154,5 +154,12 @@ describe PrototypeCalculation do
     t.send(:amee_data_category)
     t.begin_calculation.send(:amee_data_category)
   end
+  it 'can auto-create start and end date metadata' do
+    t=Transport.clone
+    t.instance_eval{
+      start_and_end_dates
+    }
+    t.metadata.labels.should eql [:start_date,:end_date]
+  end
 end
 

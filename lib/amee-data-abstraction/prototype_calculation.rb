@@ -71,6 +71,15 @@ module AMEE
         all_outputs
       end
 
+      def start_and_end_dates
+        metadatum {
+          path 'start_date'
+        }
+        metadatum {
+          path 'end_date'
+        }
+      end
+
       #--------------------
 
       def begin_calculation

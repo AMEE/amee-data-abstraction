@@ -253,5 +253,27 @@ describe OngoingCalculation do
     mycalc[:distance].value.should eql 5
     mycalc.outputs.first.value.should eql :somenumber
   end
+  it 'creates profile item with start end dates if appropriate metadata provided' do
+    mocker=AMEEMocker.new(self,:path=>'transport/car/generic',
+      :choices=>['diesel','petrol'],
+      :result=>:somenumber,
+      :params=>{'distance'=>5,:start_date=>:start,:end_date=>:end})
+    mocker.drill
+    mocker.select('fuel'=>'diesel')
+    mocker.choices=['large','small']
+    mocker.drill
+    mocker.select('size'=>'large')
+    mocker.choices=[]
+    mocker.drill
+    mocker.profile_list.profile_category.timestamp.create.get
+    myproto=Transport.clone
+    myproto.instance_eval{
+      start_and_end_dates
+    }
+    mycalc=myproto.begin_calculation
+    mycalc.choose!('fuel'=>'diesel','size'=>'large','distance'=>5,'start_date'=>:start,'end_date'=>:end)
+    mycalc.calculate!
+    mycalc.outputs.first.value.should eql :somenumber
+  end
 end
 
