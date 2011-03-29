@@ -83,6 +83,7 @@ module AMEE
         result.name name
         result.label label
         result.fixed_usage fixed_usage
+        result.save_amee saved_amee
         result
       end
 

@@ -40,6 +40,17 @@ module AMEE
         @contents=ActiveSupport::OrderedHash.new
       end
 
+      AmeeMemoised=[:amee_data_category, :amee_item_definition, :amee_ivds,
+        :amee_return_values, :amee_usages]
+      def saved_amee
+        AmeeMemoised.map{|x|instance_variable_get("@#{x.to_s}")}
+      end
+      def save_amee(values)
+        AmeeMemoised.zip(values).each do |prop,val|
+          instance_variable_set("@#{prop.to_s}",val)
+        end
+      end
+
       private
 
       def connection

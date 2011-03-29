@@ -146,5 +146,13 @@ describe PrototypeCalculation do
       :fourth,:fifth
     ]
   end
+  it 'transfers memoised amee information to constructed ongoing calculations' do
+    t=Transport.clone
+    flexmock(AMEE::Data::Category).should_receive(:get).
+      with(AMEE::DataAbstraction.connection,'/data/transport/car/generic').
+      once.and_return(true)
+    t.send(:amee_data_category)
+    t.begin_calculation.send(:amee_data_category)
+  end
 end
 

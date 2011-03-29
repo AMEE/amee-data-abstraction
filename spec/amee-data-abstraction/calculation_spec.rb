@@ -59,5 +59,14 @@ describe Calculation do
     t=Transport.clone
     t.send(:amee_ivds).first.path.should eql 'distance'
   end
+  it 'can memoise access to  AMEE' do
+    t=Transport.clone
+    #AMEE::Data::Category.get(connection, "/data#{path}")
+    flexmock(AMEE::Data::Category).should_receive(:get).
+      with(AMEE::DataAbstraction.connection,'/data/transport/car/generic').
+      once.and_return(true)
+    t.send(:amee_data_category)
+    t.send(:amee_data_category)
+  end
 end
 
