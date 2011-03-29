@@ -126,6 +126,10 @@ class AMEEMocker
     mock_id.should_receive(:item_value_definition_list).at_least.once.and_return(mock_ivds)
     return self
   end
+  def usages(someusages)
+    mock_id.should_receive(:usages).and_return(someusages)
+    return self
+  end
   def item_definition(name=:itemdef_name)
     mock_id.should_receive(:name).and_return(name)
     mock_id.should_receive(:uid).and_return(:itemdefuid)

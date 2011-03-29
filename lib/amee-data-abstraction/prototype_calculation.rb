@@ -35,7 +35,10 @@ module AMEE
       def all_profiles
         amee_ivds.each do |ivd|
           next unless ivd.profile?
-          profile { path ivd.path}
+          profile {
+            path ivd.path
+            choices ivd.choices
+          }
         end
       end
       def all_outputs
@@ -47,7 +50,8 @@ module AMEE
         self.fixed_usage usage
         amee_ivds.each do |ivd|
           next unless ivd.profile?
-          profile { path ivd.path
+          profile {
+            path ivd.path
             choices ivd.choices
           } if ivd.compulsory?(usage) || ivd.optional?(usage)
         end

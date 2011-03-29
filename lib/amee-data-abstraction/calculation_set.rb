@@ -20,6 +20,15 @@ module AMEE
         @all_blocks.push dsl_block
         @all_options.merge(options)
       end
+      def calculations_all_usages(apath,options={},&dsl_block)
+        dummycalc=PrototypeCalculation.new{path apath}
+        dummycalc.amee_usages.each do |usage|
+          calculation(options){
+            path apath
+            instance_exec(usage,&dsl_block)
+          }
+        end
+      end
     end
   end
 end

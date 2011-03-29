@@ -32,4 +32,20 @@ describe CalculationSet do
     }
     cs[:mycalc].drills.labels.should eql [:remarkably,:energetic]
   end
+  it 'can make multiple calculations quickly, one for each usage' do
+    mocker=AMEEMocker.new(self,:path=>'something')
+    mocker.item_value_definitions.usages(['bybob','byfrank']).
+      item_definition.data_category.
+      item_value_definition('first',['bybob'],[],'byfrank').
+      item_value_definition('second',['bybob'],[],'byfrank').
+      item_value_definition('third',['byfrank'],[],['bybob'])
+    cs=CalculationSet.new {
+      calculations_all_usages('/something') { |usage|
+        label usage.to_sym
+        profiles_from_usage usage
+      }
+    }
+    cs[:bybob].profiles.labels.should eql [:first,:second]
+    cs[:byfrank].profiles.labels.should eql [:third]
+  end
 end
