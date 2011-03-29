@@ -32,8 +32,10 @@ class AMEEMocker
     @mock_dc=test.flexmock(:path=>"/data/#{path}")
     @mock_id=test.flexmock
     @mock_ivds=[]
+    @mock_rvds=[]
   end
-  attr_accessor :path,:selections,:choices,:result,:params,:existing,:mock_dc,:mock_id,:mock_ivds
+  attr_accessor :path,:selections,:choices,:result,:params,
+    :existing,:mock_dc,:mock_id,:mock_ivds,:mock_rvds
   attr_reader :test
   def catuid
     path.gsub(/\//,'-').to_sym
@@ -88,6 +90,17 @@ class AMEEMocker
   end
   def itemdef_drills(some_drills)
     mock_id.should_receive(:drill_downs).and_return(some_drills)
+    return self
+  end
+  def return_value_definition(path)
+    rvd=test.flexmock :path=>path
+    mock_rvds.push rvd
+    return self
+  end
+  def return_value_definitions
+    test.flexmock(AMEE::Admin::ReturnValueDefinitionList).should_receive(:new).
+        with(connection,:itemdefuid).and_return mock_rvds
+      return self
   end
   def item_value_definition(path,compulsories=[],optionals=[],forbiddens=[])
     ivd=test.flexmock :path=>path
@@ -114,6 +127,7 @@ class AMEEMocker
   end
   def item_definition(name=:itemdef_name)
     mock_id.should_receive(:name).and_return(name)
+    mock_id.should_receive(:uid).and_return(:itemdefuid)
     mock_dc.should_receive(:item_definition).at_least.once.and_return(mock_id)
     return self
   end

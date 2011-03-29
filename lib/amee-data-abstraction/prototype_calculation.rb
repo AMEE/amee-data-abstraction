@@ -35,17 +35,34 @@ module AMEE
       def all_profiles
         amee_ivds.each do |ivd|
           next unless ivd.profile?
-          apath=ivd.path
-          profile { path apath}          
+          profile { path ivd.path}
+        end
+      end
+      def all_outputs
+        amee_return_values.each do |rvd|
+          output { path rvd.path}
         end
       end
       def profiles_from_usage(usage)
         self.fixed_usage usage
         amee_ivds.each do |ivd|
           next unless ivd.profile?
-          apath=ivd.path
-          profile { path apath } if ivd.compulsory?(usage) || ivd.optional?(usage)
+          profile { path ivd.path } if ivd.compulsory?(usage) || ivd.optional?(usage)
         end
+      end
+      def terms_from_amee(usage=nil)
+        all_drills
+        if usage
+          profiles_from_usage(usage)
+        else
+          all_profiles
+        end
+        all_outputs
+      end
+      def terms_from_amee_dynamic_usage(ausage)
+        all_drills
+        usage{ value ausage}
+        all_outputs
       end
 
       #--------------------

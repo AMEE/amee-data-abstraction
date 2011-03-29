@@ -98,5 +98,40 @@ describe PrototypeCalculation do
     pc.profiles.visible.labels.should eql [:first,:second]
     pc.terms.labels.should eql [:usage,:first,:second,:third]
   end
+  it 'can generate itself with outputs' do
+    mocker=AMEEMocker.new(self,:path=>'something')
+    mocker.return_value_definitions.
+      item_definition.data_category.
+      return_value_definition('first').
+      return_value_definition('second').
+      return_value_definition('third')
+    pc=PrototypeCalculation.new {path '/something'; all_outputs}
+    pc.outputs.labels.should eql [:first,:second,:third]
+  end
+  it 'can generate itself with everything' do
+    mocker=AMEEMocker.new(self,:path=>'something')
+    mocker.itemdef_drills ['first','second','third']
+    mocker.return_value_definitions.
+      item_value_definitions.
+      item_definition.data_category.
+      item_value_definition('fourth',['bybob'],[],'byfrank').
+      item_value_definition('fifth',['bybob'],[],'byfrank').
+      item_value_definition('sixth',['byfrank'],[],['bybob']).
+      return_value_definition('seventh').
+      return_value_definition('eighth').
+      return_value_definition('ninth')
+    pc=PrototypeCalculation.new {
+      path '/something';
+      terms_from_amee_dynamic_usage 'bybob'}
+    pc.terms.labels.should eql [:usage,
+      :first,:second,:third,
+      :fourth,:fifth,:sixth,
+      :seventh,:eighth,:ninth
+    ]
+    pc.terms.visible.labels.should eql  [:usage,
+      :first,:second,:third,
+      :fourth,:fifth
+    ]
+  end
 end
 

@@ -54,6 +54,10 @@ module AMEE
         amee_data_category.item_definition
       end
 
+      def amee_return_values
+        AMEE::Admin::ReturnValueDefinitionList.new(connection,amee_item_definition.uid)
+      end
+
       def by_path(path)
         terms.detect { |v| v.path==path }
       end
