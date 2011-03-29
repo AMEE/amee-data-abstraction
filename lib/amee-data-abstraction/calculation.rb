@@ -47,15 +47,15 @@ module AMEE
       end
 
       def amee_data_category
-        AMEE::Data::Category.get(connection, "/data#{path}")
+        @amee_data_category||=AMEE::Data::Category.get(connection, "/data#{path}")
       end
 
       def amee_item_definition
-        amee_data_category.item_definition
+        @amee_item_definition||=amee_data_category.item_definition
       end
 
       def amee_return_values
-        AMEE::Admin::ReturnValueDefinitionList.new(connection,amee_item_definition.uid)
+        @amee_return_values||=AMEE::Admin::ReturnValueDefinitionList.new(connection,amee_item_definition.uid)
       end
 
       def by_path(path)
@@ -69,7 +69,7 @@ module AMEE
       public #friend to Term
 
       def amee_ivds
-        amee_item_definition.item_value_definition_list.select{|x|x.versions.include?("2.0")}
+        @amee_ivds||=amee_item_definition.item_value_definition_list.select{|x|x.versions.include?("2.0")}
       end
 
       def current_usage
@@ -77,7 +77,7 @@ module AMEE
       end
 
       def amee_usages
-        amee_item_definition.usages
+        @amee_usages||=amee_item_definition.usages
       end
 
     end

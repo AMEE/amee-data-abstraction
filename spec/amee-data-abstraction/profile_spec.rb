@@ -10,10 +10,11 @@ describe Profile do
     mocker.item_value_definitions.
       item_definition.data_category.
     item_value_definition('distance',['someusage'],['someotherusage'])
-    Transport[:distance].compulsory?('someusage').should eql true
-    Transport[:distance].compulsory?('someotherusage').should eql false
-    Transport[:distance].optional?('someotherusage').should eql true
-    Transport[:distance].optional?('someusage').should eql false
+    t=Transport.clone
+    t[:distance].compulsory?('someusage').should eql true
+    t[:distance].compulsory?('someotherusage').should eql false
+    t[:distance].optional?('someotherusage').should eql true
+    t[:distance].optional?('someusage').should eql false
   end
   it 'can have choices' do
     i=Profile.new{label :one; choices ['a','b']}
