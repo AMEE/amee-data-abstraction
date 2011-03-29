@@ -7,7 +7,8 @@ module AMEE
           TermsList.new select{|x|x.is_a? AMEE::DataAbstraction::const_get(term.to_s.singularize.classify)}
         end
       end
-      TermFlags=[:set,:unset,:visible,:hidden,:fixed,:optional,:compulsory,:enabled,:disabled]
+      TermFlags=[:set,:unset,:visible,:hidden,:fixed,
+        :optional,:compulsory,:enabled,:disabled,:drop_down,:text_box,:date]
       TermFlags.each do |term|
         define_method(term) do
            TermsList.new select{|x|x.send("#{term}?".to_sym)}
