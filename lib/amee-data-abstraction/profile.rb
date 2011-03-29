@@ -1,8 +1,10 @@
 module AMEE
   module DataAbstraction
     class Profile < Input
+      attr_property :choices
       def initialize(options={},&block)
         super
+        interface :drop_down unless choices.blank?
         interface :text_box unless interface
       end
       def optional?(usage=nil)

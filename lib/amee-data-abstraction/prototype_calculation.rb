@@ -40,14 +40,16 @@ module AMEE
       end
       def all_outputs
         amee_return_values.each do |rvd|
-          output { path rvd.path}
+          output { path rvd.name}
         end
       end
       def profiles_from_usage(usage)
         self.fixed_usage usage
         amee_ivds.each do |ivd|
           next unless ivd.profile?
-          profile { path ivd.path } if ivd.compulsory?(usage) || ivd.optional?(usage)
+          profile { path ivd.path
+            choices ivd.choices
+          } if ivd.compulsory?(usage) || ivd.optional?(usage)
         end
       end
       def terms_from_amee(usage=nil)

@@ -72,6 +72,19 @@ describe PrototypeCalculation do
     pc=PrototypeCalculation.new {path '/something'; profiles_from_usage('bybob')}
     pc.profiles.labels.should eql [:first,:second]
   end
+  it 'can generate profile terms with choices' do
+    mocker=AMEEMocker.new(self,:path=>'something')
+    mocker.item_value_definitions.
+      item_definition.data_category.
+      item_value_definition('first',['bybob'],[],[],['a','b']).
+      item_value_definition('second',['bybob']).
+      item_value_definition('third',[],[],['bybob'])
+    pc=PrototypeCalculation.new {path '/something'; profiles_from_usage('bybob')}
+    pc[:first].choices.should eql ['a','b']
+    pc[:first].interface.should eql :drop_down
+    pc[:second].choices.should be_empty
+    pc[:second].interface.should eql :text_box
+  end
   it 'can select terms by usage with a longer list' do
     mocker=AMEEMocker.new(self,:path=>'something')
     mocker.item_value_definitions.

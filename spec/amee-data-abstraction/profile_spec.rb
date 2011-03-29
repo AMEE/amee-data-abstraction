@@ -15,4 +15,14 @@ describe Profile do
     Transport[:distance].optional?('someotherusage').should eql true
     Transport[:distance].optional?('someusage').should eql false
   end
+  it 'can have choices' do
+    i=Profile.new{label :one; choices ['a','b']}
+    i.choices.should eql ['a','b']
+    i.interface.should eql :drop_down
+  end
+  it 'doesn''t have to have choices' do
+    i=Profile.new{label :one}
+    i.choices.should be_nil
+    i.interface.should eql :text_box
+  end
 end
