@@ -23,7 +23,7 @@ module AMEE
       end
 
 
-      Interfaces=[:text_box,:drop_down]
+      Interfaces=[:text_box,:drop_down,:date]
 
       Interfaces.each do |inf|
         define_method("#{inf.to_s}?") {

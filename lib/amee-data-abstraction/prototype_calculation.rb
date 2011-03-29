@@ -74,9 +74,11 @@ module AMEE
       def start_and_end_dates
         metadatum {
           path 'start_date'
+          interface :date
         }
         metadatum {
           path 'end_date'
+          interface :date
         }
       end
 

@@ -160,6 +160,8 @@ describe PrototypeCalculation do
       start_and_end_dates
     }
     t.metadata.labels.should eql [:start_date,:end_date]
+    t[:start_date].interface.should eql :date
+    t[:start_date].date?.should be_true
   end
 end
 
