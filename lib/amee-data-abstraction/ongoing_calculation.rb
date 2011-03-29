@@ -79,6 +79,7 @@ module AMEE
       end
 
       def syncronize_with_amee
+        new_memoize_pass
         find_profile
         load_profile_item_values
         begin
@@ -150,8 +151,18 @@ module AMEE
         self.profile_item_uid=location.split('/').last
       end
 
+      MemoizedProfileInformation=[:profile_item,:data_item,:profile_category]
+      #Have to wipe these every pass, because otherwise, they might change, e.g.
+      # if metadata changes change the profile
+      # it might be possible to gain more speed by being cleverer
+      def new_memoize_pass
+        MemoizedProfileInformation.each do |prop|
+          instance_variable_set("@#{prop.to_s}",nil)
+        end
+      end
+
       def profile_item
-        AMEE::Profile::Item.get(connection, profile_item_path, get_options) if profile_item_uid
+        @profile_item||=AMEE::Profile::Item.get(connection, profile_item_path, get_options) if profile_item_uid
       end
 
       def set_profile_item_values
@@ -163,6 +174,7 @@ module AMEE
       def delete_profile_item
         AMEE::Profile::Item.delete(connection,profile_item_path)
         self.profile_item_uid=false
+        @profile_item=nil
       end
 
       def profile_category_path
@@ -182,11 +194,11 @@ module AMEE
       end
 
       def data_item
-        AMEE::Data::Item.get(connection, data_item_path, get_options)
+        @data_item||=AMEE::Data::Item.get(connection, data_item_path, get_options)
       end
 
       def profile_category
-        AMEE::Profile::Category.get(connection, profile_category_path)
+        @profile_category||=AMEE::Profile::Category.get(connection, profile_category_path)
       end
 
       def autodrill

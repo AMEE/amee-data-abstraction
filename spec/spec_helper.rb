@@ -150,7 +150,7 @@ class AMEEMocker
       and_return(pipath)
     return self
   end
-  def get(with_pi=false,failing=false)
+  def get(with_pi=false,failing=false,once=false)
     mock_pi=test.flexmock(
       :amounts=>test.flexmock(:find=>{:value=>result}),
       :data_item_uid=>dataitemuid
@@ -178,10 +178,17 @@ class AMEEMocker
         at_least.once.
         and_return(mock_di)
     end
+    if once
+      test.flexmock(AMEE::Profile::Item).should_receive(:get).
+      with(connection,pipath,{}).
+      once.
+      and_return(mock_pi)
+    else
     test.flexmock(AMEE::Profile::Item).should_receive(:get).
       with(connection,pipath,{}).
       at_least.once.
       and_return(mock_pi)
+    end
     return self
   end
   def delete

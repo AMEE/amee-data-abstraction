@@ -236,5 +236,22 @@ describe OngoingCalculation do
     mycalc.calculate!
     mycalc[:distance].value.should eql 5
   end
+  it 'memoizes profile information, but not across a pass' do
+    mycalc=Transport.begin_calculation
+    mocker=AMEEMocker.new(self,:path=>'transport/car/generic',
+      :result=>:somenumber,
+      :existing=>{'distance'=>5},:choices=>['petrol','diesel'])
+    mocker.drill
+    mocker.select('fuel'=>'diesel')
+    mocker.select('size'=>'large')
+    mocker.choices=[]
+    mocker.profile_list.update.get(true,false,true)
+    mycalc.choose!(:profile_item_uid=>mocker.uid)
+    mycalc.calculate!
+    mycalc.send(:profile_item)
+    mycalc[:fuel].value.should eql 'diesel'
+    mycalc[:distance].value.should eql 5
+    mycalc.outputs.first.value.should eql :somenumber
+  end
 end
 
