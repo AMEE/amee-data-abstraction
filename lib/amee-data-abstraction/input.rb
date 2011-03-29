@@ -6,7 +6,7 @@ module AMEE
       end
 
       def options_for_select
-        [nil]+choices
+        [[nil,nil]]+choices.map{|x|[x.underscore.humanize,x]}
       end
 
       attr_property :validation

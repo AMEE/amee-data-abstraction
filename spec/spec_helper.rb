@@ -91,6 +91,8 @@ class AMEEMocker
   end
   def item_value_definition(path,compulsories=[],optionals=[],forbiddens=[])
     ivd=test.flexmock :path=>path
+    ivd.should_receive(:profile?).and_return true
+    ivd.should_receive(:versions).and_return ['2.0']
     compulsories.each do |compulsory|
       ivd.should_receive(:compulsory?).with(compulsory).and_return(true)
       ivd.should_receive(:optional?).with(compulsory).and_return(false)

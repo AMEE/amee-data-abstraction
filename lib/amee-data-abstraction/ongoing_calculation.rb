@@ -188,10 +188,6 @@ module AMEE
       def profile_category
         AMEE::Profile::Category.get(connection, profile_category_path)
       end
-      
-      def connection
-        AMEE::DataAbstraction.connection
-      end
 
       def autodrill
         #Sometimes when a bunch of drills are specified,

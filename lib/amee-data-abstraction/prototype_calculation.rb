@@ -25,7 +25,7 @@ module AMEE
       end
       def usage(options={},&block)
         all_profiles
-        construct(Usage,options,&block)
+        construct(Usage,options.merge(:first=>true),&block)
       end
       def all_drills
         amee_item_definition.drill_downs.each do |apath|
@@ -34,6 +34,7 @@ module AMEE
       end
       def all_profiles
         amee_ivds.each do |ivd|
+          next unless ivd.profile?
           apath=ivd.path
           profile { path apath}          
         end
@@ -41,6 +42,7 @@ module AMEE
       def profiles_from_usage(usage)
         self.fixed_usage usage
         amee_ivds.each do |ivd|
+          next unless ivd.profile?
           apath=ivd.path
           profile { path apath } if ivd.compulsory?(usage) || ivd.optional?(usage)
         end
@@ -66,11 +68,15 @@ module AMEE
 
       def construct(klass,options={},&block)
         new_content=klass.new(options.merge(:parent=>self),&block)
-        new_content.label new_content.path.to_sym unless new_content.path.blank?||new_content.label
+        new_content.label new_content.path.underscore.to_sym unless new_content.path.blank?||new_content.label
         raise Exceptions::DSL.new(
           "Attempt to create #{klass} without a label or path") unless new_content.label
         new_content.name label.to_s.humanize unless new_content.name
-        @contents[new_content.label]=new_content
+        if options[:first]
+          @contents.insert_at_start(new_content.label,new_content)
+        else
+          @contents[new_content.label]=new_content
+        end
       end
 
     end

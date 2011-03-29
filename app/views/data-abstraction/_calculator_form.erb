@@ -3,18 +3,20 @@
   <%= hidden_field_tag 'form_id', form_id %>
   <table>
     <%@calculation.inputs.visible.each do |input|%>
+      <tr>
+        <% if input.drop_down? %>
 
-      <% if input.drop_down? %>
-        <tr>
           <td><%=label :entry,input.label,input.name%></td>
           <td>
             <%= select_tag "entry[#{input.label}]",
               options_for_select(input.options_for_select,input.set? ? input.value : nil),:disabled=>input.disabled?%>
           </td>
-        </tr>
-      <%else%>
-        <tr><td><%=label :entry,input.label,input.name%></td><td><%= text_field :entry, input.label, "size" => 20, :value => input.value,:disabled=>input.disabled? %></td></tr>
-      <%end%>
+
+        <%else%>
+          <td><%=label :entry,input.label,input.name%></td><td><%= text_field :entry, input.label, "size" => 20, :value => input.value,:disabled=>input.disabled? %></td>
+        <%end%>
+          <td><% if input.compulsory? %><span class="compulsory-input">*</span> <%end%></td>
+      </tr>
     <%end%>
     <%@calculation.outputs.visible.each do |result|%>
       <tr><td><%=label :entry,result.label,result.name%></td><td><%= result.value %></td></tr>

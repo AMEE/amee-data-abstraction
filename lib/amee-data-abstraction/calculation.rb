@@ -42,18 +42,16 @@ module AMEE
 
       private
 
+      def connection
+        AMEE::DataAbstraction.connection
+      end
+
       def amee_data_category
         AMEE::Data::Category.get(connection, "/data#{path}")
       end
 
       def amee_item_definition
         amee_data_category.item_definition
-      end
-
-     
-
-      def amee_usages
-        amee_item_definition.usages
       end
 
       def by_path(path)
@@ -67,11 +65,15 @@ module AMEE
       public #friend to Term
 
       def amee_ivds
-        amee_item_definition.item_value_definition_list
+        amee_item_definition.item_value_definition_list.select{|x|x.versions.include?("2.0")}
       end
 
       def current_usage
         usages.empty? ? fixed_usage : usages.first.value
+      end
+
+      def amee_usages
+        amee_item_definition.usages
       end
 
     end

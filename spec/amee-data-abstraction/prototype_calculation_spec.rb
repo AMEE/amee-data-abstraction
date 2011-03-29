@@ -96,7 +96,7 @@ describe PrototypeCalculation do
     pc=PrototypeCalculation.new {path '/something'; usage{ value 'bybob'}}
     pc.profiles.labels.should eql [:first,:second,:third]
     pc.profiles.visible.labels.should eql [:first,:second]
-    
+    pc.terms.labels.should eql [:usage,:first,:second,:third]
   end
 end
 

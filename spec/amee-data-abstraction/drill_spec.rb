@@ -4,7 +4,7 @@ describe Drill do
     AMEEMocker.new(self,:path=>'transport/car/generic',
       :selections=>[],
       :choices=>['diesel','petrol']).drill
-    Transport.begin_calculation[:fuel].options_for_select.should eql [nil,'diesel','petrol']
+    Transport.begin_calculation[:fuel].send(:choices).should eql ['diesel','petrol']
   end
   it 'knows its options when it is a later choice' do
     AMEEMocker.new(self,:path=>'transport/car/generic',
@@ -12,7 +12,7 @@ describe Drill do
       :choices=>['large','small']).drill
     t=Transport.begin_calculation
     t[:fuel].value 'diesel'
-    t[:size].options_for_select.should eql [nil,'large','small']
+    t[:size].send(:choices).should eql ['large','small']
   end
   it 'is enabled iff it is the next choice or has been chosen' do
     t=Transport.begin_calculation

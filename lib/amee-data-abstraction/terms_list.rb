@@ -32,6 +32,7 @@ module AMEE
       def out_of_use(usage=nil)
         TermsList.new select{|x|x.out_of_use?(usage)}
       end
+      
       Selectors=TermClasses+TermFlags+[:before,:after,:optional,
         :compulsory,:in_use,:out_of_use]
 

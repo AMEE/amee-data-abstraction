@@ -5,12 +5,12 @@ module AMEE
         super
         interface :text_box unless interface
       end
-      def optional?(usage)
+      def optional?(usage=nil)
         usage||=parent.current_usage
         usage ? amee_ivd.optional?(usage) : super()
       end
 
-      def compulsory?(usage)
+      def compulsory?(usage=nil)
         usage||=parent.current_usage
         usage ? amee_ivd.compulsory?(usage) : super()
       end
