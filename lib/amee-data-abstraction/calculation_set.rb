@@ -14,6 +14,7 @@ module AMEE
       def calculation(options={},&block)
         new_content=PrototypeCalculation.new(options.merge(@all_options),&block)
         @all_blocks.each {|all_block| new_content.instance_eval(&all_block) }
+        new_content.name new_content.label.to_s.humanize unless new_content.name
         @calculations[new_content.label]=new_content
       end
       def all_calculations(options={},&dsl_block)

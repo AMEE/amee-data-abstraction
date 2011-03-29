@@ -94,7 +94,7 @@ module AMEE
         new_content.label new_content.path.underscore.to_sym unless new_content.path.blank?||new_content.label
         raise Exceptions::DSL.new(
           "Attempt to create #{klass} without a label or path") unless new_content.label
-        new_content.name label.to_s.humanize unless new_content.name
+        new_content.name new_content.label.to_s.humanize unless new_content.name
         if options[:first]
           @contents.insert_at_start(new_content.label,new_content)
         else
