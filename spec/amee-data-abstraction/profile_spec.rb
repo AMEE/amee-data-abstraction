@@ -21,9 +21,19 @@ describe Profile do
     i.choices.should eql ['a','b']
     i.interface.should eql :drop_down
   end
+  it 'must have a chosen choice if it has a choice' do
+    i=Profile.new{label :one; choices ['a','b']}
+    i.choices.should eql ['a','b']
+    i.value 'a'
+    i.should be_valid
+    i.value 'c'
+    i.should_not be_valid
+  end
   it 'doesn''t have to have choices' do
     i=Profile.new{label :one}
     i.choices.should be_nil
     i.interface.should eql :text_box
+    i.value 'mark'
+    i.should be_valid
   end
 end

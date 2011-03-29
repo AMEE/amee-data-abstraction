@@ -25,6 +25,9 @@ module AMEE
       def amee_ivd
         parent.amee_ivds.detect{|x|x.path==path}
       end
+      def valid?
+        super && (choices.blank? || choices.include?(value))
+      end
     end
   end
 end
