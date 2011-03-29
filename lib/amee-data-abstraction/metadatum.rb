@@ -9,6 +9,9 @@ module AMEE
       def compulsory?(usage=nil)
         false
       end
+      def valid?
+        super && (choices.blank? || choices.include?(value))
+      end
     end
   end
 end
