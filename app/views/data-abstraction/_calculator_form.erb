@@ -1,6 +1,7 @@
 <% form_id = "drill-form-#{rand(1e8)}" %>
 <% form_tag({:action=>nil},{:id=>form_id}) do%>
   <%= hidden_field_tag 'form_id', form_id %>
+  
   <table>
     <%@calculation.inputs.visible.each do |input|%>
       <tr>
@@ -22,6 +23,7 @@
       <tr><td><%=label :entry,result.label,result.name%></td><td><%= result.value %></td></tr>
     <%end%>
   </table>
+  <%= hidden_field_tag 'entry[profile_item_uid]', @calculation.send(:profile_item_uid) %>
 <%end%>
 <%= observe_form form_id, :url => {:action => 'result'}%>
 <% javascript_tag do %>
