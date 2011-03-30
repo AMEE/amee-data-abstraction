@@ -164,5 +164,18 @@ describe PrototypeCalculation do
     t[:start_date].date?.should be_true
     t.date.labels.should eql [:start_date,:end_date]
   end
+  it 'can correct a dodgy term' do
+    pc=PrototypeCalculation.new {
+      metadatum{ label :frank }
+      correcting(:frank) {name "Bob"}
+    }
+    pc[:frank].name.should eql "Bob"
+  end
+  it 'lets corrections on missing terms go' do
+    lambda{pc=PrototypeCalculation.new {
+      metadatum{ label :sid }
+      correcting(:frank) {name "Bob"}
+    }}.should_not raise_error
+  end
 end
 

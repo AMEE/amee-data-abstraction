@@ -18,6 +18,7 @@ module AMEE
         @enabled=true
         @visible=true
         instance_eval(&block) if block
+        label path.to_s.underscore.to_sym unless path.blank?||label
         path label.to_s unless path
         name label.to_s.humanize unless name
       end

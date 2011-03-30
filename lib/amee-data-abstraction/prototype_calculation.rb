@@ -98,6 +98,11 @@ module AMEE
         }
       end
 
+      def correcting(label,&block)
+        return unless contents[label]
+        contents[label].instance_eval(&block)
+      end
+
       #--------------------
 
       def begin_calculation
@@ -119,10 +124,8 @@ module AMEE
 
       def construct(klass,options={},&block)
         new_content=klass.new(options.merge(:parent=>self),&block)
-        new_content.label new_content.path.underscore.to_sym unless new_content.path.blank?||new_content.label
         raise Exceptions::DSL.new(
-          "Attempt to create #{klass} without a label or path") unless new_content.label
-        new_content.name new_content.label.to_s.humanize unless new_content.name
+          "Attempt to create #{klass} without a label") unless new_content.label
         if options[:first]
           @contents.insert_at_start(new_content.label,new_content)
         else
