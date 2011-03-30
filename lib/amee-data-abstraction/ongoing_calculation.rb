@@ -37,6 +37,7 @@ module AMEE
         inputs.compulsory.unset.empty?
       end
 
+      attr_accessor :profile_uid,:profile_item_uid
 
       private
 
@@ -101,8 +102,6 @@ module AMEE
         delete_profile_item
         raise DidNotCreateProfileItem
       end
-
-      attr_accessor :profile_uid,:profile_item_uid
       
       def drill_options(options={})
         to=options.delete(:before)
@@ -148,7 +147,7 @@ module AMEE
       end
 
       def create_profile_item
-        raise Exceptions::AlreadyHaveProfileItem if profile_item_uid
+        raise Exceptions::AlreadyHaveProfileItem unless profile_item_uid.blank?
         location = AMEE::Profile::Item.create(profile_category,
           amee_drill.data_item_uid,
           # Don't call data_item_uid,
@@ -168,7 +167,7 @@ module AMEE
       end
 
       def profile_item
-        @profile_item||=AMEE::Profile::Item.get(connection, profile_item_path, get_options) if profile_item_uid
+        @profile_item||=AMEE::Profile::Item.get(connection, profile_item_path, get_options) unless profile_item_uid.blank?
       end
 
       def set_profile_item_values
