@@ -1,7 +1,7 @@
 <% form_id = "drill-form-#{rand(1e8)}" %>
 <% form_tag({:action=>nil},{:id=>form_id}) do%>
   <%= hidden_field_tag 'form_id', form_id %>
-  
+  <p id="ajaxloader" style="display:none"><%= image_tag 'loading.gif' %></p>
   <table>
     <%@calculation.inputs.visible.each do |input|%>
       <tr>
@@ -25,7 +25,7 @@
   </table>
   <%= hidden_field_tag 'entry[profile_item_uid]', @calculation.send(:profile_item_uid) %>
 <%end%>
-<%= observe_form form_id, :url => {:action => 'result'}%>
+<%= observe_form form_id, :before=> "$('#ajaxloader').show()", :url => {:action => 'result'}%>
 <% javascript_tag do %>
   $('#<%=form_id%>').submit(function() {
   return false;
