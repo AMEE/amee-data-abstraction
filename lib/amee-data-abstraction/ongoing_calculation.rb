@@ -10,7 +10,7 @@ module AMEE
         new_profile_item_uid= choice.delete(:profile_item_uid)
         self.profile_item_uid=new_profile_item_uid if new_profile_item_uid
         choice.each do |k,v|
-          raise Exceptions::NoSuchTerm.new(k) unless self[k]
+          next unless self[k]
           self[k].value v unless v.blank?
         end
 
@@ -174,6 +174,8 @@ module AMEE
         # Set the profile item values for the profile item.
         AMEE::Profile::Item.update(connection,profile_item_path, 
           profile_options.merge(:get_item=>false))
+        #Clear the memoised profile item, to reload with updated values
+        @profile_item=nil
       end
 
       def delete_profile_item
