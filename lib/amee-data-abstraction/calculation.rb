@@ -34,6 +34,10 @@ module AMEE
         end
       end
 
+      def explorer_url
+         "http://explorer.amee.com/categories#{path}"
+      end
+       
       protected
 
       def initialize
