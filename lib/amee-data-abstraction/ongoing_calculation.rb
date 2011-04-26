@@ -133,10 +133,11 @@ module AMEE
       def find_profile
         # Return the AMEE::Profile::Profile to which the PI for this calculation
         # belongs, and update our stored UID to match.
-        prof ||= AMEE::Profile::ProfileList.new(connection).first
-        prof ||= AMEE::Profile::Profile.create(connection)
-        self.profile_uid=prof.uid
-        return prof
+        unless self.profile_uid
+          prof ||= AMEE::Profile::ProfileList.new(connection).first
+          prof ||= AMEE::Profile::Profile.create(connection)
+          self.profile_uid=prof.uid
+        end
       end
 
       def amee_name

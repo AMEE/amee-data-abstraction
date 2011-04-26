@@ -20,6 +20,9 @@ describe Calculation do
   it 'should return the outputs' do
     Transport.outputs.labels.should  eql [:co2]
   end
+  it 'should generate an explorer URL' do
+    Transport.explorer_url.should eql 'http://explorer.amee.com/categories/transport/car/generic'
+  end
   it 'can return a term via []' do
     Transport[:co2].label.should eql :co2
   end
