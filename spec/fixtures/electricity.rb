@@ -18,7 +18,7 @@ Electricity=AMEE::DataAbstraction::PrototypeCalculation.new { # The application 
     unit "kWh" #Default unit choice
     interface :text_box #Probably not needed, as likely to be the default for profile item value unsets
     validation lambda{|x|x.is_a? Float} #Probably not needed, as default can be deduced from PIV TYPE in API. Here as illustrative.
-    other_acceptable_units :any #A dropdown should appear allowing choice of energy unit - without this line only kWh allowed
+    alternative_units :MWh, :MBTU, :BTU # If these are explcitly specified then the alternatives are limited to only these units. Otherwise all dimensionally equivalent units are available as alternatives by default
   }
   
   # Alternatively, the drill might be fixed

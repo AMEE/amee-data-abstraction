@@ -37,7 +37,7 @@ module AMEE
       Selectors=TermClasses+TermFlags+[:before,:after,:optional,
         :compulsory,:in_use,:out_of_use]
 
-      TermProperties=[:label,:name,:path,:value]
+      TermProperties=[:label,:name,:path,:value,:unit,:per_unit,:default_unit,:default_per_unit]
       TermProperties.each do |term|
         define_method(term.to_s.pluralize.to_sym) do
           map{|x|x.send(term)}

@@ -12,15 +12,39 @@
             <%= select_tag "entry[#{input.label}]",
               options_for_select(input.options_for_select,input.set? ? input.value : nil),:disabled=>input.disabled?%>
           </td>
-
         <%else%>
-          <td><%=label :entry,input.label,input.name%></td><td><%= text_field :entry, input.label, "size" => 20, :value => input.value,:disabled=>input.disabled? %></td>
+          <td><%=label :entry,input.label,input.name%></td>
+          <td><%= text_field "entry[#{input.label}]", 'value',"size" => 20,:value => input.value,:disabled=>input.disabled? %></td>
+          <% unless input.default_unit.nil? %>
+            <td><%= collection_select("entry[#{input.label}]",
+                                      'unit', input.alternative_units,
+                                      :label,
+                                      :pluralized_name,
+                                      :selected => input.unit.label ) %>
+            </td>
+          <% end %>
+          <% unless input.default_per_unit.nil? %>
+            <td>per</td>
+            <td><%= collection_select("entry[#{input.label}]", 
+                                      'per_unit',
+                                      input.alternative_per_units,
+                                      :label,
+                                      :name,
+                                      :selected => input.per_unit.label ) %>
+            </td>
+          <% end %>
         <%end%>
-          <td><% if input.compulsory? %><span class="compulsory-input">*</span> <%end%></td>
+        <td><% if input.compulsory? %><span class="compulsory-input">*</span> <%end%></td>
       </tr>
     <%end%>
     <%@calculation.outputs.visible.each do |result|%>
-      <tr><td><%=label :entry,result.label,result.name%></td><td><%= result.value %></td></tr>
+      <tr>
+        <td><%=label :entry,result.label,result.name%></td>
+        <%value = (result.value.nil? ? "" : "#{result.value}")%>
+        <%unit = (result.unit.nil? || value.empty? ? "" : " #{result.unit.symbol}")%>
+        <%per_unit = (result.per_unit.nil? || value.empty? ? "" : " / #{result.per_unit.symbol}")%>
+        <td><%=value+unit+per_unit%></td>
+      </tr>
     <%end%>
   </table>
   <%= hidden_field_tag 'entry[profile_item_uid]', @calculation.send(:profile_item_uid) %>

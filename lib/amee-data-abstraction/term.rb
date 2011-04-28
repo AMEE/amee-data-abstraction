@@ -6,7 +6,7 @@ module AMEE
 
       #DSL----
 
-      attr_property :label,:name,:value,:path,:unit,:other_acceptable_units,:interface
+      attr_property :label,:name,:value,:path,:interface
             
       #-------
 
@@ -21,6 +21,8 @@ module AMEE
         label path.to_s.underscore.to_sym unless path.blank?||label
         path label.to_s unless path
         name label.to_s.humanize unless name
+        unit default_unit unless unit
+        per_unit default_per_unit unless per_unit
       end
 
 
@@ -38,6 +40,40 @@ module AMEE
           @interface=inf
         end
         return @interface
+      end
+
+      UnitFields = [:unit,:per_unit,:default_unit,:default_per_unit]
+
+      # Define explicit methods for setting and getting default and current units
+      # and per units. These replace the attr_property methods since initialization
+      # of unit objects is required
+      #
+      UnitFields.each do |field|
+        define_method(field) do |*unit|
+          instance_variable_set("@#{field}",Unit.for(unit.first)) unless unit.empty?
+          instance_variable_get("@#{field}")
+        end
+      end
+
+      # Define explicit methods for setting and getting unit alternatives. If not
+      # explicitly defined, default to the dimensionally equivalent units of the
+      # default units. This replaces the attr_property methods since initialization
+      # of unit objects is required
+      #
+      [:unit,:per_unit].each do |field|
+        define_method("alternative_#{field}s") do |*args|
+          ivar = "@alternative_#{field}s"
+          default = send("default_#{field}".to_sym)
+          unless args.empty?
+            args << default if default
+            units = args.map {|arg| Unit.for(arg) }
+            Term.validate_dimensional_equivalence?(units)
+            instance_variable_set(ivar, units)
+          else
+            return instance_variable_get(ivar) if instance_variable_get(ivar)
+            return instance_variable_set(ivar, (default.alternatives << default)) if default
+          end
+        end
       end
 
       def set?
@@ -90,6 +126,14 @@ module AMEE
 
       def after?(lab)
         parent.terms.labels.index(lab)<parent.terms.labels.index(label)
+      end
+      
+      # Check that the supplied units are dimensionally equivalent
+      def self.validate_dimensional_equivalence?(units)
+        unless units.all? {|unit| unit.dimensions == units[0].dimensions }
+          raise AMEE::DataAbstraction::Exceptions::InvalidUnits,
+            "The specified term units are not of equivalent dimensions: #{units.map(&:label).join(",")}"
+        end
       end
       
     end

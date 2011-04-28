@@ -38,12 +38,18 @@ module AMEE
           profile {
             path ivd.path
             choices ivd.choices
+            default_unit ivd.unit
+            default_per_unit ivd.perunit
           }
         end
       end
       def all_outputs
         amee_return_values.each do |rvd|
-          output { path rvd.name}
+          output {
+            path rvd.name
+            default_unit rvd.unit
+            default_per_unit rvd.perunit
+          }
         end
       end
       def profiles_from_usage(usage)
@@ -53,6 +59,8 @@ module AMEE
           profile {
             path ivd.path
             choices ivd.choices
+            default_unit ivd.unit
+            default_per_unit ivd.perunit
           } if ivd.compulsory?(usage) || ivd.optional?(usage)
         end
       end

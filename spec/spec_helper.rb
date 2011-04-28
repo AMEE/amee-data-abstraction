@@ -92,8 +92,10 @@ class AMEEMocker
     mock_id.should_receive(:drill_downs).and_return(some_drills)
     return self
   end
-  def return_value_definition(path)
+  def return_value_definition(path,unit=nil,per_unit=nil)
     rvd=test.flexmock :name=>path
+    rvd.should_receive(:unit).and_return unit
+    rvd.should_receive(:perunit).and_return per_unit
     mock_rvds.push rvd
     return self
   end
@@ -102,10 +104,12 @@ class AMEEMocker
         with(connection,:itemdefuid).and_return mock_rvds
       return self
   end
-  def item_value_definition(path,compulsories=[],optionals=[],forbiddens=[],choices=[])
+  def item_value_definition(path,compulsories=[],optionals=[],forbiddens=[],choices=[],unit=nil,per_unit=nil)
     ivd=test.flexmock :path=>path
     ivd.should_receive(:profile?).and_return true
     ivd.should_receive(:versions).and_return ['2.0']
+    ivd.should_receive(:unit).and_return unit
+    ivd.should_receive(:perunit).and_return per_unit
     ivd.should_receive(:choices).and_return choices
     compulsories.each do |compulsory|
       ivd.should_receive(:compulsory?).with(compulsory).and_return(true)
@@ -161,9 +165,9 @@ class AMEEMocker
       params.each {|key,val| from_amee.delete key}
       from_amee.each do |k,v|
         if failing
-          mock_pi.should_receive(:value).with(k).and_return(v)
+          mock_pi.should_receive(:values).and_return([{:path => k,:value => v }])
         else
-          mock_pi.should_receive(:value).with(k).and_return(v).once
+          mock_pi.should_receive(:values).and_return([{:path => k,:value => v }]).once
         end
       end
       selections.each do |k,v|
@@ -181,7 +185,7 @@ class AMEEMocker
     if once
       test.flexmock(AMEE::Profile::Item).should_receive(:get).
       with(connection,pipath,{}).
-      once.
+      at_least.once.
       and_return(mock_pi)
     else
     test.flexmock(AMEE::Profile::Item).should_receive(:get).

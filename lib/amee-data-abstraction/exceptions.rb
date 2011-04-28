@@ -11,6 +11,7 @@ module AMEE
       class DidNotCreateProfileItem < Exception; end
       class TwoUsages < Exception; end
       #class EntryOrderException < Exception; end
+      class InvalidUnits < Exception; end
     end
   end
 end

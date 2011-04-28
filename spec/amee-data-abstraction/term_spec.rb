@@ -22,6 +22,7 @@ describe Term do
   it "has path" do
     Term.new {path :hello}.path.should eql :hello
   end
+
   it 'has parent' do
     Transport[:distance].parent.should eql Transport
   end
@@ -83,5 +84,58 @@ describe Term do
     Transport.terms.
       select{|x|x.after?(:distance)}.map(&:label).
       should eql [:co2]
+  end
+
+  it "should respond to unit methods" do
+    Term.new.methods.should include "unit","per_unit","default_unit","default_per_unit",
+                                    "alternative_units","alternative_per_units"
+  end
+
+  it "has no default unit if none declared" do
+    Term.new {path :hello}.default_unit.should be_nil
+    Term.new {path :hello}.default_per_unit.should be_nil
+    Term.new {path :hello}.unit.should be_nil
+    Term.new {path :hello}.per_unit.should be_nil
+  end
+
+  it "has default unit if specified" do
+    Term.new {path :hello; default_unit :kg}.default_unit.name.should == 'kilogram'
+    Term.new {path :hello; default_per_unit :kWh}.default_per_unit.pluralized_name.should == 'kilowatt hours'
+    Term.new {path :hello; default_unit :kg}.default_unit.should be_a Quantify::Unit::SI
+  end
+
+  it "has current unit defaulting to default unit if none specified" do
+    Term.new {path :hello; default_unit :kg}.unit.name.should == 'kilogram'
+    Term.new {path :hello; default_per_unit :kWh}.per_unit.pluralized_name.should == 'kilowatt hours'
+    Term.new {path :hello; default_unit :kg}.unit.should be_a Quantify::Unit::SI
+  end
+
+  it "should have no alternative units if none specified and no default" do
+    term = Term.new {path :hello}
+    term.default_unit.should be_nil
+    term.unit.should be_nil
+    term.default_per_unit.should be_nil
+    term.per_unit.should be_nil
+    term.alternative_units.should be_nil
+    term.alternative_per_units.should be_nil
+  end
+
+  it "has default unit alternatives if none specified" do
+    term = Term.new {path :hello; default_unit :kg; default_per_unit :kWh}
+    units = term.alternative_units.map(&:name)
+    units.should include "gigagram", "pound", "tonne"
+    per_units = term.alternative_per_units.map(&:name)
+    per_units.should include "joule", "british thermal unit", "megawatt hour"
+  end
+
+  it "has limited set of alternative units if specified" do
+    term = Term.new {path :hello; default_unit :kg; alternative_units :t, :ton_us, :lb}
+    units = term.alternative_units.map(&:name)
+    units.should include "tonne", "pound", "short ton"
+    units.should_not include "gigagram", "ounce", "gram"
+  end
+
+  it "should raise error when specifying incompatible alternative units" do
+    lambda{Term.new {path :hello; default_unit :kg; alternative_units :kWh, :km}}.should raise_error
   end
 end

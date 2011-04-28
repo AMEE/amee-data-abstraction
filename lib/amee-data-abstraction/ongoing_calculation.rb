@@ -11,7 +11,15 @@ module AMEE
         self.profile_item_uid=new_profile_item_uid if new_profile_item_uid
         choice.each do |k,v|
           next unless self[k]
-          self[k].value v unless v.blank?
+          unless v.blank?
+            unless v.is_a? Hash
+              self[k].value v unless v.blank?
+            else
+              self[k].value v[:value]
+              self[k].unit v[:unit]
+              self[k].per_unit v[:per_unit]
+            end
+          end
         end
 
         #Clear out any invalid choices
@@ -49,7 +57,11 @@ module AMEE
           else
             res= profile_item.amounts.find{|x| x[:type] == output.path}
           end
-          output.value res[:value] if res
+          if res
+            output.value res[:value]
+            output.unit res[:unit]
+            output.per_unit res[:per_unit]
+          end
         end
       end
 
@@ -63,8 +75,10 @@ module AMEE
         # amee, if we have been given a profile uid
         return unless profile_item
         profiles.unset.each do |term|
-          ameeval=profile_item.value(term.path)
-          term.value ameeval
+          ameeval=profile_item.values.find { |value| value[:path] == term.path }
+          term.value ameeval[:value]
+          term.unit ameeval[:unit]
+          term.per_unit ameeval[:per_unit]
         end
       end
 
@@ -113,6 +127,8 @@ module AMEE
         result={}
         profiles.set.each do |piv|
           result[piv.path]=piv.value
+          result["#{piv.path}Unit"]=piv.unit.label unless piv.unit.nil?
+          result["#{piv.path}PerUnit"]=piv.per_unit.label unless piv.per_unit.nil?
         end
         if contents[:start_date]&&contents[:start_date].value
           result[:start_date]=Date.parse contents[:start_date].value
@@ -124,9 +140,9 @@ module AMEE
       end
       def get_options
         # Specify unit options here based on the contents
-        #getopts={}
-        #getopts[:returnUnit] = params[:unit] if params[:unit]
-        #getopts[:returnPerUnit] = params[:perUnit] if params[:perUnit]
+        # getopts={}
+        # getopts[:returnUnit] = params[:unit] if params[:unit]
+        # getopts[:returnPerUnit] = params[:perUnit] if params[:perUnit]
         return {}
       end
 

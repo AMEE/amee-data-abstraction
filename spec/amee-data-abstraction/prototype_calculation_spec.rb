@@ -57,20 +57,25 @@ describe PrototypeCalculation do
     mocker.item_value_definitions.
       item_definition.data_category.
       item_value_definition('first').
-      item_value_definition('second').
+      item_value_definition('second',[],[],[],[],:kg).
       item_value_definition('third')
     pc=PrototypeCalculation.new {path '/something'; all_profiles}
     pc.profiles.labels.should eql [:first,:second,:third]
+    pc.profiles.default_units.first.should be_nil
+    pc.profiles.default_units.compact.first.should be_a Quantify::Unit::Base
   end
   it 'can autogenerate profile terms for itself, based on a usage' do
     mocker=AMEEMocker.new(self,:path=>'something')
     mocker.item_value_definitions.
       item_definition.data_category.
       item_value_definition('first',['bybob']).
-      item_value_definition('second',['bybob']).
+      item_value_definition('second',['bybob'],[],[],[],:MBTU,:year).
       item_value_definition('third',[],[],['bybob'])
     pc=PrototypeCalculation.new {path '/something'; profiles_from_usage('bybob')}
     pc.profiles.labels.should eql [:first,:second]
+    pc.profiles.default_units.first.should be_nil
+    pc.profiles.default_units.compact.first.symbol.should eql 'MBTU'
+    pc.profiles.default_per_units.compact.first.symbol.should eql 'yr'
   end
   it 'can generate profile terms with choices' do
     mocker=AMEEMocker.new(self,:path=>'something')
@@ -103,23 +108,35 @@ describe PrototypeCalculation do
     mocker=AMEEMocker.new(self,:path=>'something')
     mocker.item_value_definitions.
       item_definition.data_category.
-      item_value_definition('first',['bybob'],[],'byfrank').
-      item_value_definition('second',['bybob'],[],'byfrank').
-      item_value_definition('third',['byfrank'],[],['bybob'])
+      item_value_definition('first',['bybob'],[],'byfrank',[],:kg,:mi).
+      item_value_definition('second',['bybob'],[],'byfrank',[],:km).
+      item_value_definition('third',['byfrank'],[],['bybob'],[],:lb,:h)
     pc=PrototypeCalculation.new {path '/something'; usage{ value 'bybob'}}
     pc.profiles.labels.should eql [:first,:second,:third]
     pc.profiles.visible.labels.should eql [:first,:second]
     pc.terms.labels.should eql [:usage,:first,:second,:third]
+    pc.terms.default_units.first.should be_nil
+    pc.terms.default_units[1].should be_a Quantify::Unit::Base
+    pc.terms.default_units[1].name.should eql 'kilogram'
+    pc.terms.default_per_units.first.should be_nil
+    pc.terms.default_per_units[1].should be_a Quantify::Unit::Base
+    pc.terms.default_per_units[1].name.should eql 'mile'
+    pc.terms.default_per_units[2].should be_nil
   end
   it 'can generate itself with outputs' do
     mocker=AMEEMocker.new(self,:path=>'something')
     mocker.return_value_definitions.
       item_definition.data_category.
-      return_value_definition('first').
-      return_value_definition('second').
+      return_value_definition('first',:kg,:mi).
+      return_value_definition('second',:km).
       return_value_definition('third')
     pc=PrototypeCalculation.new {path '/something'; all_outputs}
     pc.outputs.labels.should eql [:first,:second,:third]
+    pc.terms.default_units.first.should be_a Quantify::Unit::Base
+    pc.terms.default_units.first.name.should eql 'kilogram'
+    pc.terms.default_per_units.first.should be_a Quantify::Unit::Base
+    pc.terms.default_per_units.first.name.should eql 'mile'
+    pc.terms.default_units[2].should be_nil
   end
   it 'can generate itself with everything' do
     mocker=AMEEMocker.new(self,:path=>'something')
@@ -128,11 +145,11 @@ describe PrototypeCalculation do
       item_value_definitions.
       item_definition.data_category.
       item_value_definition('fourth',['bybob'],[],'byfrank').
-      item_value_definition('fifth',['bybob'],[],'byfrank').
+      item_value_definition('fifth',['bybob'],[],'byfrank',[],:lb).
       item_value_definition('sixth',['byfrank'],[],['bybob']).
       return_value_definition('seventh').
       return_value_definition('eighth').
-      return_value_definition('ninth')
+      return_value_definition('ninth',:mi,:h)
     pc=PrototypeCalculation.new {
       path '/something';
       terms_from_amee_dynamic_usage 'bybob'}
@@ -145,6 +162,11 @@ describe PrototypeCalculation do
       :first,:second,:third,
       :fourth,:fifth
     ]
+    pc.terms.default_units.compact.first.should be_a Quantify::Unit::Base
+    pc.terms.default_units.compact.map(&:name).should include 'pound'
+    pc.terms.default_units.compact.map(&:name).should include 'mile'
+    pc.terms.default_per_units.compact.first.should be_a Quantify::Unit::Base
+    pc.terms.default_per_units.compact.map(&:name).should include 'hour'
   end
   it 'transfers memoised amee information to constructed ongoing calculations' do
     t=Transport.clone
