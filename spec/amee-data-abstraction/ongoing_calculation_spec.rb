@@ -126,11 +126,22 @@ describe OngoingCalculation do
     mycalc.calculate!
     mycalc.outputs.first.value.should eql :somenumber
   end
-  it 'raises exception if choice supplied for invalid term' do
-    mycalc=Transport.begin_calculation
-    lambda{mycalc.choose!('fuel'=>'diesel','banana'=>'large','distance'=>5)}.
-      should raise_exception Exceptions::NoSuchTerm
-  end
+  #This exception has been removed, to support the case where the persistence module
+  #had a saved calculation from before a configuration file changed. We might want to
+  #do something more sophisticated.
+#  it 'raises exception if choice supplied for invalid term' do
+#    mycalc=Transport.begin_calculation
+#    mocker=AMEEMocker.new(self,:path=>'transport/car/generic',
+#      :choices=>['diesel','petrol'],
+#      :result=>:somenumber,
+#      :params=>{'distance'=>5})
+#    mocker.drill
+#    mocker.select('fuel'=>'diesel')
+#    mocker.choices=['large','small']
+#    mocker.drill
+#    lambda{mycalc.choose!('fuel'=>'diesel','banana'=>'large','distance'=>5)}.
+#      should raise_exception Exceptions::NoSuchTerm
+#  end
   it 'can be supplied just a UID, and recover PIVs and drill values from AMEE' do
     mycalc=Transport.begin_calculation
     mocker=AMEEMocker.new(self,:path=>'transport/car/generic',
@@ -245,7 +256,7 @@ describe OngoingCalculation do
     mocker.select('fuel'=>'diesel')
     mocker.select('size'=>'large')
     mocker.choices=[]
-    mocker.profile_list.update.get(true,false,true)
+    mocker.profile_list.update.get(true,false,false)
     mycalc.choose!(:profile_item_uid=>mocker.uid)
     mycalc.calculate!
     mycalc.send(:profile_item)

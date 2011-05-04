@@ -4,32 +4,10 @@ module AMEE
 
       public
 
-      def choose!(choice)
-        new_profile_uid= choice.delete(:profile_uid)
-        self.profile_uid=new_profile_uid if new_profile_uid
-        new_profile_item_uid= choice.delete(:profile_item_uid)
-        self.profile_item_uid=new_profile_item_uid if new_profile_item_uid
-        choice.each do |k,v|
-          next unless self[k]
-          unless v.blank?
-            unless v.is_a? Hash
-              self[k].value v unless v.blank?
-            else
-              self[k].value v[:value]
-              self[k].unit v[:unit]
-              self[k].per_unit v[:per_unit]
-            end
-          end
-        end
 
-        #Clear out any invalid choices
-        inputs.each do |d|
-          d.validate! # Up to each kind of quantity to decide whether to unset itself
-          # or raise an exception, if it is invalid.
-          # Typical behaviour is to simply set one's value to zero.
-        end
-       
-        autodrill
+      def choose!(choice)   
+        choose_without_validation!(choice)
+        validate!
       end
 
       def calculate!
@@ -46,6 +24,38 @@ module AMEE
       end
 
       attr_accessor :profile_uid,:profile_item_uid
+
+      #protected#--- not public API - only persistence gem should call these two
+
+      def validate!
+        #Clear out any invalid choices
+        inputs.each do |d|
+          d.validate! # Up to each kind of quantity to decide whether to unset itself
+          # or raise an exception, if it is invalid.
+          # Typical behaviour is to simply set one's value to zero.
+        end
+
+        autodrill
+      end
+
+      def choose_without_validation!(choice)
+        new_profile_uid= choice.delete(:profile_uid)
+        self.profile_uid=new_profile_uid if new_profile_uid
+        new_profile_item_uid= choice.delete(:profile_item_uid)
+        self.profile_item_uid=new_profile_item_uid if new_profile_item_uid
+        choice.each do |k,v|
+          next unless self[k]
+          unless v.blank?
+            unless v.is_a? Hash
+              self[k].value v unless v.blank?
+            else
+              self[k].value v[:value]
+              self[k].unit v[:unit]
+              self[k].per_unit v[:per_unit]
+            end
+          end
+        end
+      end
 
       private
 
