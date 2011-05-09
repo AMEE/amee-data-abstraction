@@ -45,7 +45,20 @@ module AMEE
       def validate!
         #Typically, you just wipe yourself if supplied value not valid, but
         #deriving classes might want to raise an exception
-        value nil unless fixed? || valid?
+        invalid unless fixed? || valid?
+      end
+
+      def invalid(because=nil)
+        if because.blank?
+          because="."
+        else
+          because=" #{because}"
+        end
+        if parent
+          parent.invalid(label,"#{name} is invalid#{because}")
+        else
+          raise AMEE::DataAbstraction::Exceptions::ChoiceValidation.new("#{name} is invalid#{because}")
+        end
       end
 
       def disabled?
