@@ -10,6 +10,7 @@ module AMEE
       def initialize(options={},&block)
         interface :drop_down
         super
+        choice_validation_message
       end
 
       private
