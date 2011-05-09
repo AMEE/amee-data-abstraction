@@ -311,5 +311,54 @@ describe OngoingCalculation do
     mycalc.calculate!
     mycalc.outputs.first.value.should eql :somenumber
   end
+  it 'starts off dirty' do
+    
+    mycalc=Transport.begin_calculation
+    mycalc.should be_dirty
+  end
+  it 'becomes clean when you calculate' do
+    mocker=AMEEMocker.new(self,:path=>'transport/car/generic',
+      :choices=>['diesel','petrol'],
+      :result=>:somenumber,
+      :params=>{'distance'=>5})
+    mocker.drill
+    mocker.select('fuel'=>'diesel')
+    mocker.choices=['large','small']
+    mocker.drill
+    mocker.select('size'=>'large')
+    mocker.choices=[]
+    mocker.drill
+    mocker.profile_list.profile_category.timestamp.create.get
+    mycalc=Transport.begin_calculation
+    mycalc.should be_dirty
+    mycalc.choose!('fuel'=>'diesel','size'=>'large','distance'=>5)
+    mycalc.calculate!
+    mycalc.should_not be_dirty
+    mycalc.outputs.first.value.should eql :somenumber
+    mycalc.should_not be_dirty
+  end
+  it 'becomes dirty again if you reset something after you calculate' do
+    mocker=AMEEMocker.new(self,:path=>'transport/car/generic',
+      :choices=>['diesel','petrol'],
+      :result=>:somenumber,
+      :params=>{'distance'=>5})
+    mocker.drill
+    mocker.select('fuel'=>'diesel')
+    mocker.choices=['large','small']
+    mocker.drill
+    mocker.select('size'=>'large')
+    mocker.choices=[]
+    mocker.drill
+    mocker.profile_list.profile_category.timestamp.create.get
+    mycalc=Transport.begin_calculation
+    mycalc.should be_dirty
+    mycalc.choose!('fuel'=>'diesel','size'=>'large','distance'=>5)
+    mycalc.calculate!
+    mycalc.should_not be_dirty
+    mycalc.outputs.first.value.should eql :somenumber
+    mycalc.should_not be_dirty
+    mycalc.choose!('distance'=>7)
+    mycalc.should be_dirty
+  end
 end
 

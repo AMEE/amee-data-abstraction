@@ -21,7 +21,10 @@ module AMEE
 
       def value(*args)
         unless args.empty?
-          raise Exceptions::FixedValueInterference if fixed?&&args.first!=@value
+          if args.first!=@value
+            raise Exceptions::FixedValueInterference if fixed?
+            parent.dirty! if parent
+          end
           @value=args.first
         end
         return @value

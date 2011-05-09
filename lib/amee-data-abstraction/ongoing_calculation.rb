@@ -10,12 +10,15 @@ module AMEE
       end
 
       def calculate!
+        return unless dirty?
         syncronize_with_amee
+        clean!
       end
 
       # Friend constructor for PrototypeCalculation ONLY
       def initialize
         super
+        dirty!
       end
 
       def satisfied?
@@ -23,6 +26,18 @@ module AMEE
       end
 
       attr_accessor :profile_uid,:profile_item_uid
+
+      def dirty?
+        @dirty
+      end
+
+      def dirty!
+        @dirty=true
+      end
+
+      def clean!
+        @dirty=false
+      end
 
       #protected#--- not public API - only persistence gem should call these two
 
