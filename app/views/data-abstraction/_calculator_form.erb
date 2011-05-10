@@ -47,7 +47,7 @@
       </tr>
     <%end%>
   </table>
-  <%= hidden_field_tag 'entry[profile_item_uid]', @calculation.send(:profile_item_uid) %>
+  <%= hidden_field_tag 'entry[id]', @calculation.id if @calculation.id %>
 <%end%>
 <%= observe_form form_id, :before=> "$('#ajaxloader').show()", :url => {:action => 'result'}%>
 <% javascript_tag do %>

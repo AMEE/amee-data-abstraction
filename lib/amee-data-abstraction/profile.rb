@@ -5,6 +5,7 @@ module AMEE
       def initialize(options={},&block)
         super
         interface :drop_down unless choices.blank?
+        choice_validation_message unless choices.blank?
         interface :text_box unless interface
       end
       def optional?(usage=nil)

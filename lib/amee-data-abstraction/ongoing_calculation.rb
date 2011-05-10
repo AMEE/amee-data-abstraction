@@ -8,34 +8,62 @@ module AMEE
       def choose!(choice)   
         choose_without_validation!(choice)
         validate!
+        raise AMEE::DataAbstraction::Exceptions::ChoiceValidation.new(invalidity_messages) unless invalidity_messages.empty?
+      end
+
+      def choose(choice)
+        begin
+          choose!(choice)
+          return true
+        rescue AMEE::DataAbstraction::Exceptions::ChoiceValidation
+          return false
+        end
       end
 
       def calculate!
+        return unless dirty?
         syncronize_with_amee
+        clean!
       end
 
       # Friend constructor for PrototypeCalculation ONLY
       def initialize
         super
+        dirty!
+        reset_invalidity_messages
       end
 
       def satisfied?
         inputs.compulsory.unset.empty?
       end
 
-      attr_accessor :profile_uid,:profile_item_uid
+      attr_accessor :profile_uid,:profile_item_uid,:invalidity_messages
+
+      def dirty?
+        @dirty
+      end
+
+      def dirty!
+        @dirty=true
+      end
+
+      def clean!
+        @dirty=false
+      end
 
       #protected#--- not public API - only persistence gem should call these two
 
       def validate!
-        #Clear out any invalid choices
+        reset_invalidity_messages
         inputs.each do |d|
-          d.validate! # Up to each kind of quantity to decide whether to unset itself
-          # or raise an exception, if it is invalid.
-          # Typical behaviour is to simply set one's value to zero.
+          d.validate! unless d.unset?
         end
 
         autodrill
+      end
+
+      def invalid(label,message)
+        @invalidity_messages[label]=message
       end
 
       def choose_without_validation!(choice)
@@ -58,6 +86,10 @@ module AMEE
       end
 
       private
+
+      def reset_invalidity_messages
+        @invalidity_messages={}
+      end
 
       def load_outputs
         outputs.each do |output|

@@ -7,21 +7,39 @@ describe Input do
    i.fixed?.should be_true
    lambda{i.value 7}.should raise_error Exceptions::FixedValueInterference
  end
- it 'wipes its value unless valid' do
+ it 'raises exception when invalid' do
    i=Input.new{validation /bark/}
    i.value 'barking'
-   i.validate!
+   lambda{i.validate!}.should_not raise_error
    i.value.should eql 'barking'
    i.value 'marking'
-   i.validate!
-   i.value.should eql nil
+   lambda{i.validate!}.should raise_error Exceptions::ChoiceValidation
+   j=Input.new{}
+   j.value 'marking'
+   j.value.should eql 'marking'
+ end
+ it 'can have custom validation message' do
+   i=Input.new{label :woof; validation /bark/; validation_message {"#{value} does not match pattern /bark/"}}
+   i.value 'marking'
+   lambda{i.validate!}.should raise_error Exceptions::ChoiceValidation,"marking does not match pattern /bark/"
+   j=Input.new{}
+   j.value 'marking'
+   j.value.should eql 'marking'
+ end
+ it 'can have default validation message' do
+   i=Input.new{label :woof; validation /bark/}
+   i.value 'barking'
+   lambda{i.validate!}.should_not raise_error
+   i.value.should eql 'barking'
+   i.value 'marking'
+   lambda{i.validate!}.should raise_error Exceptions::ChoiceValidation,"Woof is invalid."
    j=Input.new{}
    j.value 'marking'
    j.value.should eql 'marking'
  end
  it 'is always valid if it is fixed' do
    i=Input.new{fixed 5; validation /7/}
-   i.validate!
+   lambda{i.validate!}.should_not raise_error
    i.value.should eql 5
  end
  it 'is always disabled if it is fixed' do

@@ -10,6 +10,7 @@ module AMEE
       class Syncronization < Exception; end
       class DidNotCreateProfileItem < Exception; end
       class TwoUsages < Exception; end
+      class ChoiceValidation < Exception; end
       #class EntryOrderException < Exception; end
       class InvalidUnits < Exception; end
     end
