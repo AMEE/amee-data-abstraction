@@ -16,7 +16,7 @@ module AMEE
       private
 
       def valid?
-        super && (choices.include? value) && (choices.length > 1)
+        super && (choices.include? value) #&& (choices.length > 1)
       end
       
       def choices

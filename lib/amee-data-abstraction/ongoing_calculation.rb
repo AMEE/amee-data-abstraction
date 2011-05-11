@@ -172,10 +172,10 @@ module AMEE
           result["#{piv.path}Unit"]=piv.unit.label unless piv.unit.nil?
           result["#{piv.path}PerUnit"]=piv.per_unit.label unless piv.per_unit.nil?
         end
-        if contents[:start_date]&&contents[:start_date].value
+        if contents[:start_date] and not contents[:start_date].value.blank?
           result[:start_date]=Date.parse contents[:start_date].value
         end
-        if contents[:end_date]&&contents[:end_date].value
+        if contents[:end_date] and not contents[:end_date].value.blank?
           result[:end_date]=Date.parse contents[:end_date].value
         end
         return result

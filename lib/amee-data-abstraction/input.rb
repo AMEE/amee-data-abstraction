@@ -1,12 +1,13 @@
 module AMEE
   module DataAbstraction
     class Input < Term
+
       def choices
         raise NotImplementedError
       end
 
       def options_for_select
-        [[nil,nil]]+choices.map{|x|[x.underscore.humanize,x]}
+        [[nil,nil]]+choices.map{|x|[x.underscore.humanize,x] unless x.nil? }.compact
       end
 
       attr_property :validation
