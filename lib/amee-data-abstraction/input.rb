@@ -34,7 +34,7 @@ module AMEE
 
       def value(*args)
         unless args.empty?
-          if args.first!=@value
+          if args.first.to_s!=@value.to_s
             raise Exceptions::FixedValueInterference if fixed?
             parent.dirty! if parent
           end
