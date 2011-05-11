@@ -26,6 +26,15 @@ module AMEE
         clean!
       end
 
+      def clear_invalid_terms!
+        terms.select do |term|
+          invalidity_messages.keys.include?(term.label)
+        end.each do |term|
+          term.value nil
+        end
+        reset_invalidity_messages
+      end
+
       # Friend constructor for PrototypeCalculation ONLY
       def initialize
         super
