@@ -53,6 +53,7 @@ module AMEE
       #protected#--- not public API - only persistence gem should call these two
 
       def validate!
+        return unless dirty?
         reset_invalidity_messages
         inputs.each do |d|
           d.validate! unless d.unset?
