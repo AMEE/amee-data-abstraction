@@ -4,6 +4,30 @@ module AMEE
 
       public
 
+      attr_accessor :profile_uid,:profile_item_uid,:invalidity_messages
+
+      # Friend constructor for PrototypeCalculation ONLY
+      def initialize
+        super
+        dirty!
+        reset_invalidity_messages
+      end
+
+      def dirty?
+        @dirty
+      end
+
+      def dirty!
+        @dirty=true
+      end
+
+      def clean!
+        @dirty=false
+      end
+
+      def satisfied?
+        inputs.compulsory.unset.empty?
+      end
 
       def choose!(choice)   
         choose_without_validation!(choice)
@@ -18,61 +42,6 @@ module AMEE
         rescue AMEE::DataAbstraction::Exceptions::ChoiceValidation
           return false
         end
-      end
-
-      def calculate!
-        return unless dirty?
-        syncronize_with_amee
-        clean!
-      end
-
-      def clear_invalid_terms!
-        terms.select do |term|
-          invalidity_messages.keys.include?(term.label)
-        end.each do |term|
-          term.value nil
-        end
-        reset_invalidity_messages
-      end
-
-      # Friend constructor for PrototypeCalculation ONLY
-      def initialize
-        super
-        dirty!
-        reset_invalidity_messages
-      end
-
-      def satisfied?
-        inputs.compulsory.unset.empty?
-      end
-
-      attr_accessor :profile_uid,:profile_item_uid,:invalidity_messages
-
-      def dirty?
-        @dirty
-      end
-
-      def dirty!
-        @dirty=true
-      end
-
-      def clean!
-        @dirty=false
-      end
-
-      #protected#--- not public API - only persistence gem should call these two
-
-      def validate!
-        reset_invalidity_messages
-        inputs.each do |d|
-          d.validate! unless d.unset?
-        end
-
-        autodrill
-      end
-
-      def invalid(label,message)
-        @invalidity_messages[label]=message
       end
 
       def choose_without_validation!(choice)
@@ -92,6 +61,36 @@ module AMEE
             end
           end
         end
+      end
+
+      def calculate!
+        return unless dirty?
+        syncronize_with_amee
+        clean!
+      end
+
+      #protected#--- not public API - only persistence gem should call these two
+
+      def validate!
+        reset_invalidity_messages
+        inputs.each do |d|
+          d.validate! unless d.unset?
+        end
+
+        autodrill
+      end
+
+      def invalid(label,message)
+        @invalidity_messages[label]=message
+      end
+
+      def clear_invalid_terms!
+        terms.select do |term|
+          invalidity_messages.keys.include?(term.label)
+        end.each do |term|
+          term.value nil
+        end
+        reset_invalidity_messages
       end
 
       private
@@ -189,6 +188,7 @@ module AMEE
         end
         return result
       end
+
       def get_options
         # Specify unit options here based on the contents
         # getopts={}
@@ -282,7 +282,11 @@ module AMEE
         # list drills given in params, merged with values autopicked by amee driller
         picks=amee_drill.selections
         picks.each do |path,value|
-          drill_by_path(path).value value
+          if drill = drill_by_path(path)
+            drill.value value
+          else
+            drills << Drill.new {path path; value value}
+          end
         end
       end
 

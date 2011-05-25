@@ -83,9 +83,7 @@ module AMEE
         metadatum {
           path 'start_date'
           interface :date
-          value nil
           validation lambda{|value|
-            value.blank? or
             begin
               Date.parse(value)
               true
@@ -97,9 +95,7 @@ module AMEE
         metadatum {
           path 'end_date'
           interface :date
-          value nil
           validation lambda{|value|
-            value.blank? or
             begin
               Date.parse(value)
               true
@@ -114,8 +110,6 @@ module AMEE
         return unless contents[label]
         contents[label].instance_eval(&block)
       end
-
-      #--------------------
 
       def begin_calculation
         result=OngoingCalculation.new

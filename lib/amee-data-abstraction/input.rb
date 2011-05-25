@@ -62,8 +62,6 @@ module AMEE
         invalid unless fixed? || valid?
       end
 
-      
-
       def invalid
         if parent
           parent.invalid(label,instance_eval(&@validation_block))

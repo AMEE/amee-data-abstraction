@@ -4,12 +4,8 @@ module AMEE
 
       public
 
-      #DSL----
-
       attr_property :label,:name,:value,:path,:interface
             
-      #-------
-
       attr_accessor :parent
 
       def initialize(options={},&block)
@@ -24,7 +20,6 @@ module AMEE
         unit default_unit unless unit
         per_unit default_per_unit unless per_unit
       end
-
 
       Interfaces=[:text_box,:drop_down,:date]
 
@@ -67,7 +62,7 @@ module AMEE
           unless args.empty?
             args << default if default
             units = args.map {|arg| Unit.for(arg) }
-            Term.validate_dimensional_equivalence?(units)
+            Term.validate_dimensional_equivalence?(*units)
             instance_variable_set(ivar, units)
           else
             return instance_variable_get(ivar) if instance_variable_get(ivar)
@@ -127,10 +122,34 @@ module AMEE
       def after?(lab)
         parent.terms.labels.index(lab)<parent.terms.labels.index(label)
       end
-      
+
+      def initialize_copy(source)
+        super
+        UnitFields.each do |property|
+          prop = send(property)
+          self.send(property, prop.clone) unless prop.nil?
+        end
+      end
+
+      # String representation of term. Format argument describes the format in which
+      # units should be rendered, and default to the unit symbol. Alternative options
+      # include :name, :pluralized_name and :label
+      #
+      def to_s(format=:symbol)
+        string = "#{value}"
+        if unit and per_unit
+          string += " #{(unit/per_unit).send(format)}"
+        elsif unit
+          string += " #{unit.send(format)}"
+        elsif per_unit
+          string += " #{(1/per_unit).send(format)}"
+        end
+        return string
+      end
+
       # Check that the supplied units are dimensionally equivalent
-      def self.validate_dimensional_equivalence?(units)
-        unless units.all? {|unit| unit.dimensions == units[0].dimensions }
+      def self.validate_dimensional_equivalence?(*units)
+        unless [units].flatten.all? {|unit| unit.dimensions == units[0].dimensions }
           raise AMEE::DataAbstraction::Exceptions::InvalidUnits,
             "The specified term units are not of equivalent dimensions: #{units.map(&:label).join(",")}"
         end

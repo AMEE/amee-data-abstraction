@@ -1,6 +1,7 @@
 module AMEE
   module DataAbstraction
     class Drill < Input
+
       public
 
       def disabled?

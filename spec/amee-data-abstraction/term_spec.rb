@@ -138,4 +138,42 @@ describe Term do
   it "should raise error when specifying incompatible alternative units" do
     lambda{Term.new {path :hello; default_unit :kg; alternative_units :kWh, :km}}.should raise_error
   end
+
+  it "should make a clone" do
+    term = Term.new {path :hello; default_unit :kg; alternative_units :t, :ton_us, :lb}
+    term.path.should eql :hello
+    term.default_unit.should be_a Quantify::Unit::Base
+    original_unit_instance = term.default_unit
+    term.default_unit.symbol.should eql 'kg'
+    new_term = term.clone
+    new_term.path.should eql :hello
+    new_term.default_unit.should be_a Quantify::Unit::Base
+    new_term.default_unit.symbol.should eql 'kg'
+    new_unit_instance = new_term.default_unit
+    original_unit_instance.should_not eql new_unit_instance
+  end
+
+  it "should represent term as string with unit symbol if no argument provided" do
+    Term.new {path :hello; value 12; default_unit :kg}.to_s.should == '12 kg'
+    Term.new {path :hello; value 12; default_unit :kg; per_unit :h}.to_s.should == '12 kg h^-1'
+    Term.new {path :hello; value 12; per_unit :h}.to_s.should == '12 h^-1'
+  end
+
+  it "should represent term as string with unit label" do
+    Term.new {path :hello; value 12; default_unit :kg}.to_s(:label).should == '12 kg'
+    Term.new {path :hello; value 12; default_unit :kg; per_unit :h}.to_s(:label).should == '12 kg/h'
+    Term.new {path :hello; value 12; per_unit :h}.to_s(:label).should == '12 h^-1'
+  end
+
+  it "should represent term as string with unit name" do
+    Term.new {path :hello; value 12; default_unit :kg}.to_s(:name).should == '12 kilogram'
+    Term.new {path :hello; value 12; default_unit :kg; per_unit :h}.to_s(:name).should == '12 kilogram per hour'
+    Term.new {path :hello; value 12; per_unit :h}.to_s(:name).should == '12 per hour'
+  end
+
+  it "should represent term as string with unit pluralized name" do
+    Term.new {path :hello; value 12; default_unit :kg}.to_s(:pluralized_name).should == '12 kilograms'
+    Term.new {path :hello; value 12; default_unit :kg; per_unit :h}.to_s(:pluralized_name).should == '12 kilograms per hour'
+    Term.new {path :hello; value 12; per_unit :h}.to_s(:pluralized_name).should == '12 per hour'
+  end
 end
