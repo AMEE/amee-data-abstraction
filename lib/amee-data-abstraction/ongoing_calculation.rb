@@ -282,6 +282,10 @@ module AMEE
         # list drills given in params, merged with values autopicked by amee driller
         picks=amee_drill.selections
         picks.each do |path,value|
+          # If drill term does not exist, initialize a dummy instance. This is useful in those cases
+          # where some drills selections are unecessary (i.e. not all choices require selection for data
+          # items to be uniquely identified) and removes the need to explicitly specify the blank drills
+          # in configuration. This doen't matter if calculations are auto configured.
           if drill = drill_by_path(path)
             drill.value value
           else
