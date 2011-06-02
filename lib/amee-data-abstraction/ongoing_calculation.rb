@@ -53,11 +53,13 @@ module AMEE
           next unless self[k]
           unless v.blank?
             unless v.is_a? Hash
-              self[k].value v unless v.blank?
+              self[k].value v unless v.nil?
             else
-              self[k].value v[:value]
-              self[k].unit v[:unit]
-              self[k].per_unit v[:per_unit]
+              # Added unless clause. Initially used #blank? method but this meant
+              # that an intentional blanking of a value would not be honoured.
+              self[k].value v[:value] unless v[:value].nil?
+              self[k].unit v[:unit] unless v[:unit].nil?
+              self[k].per_unit v[:per_unit] unless v[:per_unit].nil?
             end
           end
         end
@@ -69,14 +71,11 @@ module AMEE
         clean!
       end
 
-      #protected#--- not public API - only persistence gem should call these two
-
       def validate!
         reset_invalidity_messages
         inputs.each do |d|
           d.validate! unless d.unset?
         end
-
         autodrill
       end
 
@@ -84,6 +83,11 @@ module AMEE
         @invalidity_messages[label]=message
       end
 
+      # Method used to wipe invalid terms. Motivation was to blank invalid drills
+      # following a drill reselection (this originally working funcitonality was
+      # broken by the subsequently added validation functionality). Can be called
+      # from Rails controller following #choose(!), depending on the requirements
+      #
       def clear_invalid_terms!
         terms.select do |term|
           invalidity_messages.keys.include?(term.label)
@@ -111,6 +115,14 @@ module AMEE
             output.value res[:value]
             output.unit res[:unit]
             output.per_unit res[:per_unit]
+          else
+            # If no platform result, then no outputs should be set.
+            #
+            # Added so that nullifying a compulsory PIV wipes output value, otherwise
+            # previous output values were persisting after PIVs removed. An alternative
+            # approach might be to add Outputs to the #validate! method, nullifying them
+            # not all compulsory inputs set. Perhaps units should also be nullified.
+            output.value nil
           end
         end
       end

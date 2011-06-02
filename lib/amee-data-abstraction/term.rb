@@ -111,6 +111,11 @@ module AMEE
         @visible=true
       end
 
+      # Permits handling of term summing, averaging, etc.
+      def has_numeric_value?
+        set? and Float(value) rescue false
+      end
+
       def inspect
         "[#{self.class} #{label} : #{value}]"
       end

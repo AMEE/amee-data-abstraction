@@ -12,7 +12,7 @@ Gem::Specification.new do |s|
   s.authors = ["James Hetherington"]
   s.files = ["README", "COPYING", "CHANGELOG"]
   s.files += FileList.new('lib/**/*.rb')
-  s.files += ['init.rb', 'rails/init.rb', 'app/views/data-abstraction/_calculator_form.erb']
+  s.files += ['init.rb', 'rails/init.rb']
   s.files += [] #bin/executable
   s.files += FileList.new('examples/**/*.rb')
   s.files += ['init.rb', 'rails/init.rb']
