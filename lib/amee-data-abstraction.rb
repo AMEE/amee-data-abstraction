@@ -5,6 +5,7 @@ require 'quantify'
 
 require File.dirname(__FILE__) + '/core-extensions/class'
 require File.dirname(__FILE__) + '/core-extensions/ordered_hash'
+require File.dirname(__FILE__) + '/core-extensions/hash'
 require File.dirname(__FILE__) + '/core-extensions/proc'
 require File.dirname(__FILE__) + '/config/amee_units'
 require File.dirname(__FILE__) + '/amee-data-abstraction/exceptions'
