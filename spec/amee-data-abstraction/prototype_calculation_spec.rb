@@ -160,7 +160,8 @@ describe PrototypeCalculation do
     ]
     pc.terms.visible.labels.should eql  [:usage,
       :first,:second,:third,
-      :fourth,:fifth
+      :fourth,:fifth,
+      :seventh,:eighth,:ninth
     ]
     pc.terms.default_units.compact.first.should be_a Quantify::Unit::Base
     pc.terms.default_units.compact.map(&:name).should include 'pound'
