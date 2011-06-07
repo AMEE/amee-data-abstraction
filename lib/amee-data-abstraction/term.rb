@@ -4,7 +4,7 @@ module AMEE
 
       public
 
-      attr_property :label,:name,:value,:path,:interface
+      attr_property :label,:name,:value,:path,:interface,:note
             
       attr_accessor :parent
 
@@ -19,6 +19,7 @@ module AMEE
         name label.to_s.humanize unless name
         unit default_unit unless unit
         per_unit default_per_unit unless per_unit
+        # should add in here auto setting of :note property using ivd annotation
       end
 
       Interfaces=[:text_box,:drop_down,:date]
