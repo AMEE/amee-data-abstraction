@@ -37,7 +37,7 @@ module AMEE
         unless args.empty?
           if args.first!=@value
             raise Exceptions::FixedValueInterference if fixed?
-            parent.dirty! if parent
+            parent.dirty! if parent and parent.is_a? OngoingCalculation
           end
           @value=args.first
         end
