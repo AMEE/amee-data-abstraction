@@ -142,6 +142,12 @@ Quantify::Unit::NonSI.configure do
     unit.make_canonical
   end
 
+  # AMEE uses 'day' rather than 'd' as the label for the time period, day
+  Unit.day.operate do |unit|
+    unit.label = 'day'
+    unit.make_canonical
+  end
+
   # Load prefixed version of British thermal unit, which is used in AMEE
   prefix_and_load :M, :BTU_FiftyNineF
 
