@@ -47,10 +47,14 @@ describe PrototypeCalculation do
   end
   it 'can autogenerate drill terms for itself, based on talking to amee' do
     mocker=AMEEMocker.new(self,:path=>'something')
-    mocker.itemdef_drills ['first','second','third']
-    mocker.item_definition.data_category
+    mocker.item_value_definitions.
+      item_definition.data_category.
+      item_value_definition('first',[],[],[],nil,nil,nil,false,true).
+      item_value_definition('second',[],[],[],nil,nil,nil,false,true).
+      item_value_definition('third',[],[],[],nil,nil,nil,false,true)
     pc=PrototypeCalculation.new {path '/something'; all_drills}
     pc.drills.labels.should eql [:first,:second,:third]
+    pc.drills.names.should eql ['first','second','third']
   end
   it 'can autogenerate profile terms for itself' do
     mocker=AMEEMocker.new(self,:path=>'something')
@@ -138,12 +142,15 @@ describe PrototypeCalculation do
     pc.terms.default_per_units.first.name.should eql 'mile'
     pc.terms.default_units[2].should be_nil
   end
+
   it 'can generate itself with everything' do
     mocker=AMEEMocker.new(self,:path=>'something')
-    mocker.itemdef_drills ['first','second','third']
     mocker.return_value_definitions.
       item_value_definitions.
       item_definition.data_category.
+      item_value_definition('first',['bybob','byfrank'],[],[],nil,nil,nil,false,true).
+      item_value_definition('second',['bybob','byfrank'],[],[],nil,nil,nil,false,true).
+      item_value_definition('third',['bybob','byfrank'],[],[],nil,nil,nil,false,true).
       item_value_definition('fourth',['bybob'],[],'byfrank').
       item_value_definition('fifth',['bybob'],[],'byfrank',[],:lb).
       item_value_definition('sixth',['byfrank'],[],['bybob']).

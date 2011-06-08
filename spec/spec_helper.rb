@@ -33,34 +33,45 @@ class AMEEMocker
     @mock_id=test.flexmock
     @mock_ivds=[]
     @mock_rvds=[]
+    @mock_drills=[]
   end
+
   attr_accessor :path,:selections,:choices,:result,:params,
-    :existing,:mock_dc,:mock_id,:mock_ivds,:mock_rvds
+    :existing,:mock_dc,:mock_id,:mock_ivds,:mock_rvds,:mock_drills
+
   attr_reader :test
+
   def catuid
     path.gsub(/\//,'-').to_sym
   end
+
   def select(opts)
     # Like an array of pairs, not a hash, for ordering reasons.
     opts.each do |k,v|
       @selections[k]=v
     end
   end
+
   def connection
     AMEE::DataAbstraction.connection
   end
+
   def dataitemuid
     "#{catuid}:#{selections.map{|k,v|"#{k}-#{v}"}.join('-')}"
   end
+
   def uid
     dataitemuid+"PI"
   end
+
   def pipath
     "/profiles/someprofileuid/#{path}/#{uid}"
   end
+
   def dipath
     "/data/#{path}/#{dataitemuid}"
   end
+
   def drill
     test.flexmock(AMEE::Data::DrillDown).
       should_receive(:get).
@@ -71,27 +82,27 @@ class AMEEMocker
         :data_item_uid=>dataitemuid))
     return self
   end
+
   def profile_list
     test.flexmock(AMEE::Profile::ProfileList).should_receive(:new).
       with(connection).at_least.once.
       and_return(test.flexmock(:first=>test.flexmock(:uid=>:someprofileuid)))
     return self
   end
+
   def timestamp
     test.flexmock(UUIDTools::UUID).should_receive(:timestamp_create).at_least.once.
       and_return(:sometimestamp)
     return self
   end
+
   def profile_category
     test.flexmock(AMEE::Profile::Category).should_receive(:get).
       with(connection,"/profiles/someprofileuid/#{path}").at_least.once.
       and_return(catuid)
     return self
   end
-  def itemdef_drills(some_drills)
-    mock_id.should_receive(:drill_downs).and_return(some_drills)
-    return self
-  end
+  
   def return_value_definition(path,unit=nil,per_unit=nil)
     rvd=test.flexmock :name=>path
     rvd.should_receive(:unit).and_return unit
@@ -99,14 +110,18 @@ class AMEEMocker
     mock_rvds.push rvd
     return self
   end
+
   def return_value_definitions
     test.flexmock(AMEE::Admin::ReturnValueDefinitionList).should_receive(:new).
         with(connection,:itemdefuid).and_return mock_rvds
       return self
   end
-  def item_value_definition(path,compulsories=[],optionals=[],forbiddens=[],choices=[],unit=nil,per_unit=nil)
+
+  def item_value_definition(path,compulsories=[],optionals=[],forbiddens=[],choices=[],unit=nil,per_unit=nil,profile=true,drill=false)
     ivd=test.flexmock :path=>path
-    ivd.should_receive(:profile?).and_return true
+    ivd.should_receive(:name).and_return path
+    ivd.should_receive(:profile?).and_return profile
+    ivd.should_receive(:drill?).and_return drill
     ivd.should_receive(:versions).and_return ['2.0']
     ivd.should_receive(:unit).and_return unit
     ivd.should_receive(:perunit).and_return per_unit
@@ -126,26 +141,31 @@ class AMEEMocker
     mock_ivds.push ivd
     return self
   end
+
   def item_value_definitions
     mock_id.should_receive(:item_value_definition_list).at_least.once.and_return(mock_ivds)
     return self
   end
+
   def usages(someusages)
     mock_id.should_receive(:usages).and_return(someusages)
     return self
   end
+
   def item_definition(name=:itemdef_name)
     mock_id.should_receive(:name).and_return(name)
     mock_id.should_receive(:uid).and_return(:itemdefuid)
     mock_dc.should_receive(:item_definition).at_least.once.and_return(mock_id)
     return self
   end
+
   def data_category
     test.flexmock(AMEE::Data::Category).should_receive(:get).
       with(connection,"/data/#{path}").at_least.once.
       and_return(mock_dc)
     return self
   end
+
   def create
     test.flexmock(AMEE::Profile::Item).should_receive(:create).
       with(catuid,dataitemuid,
@@ -154,6 +174,7 @@ class AMEEMocker
       and_return(pipath)
     return self
   end
+
   def get(with_pi=false,failing=false,once=false)
     mock_pi=test.flexmock(
       :amounts=>test.flexmock(:find=>{:value=>result}),
@@ -195,12 +216,14 @@ class AMEEMocker
     end
     return self
   end
+
   def delete
     test.flexmock(AMEE::Profile::Item).should_receive(:delete).
       at_least.once.
       with(connection,pipath)
     return self
   end
+
   def update
     test.flexmock(AMEE::Profile::Item).should_receive(:update).
       with(connection,pipath,

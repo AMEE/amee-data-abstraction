@@ -28,21 +28,28 @@ module AMEE
         construct(Usage,options.merge(:first=>true),&block)
       end
       def all_drills
-        amee_item_definition.drill_downs.each do |apath|
-          drill { path apath }
+        amee_ivds.each do |ivd|
+          next unless ivd.drill?
+          drill {
+            path ivd.path
+            name ivd.name
+          }
         end
       end
+      
       def all_profiles
         amee_ivds.each do |ivd|
           next unless ivd.profile?
           profile {
             path ivd.path
+            name ivd.name
             choices ivd.choices
             default_unit ivd.unit
             default_per_unit ivd.perunit
           }
         end
       end
+
       def all_outputs
         amee_return_values.each do |rvd|
           output {
@@ -52,18 +59,21 @@ module AMEE
           }
         end
       end
+
       def profiles_from_usage(usage)
         self.fixed_usage usage
         amee_ivds.each do |ivd|
           next unless ivd.profile?
           profile {
             path ivd.path
+            name ivd.name
             choices ivd.choices
             default_unit ivd.unit
             default_per_unit ivd.perunit
           } if ivd.compulsory?(usage) || ivd.optional?(usage)
         end
       end
+
       def terms_from_amee(usage=nil)
         all_drills
         if usage
@@ -73,6 +83,7 @@ module AMEE
         end
         all_outputs
       end
+
       def terms_from_amee_dynamic_usage(ausage)
         all_drills
         usage{ value ausage}
@@ -82,6 +93,7 @@ module AMEE
       def start_and_end_dates
         metadatum {
           path 'start_date'
+          name 'Start date'
           interface :date
           validation lambda{|value|
             begin
@@ -94,6 +106,7 @@ module AMEE
         }
         metadatum {
           path 'end_date'
+          name 'End date'
           interface :date
           validation lambda{|value|
             begin
