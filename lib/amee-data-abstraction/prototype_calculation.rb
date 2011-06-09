@@ -28,12 +28,16 @@ module AMEE
         construct(Usage,options.merge(:first=>true),&block)
       end
       def all_drills
-        amee_ivds.each do |ivd|
-          next unless ivd.drill?
-          drill {
-            path ivd.path
-            name ivd.name
-          }
+        # Need to use #drill_downs rather than simply finding drills
+        # directly from #amee_ivds in order to establish drill order
+        amee_item_definition.drill_downs.each do |apath|
+          amee_ivds.each do |ivd|
+            next unless ivd.path == apath
+            drill {
+              path ivd.path
+              name ivd.name
+            }
+          end
         end
       end
       

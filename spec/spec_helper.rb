@@ -33,11 +33,10 @@ class AMEEMocker
     @mock_id=test.flexmock
     @mock_ivds=[]
     @mock_rvds=[]
-    @mock_drills=[]
   end
 
   attr_accessor :path,:selections,:choices,:result,:params,
-    :existing,:mock_dc,:mock_id,:mock_ivds,:mock_rvds,:mock_drills
+    :existing,:mock_dc,:mock_id,:mock_ivds,:mock_rvds
 
   attr_reader :test
 
@@ -100,6 +99,11 @@ class AMEEMocker
     test.flexmock(AMEE::Profile::Category).should_receive(:get).
       with(connection,"/profiles/someprofileuid/#{path}").at_least.once.
       and_return(catuid)
+    return self
+  end
+
+  def itemdef_drills(some_drills)
+    mock_id.should_receive(:drill_downs).and_return(some_drills)
     return self
   end
   

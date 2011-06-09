@@ -47,6 +47,7 @@ describe PrototypeCalculation do
   end
   it 'can autogenerate drill terms for itself, based on talking to amee' do
     mocker=AMEEMocker.new(self,:path=>'something')
+    mocker.itemdef_drills ['first','second','third']
     mocker.item_value_definitions.
       item_definition.data_category.
       item_value_definition('first',[],[],[],nil,nil,nil,false,true).
@@ -145,6 +146,7 @@ describe PrototypeCalculation do
 
   it 'can generate itself with everything' do
     mocker=AMEEMocker.new(self,:path=>'something')
+    mocker.itemdef_drills ['first','second','third']
     mocker.return_value_definitions.
       item_value_definitions.
       item_definition.data_category.
