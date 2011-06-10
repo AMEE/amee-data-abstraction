@@ -10,6 +10,9 @@ describe CalculationSet do
   it 'can create an instance' do
     ElectricityAndTransport.should be_a CalculationSet
   end
+  it 'can create an instance' do
+    ElectricityAndTransport.calculations.should be_a ActiveSupport::OrderedHash
+  end
   it 'can access a calculation by key' do
     ElectricityAndTransport[:transport].should be_a PrototypeCalculation
   end
