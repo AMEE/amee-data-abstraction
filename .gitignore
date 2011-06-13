@@ -2,3 +2,4 @@
 /pkg/
 .gitignore
 /nbproject
+*.gem
