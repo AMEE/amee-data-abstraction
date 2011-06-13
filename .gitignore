@@ -1,5 +1,4 @@
 /coverage/
 /pkg/
-nbproject/
 .gitignore
-*.gem
+/nbproject

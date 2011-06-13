@@ -75,6 +75,7 @@ module AMEE
       end
 
       def validate!
+        return unless dirty?
         reset_invalidity_messages
         inputs.each do |d|
           d.validate! unless d.unset?
