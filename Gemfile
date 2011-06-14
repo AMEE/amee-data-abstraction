@@ -11,3 +11,4 @@ gem 'flexmock', '0.8.6'
 gem "amee", ">= 2.6.0", "< 3.0"
 gem "amee-internal", ">= 3.7.2", "< 4.0"
 gem 'uuidtools', '2.1.2'
+gem 'quantify', '1.0.0'
