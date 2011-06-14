@@ -3,7 +3,7 @@ require 'rake'
 
 Gem::Specification.new do |s|
   s.name = "amee-data-abstraction"
-  s.version = AMEE::DataAbstraction::VERSION::STRING
+  s.version = AMEE::DataAbstraction::VERSION::STRING + ".rc1"
   s.date = "2011-05-25"
   s.summary = "Calculation and form building tool hiding details of AMEE API"
   s.email = "help@amee.com"
