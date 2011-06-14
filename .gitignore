@@ -2,3 +2,5 @@
 /pkg/
 .gitignore
 /nbproject
+
+/.Gemfile.swp
