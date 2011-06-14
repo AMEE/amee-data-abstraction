@@ -1,7 +1,7 @@
 module AMEE
   module DataAbstraction
     module VERSION #:nodoc:
-      MAJOR = 2
+      MAJOR = 1
       MINOR = 0
       TINY  = 0
       STRING = [MAJOR, MINOR, TINY].join('.')
