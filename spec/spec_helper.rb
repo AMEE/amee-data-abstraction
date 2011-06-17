@@ -123,7 +123,7 @@ class AMEEMocker
 
   def item_value_definition(path,compulsories=[],optionals=[],forbiddens=[],choices=[],unit=nil,per_unit=nil,profile=true,drill=false)
     ivd=test.flexmock :path=>path
-    ivd.should_receive(:name).and_return path
+    ivd.should_receive(:name).and_return path.to_s.humanize
     ivd.should_receive(:profile?).and_return profile
     ivd.should_receive(:drill?).and_return drill
     ivd.should_receive(:versions).and_return ['2.0']

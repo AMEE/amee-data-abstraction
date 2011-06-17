@@ -55,7 +55,7 @@ describe PrototypeCalculation do
       item_value_definition('third',[],[],[],nil,nil,nil,false,true)
     pc=PrototypeCalculation.new {path '/something'; all_drills}
     pc.drills.labels.should eql [:first,:second,:third]
-    pc.drills.names.should eql ['first','second','third']
+    pc.drills.names.should eql ['First','Second','Third']
   end
   it 'can autogenerate profile terms for itself' do
     mocker=AMEEMocker.new(self,:path=>'something')
@@ -166,6 +166,11 @@ describe PrototypeCalculation do
       :first,:second,:third,
       :fourth,:fifth,:sixth,
       :seventh,:eighth,:ninth
+    ]
+    pc.terms.names.should eql ['Usage',
+      'First','Second','Third',
+      'Fourth','Fifth','Sixth',
+      'Seventh','Eighth','Ninth'
     ]
     pc.terms.visible.labels.should eql  [:usage,
       :first,:second,:third,

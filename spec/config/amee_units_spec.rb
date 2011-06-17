@@ -6,7 +6,7 @@ describe "AMEE units" do
   include Quantify
 
   # The Unit.<unit_name_symbol_or_label> pattern retrieves the unit which is
-  # provided as the (pseudo) method name (using #emthod_missing). In cases where
+  # provided as the (pseudo) method name (using #method_missing). In cases where
   # the named unit does not exist an error is raised. In some cases, however,
   # where the unit can be constructed from a known and compatible unit and prefix
   # combination, it is created but not loaded to the canonical system of units.

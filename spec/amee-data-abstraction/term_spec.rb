@@ -13,14 +13,21 @@ describe Term do
     Term.new {call_me}
     Term.called.should be_true
   end
+
   it "has label" do
     Term.new {label :hello}.label.should eql :hello
   end
+
   it "has name" do
     Term.new {name :hello}.name.should eql :hello
   end
+
   it "has path" do
     Term.new {path :hello}.path.should eql :hello
+  end
+
+  it "has note" do
+    Term.new {note 'hello'}.note.should eql 'hello'
   end
 
   it 'has parent' do
