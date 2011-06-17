@@ -183,4 +183,12 @@ describe Term do
     Term.new {path :hello; value 12; default_unit :kg; per_unit :h}.to_s(:pluralized_name).should == '12 kilograms per hour'
     Term.new {path :hello; value 12; per_unit :h}.to_s(:pluralized_name).should == '12 per hour'
   end
+
+  it "should be recognised as numeric" do
+    Term.new {path :hello; value 12; default_unit :kg}.has_numeric_value?.should be_true
+  end
+
+  it "should be recognised as non numeric" do
+    Term.new {path :hello; value 'bob'; default_unit :kg}.has_numeric_value?.should be_false
+  end
 end
