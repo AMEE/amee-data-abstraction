@@ -11,7 +11,7 @@ module AMEE
         instance_eval(&block) if block
       end
 
-      # Hash of labels to calculations
+      # Hash, keys are labels, values are PrototypeCalculations
       attr_accessor :calculations
 
       # Calculation corresponding to the supplied label
@@ -36,9 +36,9 @@ module AMEE
         @all_options.merge(options)
       end
 
-      # Instantiate several prototype calculations, by loading each possible usage
-      # for the category with path given in apath, and then customise each with the
-      # supplied DSL block. The usage is given as a parameter to the DSL block.
+      #Instantiate several prototype calculations, by loading each possible usage
+      #for the category with path given in apath, and then customise each with the
+      #supplied DSL block. The usage is given as a parameter to the DSL block.
       def calculations_all_usages(apath,options={},&dsl_block)
         dummycalc=PrototypeCalculation.new{path apath}
         dummycalc.amee_usages.each do |usage|

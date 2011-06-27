@@ -23,5 +23,6 @@ require File.dirname(__FILE__) + '/amee-data-abstraction/output'
 require File.dirname(__FILE__) + '/amee-data-abstraction/metadatum'
 
 module AMEE::DataAbstraction
+  # Connection to AMEE server.
   mattr_accessor :connection
 end

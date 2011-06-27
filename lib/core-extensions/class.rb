@@ -1,4 +1,6 @@
 class Class
+
+  # As attr_accessor, except value of property is set with foo.propname 5 not foo.attrname=5
   def attr_property(*accessors)
     accessors.each do |m|
       define_method(m) do |*val|
