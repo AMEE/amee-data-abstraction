@@ -136,17 +136,13 @@ Quantify::Unit::NonSI.configure do
 
   # Give the remaining (default) British thermal unit version a humanised name
   # and symbol
-  Unit.BTU_FiftyNineF.operate do |unit|
+  Unit.BTU_FiftyNineF.configure_as_canonical do |unit|
     unit.name = 'british thermal unit'
     unit.symbol = 'BTU'
-    unit.make_canonical
   end
 
   # AMEE uses 'day' rather than 'd' as the label for the time period, day
-  Unit.day.operate do |unit|
-    unit.label = 'day'
-    unit.make_canonical
-  end
+  Unit.day.canonical_label = 'day'
 
   # Load prefixed version of British thermal unit, which is used in AMEE
   prefix_and_load :M, :BTU_FiftyNineF
