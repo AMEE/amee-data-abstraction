@@ -1,81 +1,169 @@
+
+# Authors::   James Hetherington, James Smith, Andrew Berkeley, George Palmer
+# Copyright:: Copyright (c) 2011 AMEE UK Ltd
+# License::   Permission is hereby granted, free of charge, to any person obtaining
+#             a copy of this software and associated documentation files (the
+#             "Software"), to deal in the Software without restriction, including
+#             without limitation the rights to use, copy, modify, merge, publish,
+#             distribute, sublicense, and/or sell copies of the Software, and to
+#             permit persons to whom the Software is furnished to do so, subject
+#             to the following conditions:
+#
+#             The above copyright notice and this permission notice shall be included
+#             in all copies or substantial portions of the Software.
+#
+#             THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+#             EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+#             MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+#             IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+#             CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+#             TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+#             SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
+# :title: Class: AMEE::DataAbstraction::OngoingCalculation
+
 module AMEE
   module DataAbstraction
 
-    # Subclass of calculation, for an instantiated calculation in an application,
-    # corresponding to a particular environmentally impactful activity.
+    # Instances of the <i>OngoingCalculation</i> class represent actual
+    # calculations made via the AMEE platform.
+    #
+    # The class inherits from the <i>Calculation</i> class and is therefore
+    # primarly characterised by the <tt>label</tt>, <tt>name</tt>, and <tt>path</tt>
+    # attributes, as well as an associated instance of the <tt>TermsList</tt>
+    # class which represents each of the values (input, outputs, metdata) involved
+    # in the calculation.
+    #
+    # Instances of <i>OngoingCalcualtion</i> are typically instantiated from an
+    # instance of <i>PrototypeCalculation</i> using the <tt>#begin_calculation</tt>
+    # method, e.g.
+    #
+    #  my_prototype.begin_calculation       #=> <AMEE::DataAbstraction::OngoingCalculation ...>
+    #
+    # In this case, the new instance inherits all of the attributes and terms
+    # defined on the <i>PrototypeCalculation</i> template.
+    #
+    # In contrast to instances of <i>PrototypeCalculation</i>, instances of the
+    # <i>OngoingCalculation</i> class will typically have their term values
+    # explicitly set according to the specific calculation scenario being
+    # represented. Other term attributes, e.g. units, may also be modified on a
+    # calculation-by-calculation basis. These values and other attributes form
+    # (at least some of) the data which is passed to the AMEE platform in order
+    # to make caluclations.
+    #
     class OngoingCalculation < Calculation
 
       public
 
-      #UID of owning amee profile
+      # String representing the AMEE platform profile UID assocaited with <tt>self</tt>
       attr_accessor :profile_uid
       
-      #UID of current corresponding AMEE profile item
+      # String representing the AMEE platform profile item UID assocaited with <tt>self</tt>
       attr_accessor :profile_item_uid
       
-      #Hash of invalidity messages. Keys are term labels, values are string error message reports.
+      # Hash of invalidity messages. Keys are represent the labels of terms
+      # assocaited with <tt>self</tt>. Values are string error message reports associated
+      # with the keyed term.
+      #
       attr_accessor :invalidity_messages
 
-      # Construct an Ongoing Calculation, should be called only via PrototypeCalculation#begin_calculation
-      # not intended for external use.
+      # Construct an Ongoing Calculation. Should be called only via
+      # <tt>PrototypeCalculation#begin_calculation</tt>. Not intended for external
+      # use.
+      #
       def initialize
         super
         dirty!
         reset_invalidity_messages
       end
 
-      # Has a value of a calculation term been changed since the calculation was last sent to AMEE.
+      # Returns true if the value of a term associated with <tt>self</tt> has been changed
+      # since the calculation was last synchronized with the AMEE platform.
+      # Otherwise, return false.
+      #
       def dirty?
         @dirty
       end
 
-      # Declare that the calculation is dirty, and must be sent to AMEE before results are valid.
+      # Declare that the calculation is dirty, i.e. that changes to term values
+      # have been made since <tt>self</tt> was last synchronized with the AMEE platform,
+      # in which case a synchonization with with AMEE must occur for <tt>self</tt> to be
+      # valid.
+      #
       def dirty!
         @dirty=true
       end
 
-      # Declare that the calculation is not dirty, and need not be sent to AMEE for results to be valid.
+      # Declare that the calculation is not dirty, and need not be sent to AMEE
+      # for results to be valid.
+      #
       def clean!
         @dirty=false
       end
 
-      # Have values been specified for all compulsory terms?
-      # Is the calculation ready to be sent to AMEE to get results?
+      # Returns true if all compulsory terms are set, i.e. ahve non-nil values.
+      # This inidicates that <tt>self</tt> is ready to be sent to the AMEE platform for
+      # outputs to be calculated
+      #
       def satisfied?
         inputs.compulsory.unset.empty?
       end
 
-      #Specify a value for one or more input terms
-      #choice should be a hash, from term labels to values chosen.
-      #Values can be simple values, or Quantify unit quantities.
-      #Raise ChoiceValidation if any of the values supplied is unacceptable
-      def choose!(choice)   
-        choose_without_validation!(choice)
-        validate!
-        raise AMEE::DataAbstraction::Exceptions::ChoiceValidation.new(invalidity_messages) unless invalidity_messages.empty?
-      end
-
-      #Specify a value for one or more input terms
-      #choice should be a hash, from term labels to values chosen.
-      #Values can be simple values, or Quantify unit quantities.
-      #Return false if any of the values supplied is unacceptable
-      def choose(choice)
-        begin
-          choose!(choice)
-          return true
-        rescue AMEE::DataAbstraction::Exceptions::ChoiceValidation
-          return false
-        end
-      end
-
-      #Specify a value for one or more input terms
-      #choice should be a hash, from term labels to values chosen.
-      #Do not attempt to check that the values specified are acceptable.
-      #Values can be simple values, or Quantify unit quantities.
+      # Mass assignment of (one or more) term attributes (value, unit, per_unit)
+      # based on data defined in <tt>choice</tt>. <tt>choice</tt> should be
+      # a hash with keys representing the labels of terms which are to be updated.
+      # Hash values can represent either the the value to be assigned explicitly,
+      # or, alternatively, a hash representing any or all of the term value, unit
+      # and per_unit attributes (keyed as :value, :unit and :per_unit).
+      #
+      # Unit attributes can be represented by any form which is accepted by the
+      # <i>Quantify::Unit#for</i> method (either an instance of
+      # <i>Quantify::Unit::Base</i> (or subclass) or a symbolized or string
+      # representation of the a unit symbol, name or label).
+      #
+      # Nil values are ignored. Term attributes can be intentionally blanked by
+      # passing a blank string as the respective hash value.
+      #
+      # Examples of options hash which modify only term values:
+      #
+      #  options = { :type => 'van' }
+      #
+      #  options = { :type => 'van',
+      #              :distance => 100 }
+      #
+      #  options = { :type => 'van',
+      #              :distance => "" }
+      #
+      # Examples of options hash which modify other term attributes:
+      #
+      #  options = { :type => 'van',
+      #              :distance => { :value => 100 }}
+      #
+      #  options = { :type => 'van',
+      #              :distance => { :value => 100,
+      #                             :unit => :mi }}
+      #
+      #  options = { :type => 'van',
+      #              :distance => { :value => 100,
+      #                             :unit => 'feet' }}
+      #
+      #  my_distance_unit = <Quantify::Unit::NonSI:0xb71cac48 @label="mi" ... >
+      #  my_time_unit     = <Quantify::Unit::NonSI:0xb71c67b0 @label="h" ... >
+      #
+      #  options = { :type => 'van',
+      #              :distance => { :value => 100,
+      #                             :unit => my_unit,
+      #                             :per_unit => my_time_unit }}
+      #
+      #  my_calculation.choose_without_validation!(options)
+      #
+      # Do not attempt to check that the values specified are acceptable.
+      #
       def choose_without_validation!(choice)
         # Make sure choice keys are symbols since they are mapped to term labels
         # Uses extension methods for Hash defined in /core_extensions
         choice.recursive_symbolize_keys!
+
         new_profile_uid= choice.delete(:profile_uid)
         self.profile_uid=new_profile_uid if new_profile_uid
         new_profile_item_uid= choice.delete(:profile_item_uid)
@@ -86,8 +174,11 @@ module AMEE
             unless v.is_a? Hash
               self[k].value v unless v.nil?
             else
-              # Added unless clause. Initially used #blank? method but this meant
-              # that an intentional blanking of a value would not be honoured.
+              # <tt>unless</tt> clause so that single attributes can be updated
+              # without nullifying others. <tt>#nil?</tt> used, rather than
+              # <tt>#blank?</tt> so that intentional blanking of values is
+              # honoured.
+              #
               self[k].value v[:value] unless v[:value].nil?
               self[k].unit v[:unit] unless v[:unit].nil?
               self[k].per_unit v[:per_unit] unless v[:per_unit].nil?
@@ -96,16 +187,44 @@ module AMEE
         end
       end
 
-      # Dispatch the calculation to AMEE to update results.
+      # Similar to <tt>#choose_without_validation!</tt> but performs validation
+      # on the modified input terms and raises a <i>ChoiceValidation</i>
+      # exception if any of the values supplied is invalid
+      #
+      def choose!(choice)
+        choose_without_validation!(choice)
+        validate!
+        raise AMEE::DataAbstraction::Exceptions::ChoiceValidation.new(invalidity_messages) unless
+          invalidity_messages.empty?
+      end
+
+      # Similar to <tt>#choose!</tt> but returns <tt>false</tt> if any term
+      # attributes are invalid, rather than raising an exception. Returns
+      # <tt>true</tt> if validation is successful.
+      #
+      def choose(choice)
+        begin
+          choose!(choice)
+          return true
+        rescue AMEE::DataAbstraction::Exceptions::ChoiceValidation
+          return false
+        end
+      end
+
+      # Synchonizes the current term values and attributes with the AMEE platform
+      # if <tt>self</tt> is <tt>dirty?</tt>, and subsequently calls <tt>clean!</tt>
+      # on <tt>self</tt>
+      #
       def calculate!
         return unless dirty?
         syncronize_with_amee
         clean!
       end
 
-      #Check that values set for all terms are acceptable, and raise
-      #ChoiceValidation if they are not.
-      #Error messages are available in calculation.invalidity_messages hash.
+      # Check that the values set for all terms are acceptable, and raise a
+      # <i>ChoiceValidation</i> exception if not. Error messages are available
+      # via the <tt>self.invalidity_messages</tt> hash.
+      #
       def validate!
         return unless dirty?
         reset_invalidity_messages
@@ -115,17 +234,19 @@ module AMEE
         autodrill
       end
 
-      # Declare that the term labelled by label has an unnaceptable value, with
-      # the supplied error message.
+      # Declare that the term labelled by <tt>label</tt> has an unnaceptable value
+      # and load the <tt>message</tt> into the <tt>invalidity_messages</tt> hash.
+      #
       def invalid(label,message)
         @invalidity_messages[label]=message
       end
 
-      #Wipe invalid terms. Can be called
-      #from Rails controller following #choose(!)
-      #so that invalid terms resulting from modification of a previously valid calculation
-      #such as changing an earlier drill invalidating the choices for later drills,
-      #can be cleared.
+      # Set the values of any invalid terms to nil. Can be called following any
+      # of the <tt>#choose...</tt> methods so that invalid terms resulting from
+      # modification of a previously valid calculation can be cleared. This is
+      # particularly useful in cases where drill down choices have been changed
+      # thus invalidating the choices for subsequent drills.
+      #
       def clear_invalid_terms!
         terms.select do |term|
           invalidity_messages.keys.include?(term.label)
@@ -137,12 +258,14 @@ module AMEE
 
       private
 
-      #Empty the hash of error messages for term choices.
+      # Empty the hash of error messages for term choices.
       def reset_invalidity_messages
         @invalidity_messages={}
       end
 
-      # Obtain from AMEE the results, and set this in output terms.
+      # Obtain from the AMEE platform the results of a calculation, and set these
+      # to the output terms of <tt>self</tt>.
+      #
       def load_outputs
         outputs.each do |output|
           res=nil
@@ -156,25 +279,25 @@ module AMEE
             output.unit res[:unit]
             output.per_unit res[:per_unit]
           else
-            # If no platform result, then no outputs should be set.
+            # If no platform result, then no outputs should be set. Added so that
+            # nullifying a compulsory PIV wipes output value, otherwise previous
+            # output values persist after PIVs have been removed.
             #
-            # Added so that nullifying a compulsory PIV wipes output value, otherwise
-            # previous output values were persisting after PIVs removed. An alternative
-            # approach might be to add Outputs to the #validate! method, nullifying them
-            # not all compulsory inputs set. Perhaps units should also be nullified.
             output.value nil
           end
         end
       end
 
-      # Load any metadata stored in the AMEE profile which can be used to
-      # set the metadata for this calculation
-      # Not implemented in AMEE yet.
+      # Load any metadata stored in the AMEE profile which can be used to set
+      # metadata for <tt>self</tt>. Not implemented in AMEE yet.
+      #
       def load_metadata  
       end
 
-      # For any unset profile item values, load the corresponding values from
-      # amee, if we have been given a profile uid
+      # If a profile item exists for <tt>self</tt>, load the corresponding values
+      # and units for any unset <i>Profile</i> terms (profile item values) from
+      # the AMEE platform
+      #
       def load_profile_item_values  
         return unless profile_item
         profiles.unset.each do |term|
@@ -185,9 +308,15 @@ module AMEE
         end
       end
 
-      #Load drill values from AMEE. If AMEE drills are different than locally set values,
-      #raise Syncronization exception, so that we know we need to wipe the AMEE PI and
-      #create a new one.
+      # Load drill values from the AMEE platform. If the remote drills selections
+      # are different than locally set values, raise a <i>Syncronization</i>
+      # exception.
+      #
+      # If an exception is raised, typical practice would be to delete the profile
+      # item associated with <tt>self</tt> and create a new one with the current
+      # selection of drill down choices (see, for example, the
+      # <tt>#synchronize_with_amee</tt> method
+      #
       def load_drills
         return unless profile_item
         drills.each do |term|
@@ -197,10 +326,12 @@ module AMEE
         end
       end
 
-      #Dispatch the calculation to AMEE. If necessary, delete an out of date AMEE PI and create a new one.
-      #Fetch values stored in AMEE and not stored locally.
-      #Send values stored locally and not stored in AMEE.
-      #Fetch calculation results from AMEE.
+      # Dispatch the calculation to AMEE. If necessary, delete an out of date
+      # AMEE profile item and create a new one. Fetch any values which are stored
+      # in the AMEE platform and not stored locally. Send any values stored locally
+      # and not stored in the AMEE platform. Fetch calculation results from the
+      # AMEE platform and update outputs assocaited with <tt>self</tt>
+      #
       def syncronize_with_amee
         new_memoize_pass
         find_profile
@@ -211,7 +342,8 @@ module AMEE
           delete_profile_item
         end
         load_metadata
-        if satisfied? # We could create an unsatisfied PI, and just check drilled? here
+        # We could create an unsatisfied PI, and just check drilled? here
+        if satisfied?
           if profile_item
             set_profile_item_values
           else
@@ -220,20 +352,30 @@ module AMEE
           load_outputs
         end
       rescue AMEE::UnknownError
-        # Tidy up, only if we created a "Bad" profile item. Need to check this condition
+        # Tidy up, only if we created a "Bad" profile item.
+        # Need to check this condition
         delete_profile_item
         raise DidNotCreateProfileItem
       end
 
-      # String format of drill options appropriate to an AMEE API call.
+      # Returns a <i>String</i> representation of drill down choices appropriate for
+      # submitting to the AMEE platform. An optional hash argument can be provided,
+      # with the key <tt>:before</tt> in order to specify the drill down choice
+      # to which the representation is required, e.g.
+      #
+      #  my_calc.drill_options                     #=> "type=van&fuel=petrol&size=2.0+litres"
+      #
+      #  my_calc.drill_options(:before => :size)   #=> "type=van&fuel=petrol"
+      #
       def drill_options(options={})
         to=options.delete(:before)
         drills_to_use=to ? drills.before(to).set : drills.set
         drills_to_use.map{|x| "#{CGI.escape(x.path)}=#{CGI.escape(x.value)}"}.join("&")
       end
 
-      #Hash of profile item update/create options appropriate to an AMEE API call
-      #via the AMEE rubygem.
+      # Returns a <i>Hash</i> representation of <i>Profile</i> term attributes
+      # appropriate for submitting to the AMEE platform via the AMEE rubygem.
+      #
       def profile_options
         result={}
         profiles.set.each do |piv|
@@ -250,9 +392,12 @@ module AMEE
         return result
       end
 
-      #Hash of profile item get options, appropriate to an AMEE API call
-      #here is where we would fill in return unit convertion requests if these
-      #are implemented.
+      # Returns a <i>Hash</i> of options for profile item GET requests to the AMEE
+      # platform.
+      #
+      # This is where is where return unit convertion requests can be handled
+      # if/when theseare implemented.
+      #
       def get_options
         # Specify unit options here based on the contents
         # getopts={}
@@ -261,8 +406,10 @@ module AMEE
         return {}
       end
 
-      # Return the AMEE::Profile::Profile to which the PI for this calculation
-      # belongs, and update our stored UID to match.
+      # Return the <i>AMEE::Profile::Profile</i> object under which the AMEE profile
+      # item associated with <tt>self</tt> belongs and and update
+      # <tt>self.profile_uid</tt> to make the appropriate reference.
+      #
       def find_profile
         unless self.profile_uid
           prof ||= AMEE::Profile::ProfileList.new(connection).first
@@ -271,26 +418,37 @@ module AMEE
         end
       end
 
-      #Generate a unique name for the profile item. Random for now.
-      #Later, we could generate this by interrogating metadata according to specifications of
-      #Organisational model.
+      # Generate a unique name for the profile item assocaited with <tt>self</tt>.
+      # This is required in order to make similarly drilled profile items within 
+      # the same profile distinguishable. 
+      # 
+      # This is random at present but could be improved to generate more meaningful
+      # name by interrogating metadata according to specifications of an
+      # organisational model.
+      #
       def amee_name
         UUIDTools::UUID.timestamp_create
       end
 
+
+      # Create a profile item in the AMEE platform to be associated with
+      # <tt>self</tt>. Raises <i>AlreadyHaveProfileItem</i> exception if a
+      # profile item value is already associated with <tt>self</tt>
+      #
       def create_profile_item
         raise Exceptions::AlreadyHaveProfileItem unless profile_item_uid.blank?
         location = AMEE::Profile::Item.create(profile_category,
+          # call <tt>#data_item_uid</tt> on drill object rather than <tt>self</tt> 
+          # since there exists no profile item value yet
           amee_drill.data_item_uid,
-          # Don't call data_item_uid,
-          # cos we haven't got a profile to get the uid from, get it from the drill
           profile_options.merge(:get_item=>false,:name=>amee_name))
         self.profile_item_uid=location.split('/').last
       end
 
-      # Methods which should be memoized once per interaction with AMEE to minimise API calls.
-      # Have to wipe these every pass, because otherwise, they might change, e.g.
-      # if metadata changes change the profile
+      # Methods which should be memoized once per interaction with AMEE to minimise
+      # API calls. These require wiping at every pass, because otherwise, they might
+      # change, e.g. if metadata changes change the profile
+      #
       MemoizedProfileInformation=[:profile_item,:data_item,:profile_category]
 
       # Clear the memoized values.
@@ -300,11 +458,16 @@ module AMEE
         end
       end
 
+      # Return the <i>AMEE::Profile::Item</i> object associated with self. If
+      # not set, instantiates via the AMEE platform and assigns to <tt>self</tt>
+      #
       def profile_item
         @profile_item||=AMEE::Profile::Item.get(connection, profile_item_path, get_options) unless profile_item_uid.blank?
       end
 
-      # Set the profile item values for the profile item.
+      # Update the associated profile item in the AMEE platform with the current
+      # <i>Profile</i> term values and attributes
+      #
       def set_profile_item_values
         AMEE::Profile::Item.update(connection,profile_item_path, 
           profile_options.merge(:get_item=>false))
@@ -312,47 +475,70 @@ module AMEE
         @profile_item=nil
       end
 
+      # Delete the profile item which is associated with <tt>self</tt> from the
+      # AMEE platform and nullify the local references (i.e.
+      # <tt>@profile_item</tt> and <tt>#profile_item_uid</tt>)
+      #
       def delete_profile_item
         AMEE::Profile::Item.delete(connection,profile_item_path)
         self.profile_item_uid=false
         @profile_item=nil
       end
 
+      # Returns a string representing the AMEE platform path to the profile
+      # category associated with <tt>self</self>
+      #
       def profile_category_path
         "/profiles/#{profile_uid}#{path}"
       end
 
+      # Returns a string representing the AMEE platform path to the profile
+      # item associated with <tt>self</self>
+      #
       def profile_item_path
         "#{profile_category_path}/#{profile_item_uid}"
       end
 
+      # Returns a string representing the AMEE platform path to the data item
+      # associated with <tt>self</self>
+      #
       def data_item_path
         "/data#{path}/#{data_item_uid}"
       end
 
+      # Returns a string representing the AMEE platform UID for the data item
+      # associated with <tt>self</self>
+      #
       def data_item_uid
         profile_item.data_item_uid
       end
 
+      # Return the <i>AMEE::Data::Item</i> object associated with self. If
+      # not set, instantiates via the AMEE platform and assigns to <tt>self</tt>
+      #
       def data_item
         @data_item||=AMEE::Data::Item.get(connection, data_item_path, get_options)
       end
 
+      # Return the <i>AMEE::Profile::Category</i> object associated with self. If
+      # not set, instantiates via the AMEE platform and assigns to <tt>self</tt>
+      #
       def profile_category
         @profile_category||=AMEE::Profile::Category.get(connection, profile_category_path)
       end
 
-      #Sometimes when a bunch of drills are specified,
-      #this is enough to specify values for some more of them, for example,
-      # if there is only one choice
+      # Automatically set the value of a drill term if there is only one choice
       def autodrill
         
         picks=amee_drill.selections
         picks.each do |path,value|
-          # If drill term does not exist, initialize a dummy instance. This is useful in those cases
-          # where some drills selections are unecessary (i.e. not all choices require selection for data
-          # items to be uniquely identified) and removes the need to explicitly specify the blank drills
-          # in configuration. This doen't matter if calculations are auto configured.
+          # If drill term does not exist, initialize a dummy instance.
+          # 
+          # This is useful in those cases where some drills selections are unecessary
+          # (i.e. not all choices require selection for data items to be uniquely
+          # identified) and removes the need to explicitly specify the blank drills
+          # in configuration. This doesn't matter if calculations are auto configured.
+          #
           if drill = drill_by_path(path)
             drill.value value
           else
@@ -361,12 +547,16 @@ module AMEE
         end
       end
 
-      public #pretend private
-      #private -- missing friend feature, and
-      #'friend' gem https://github.com/lsegal/friend
-      #Isn't working.
+      public
 
-      # Get the AMEE drill resource corresponding to the chosen drills.
+      # Instantiate an <tt>AMEE::Data::DrillDown</tt> object representing the
+      # drill down sequence defined by the drill terms associated with
+      # <tt>self</tt>. As with <tt>#drill_options</tt>, An optional hash argument
+      # can be provided, with the key <tt>:before</tt> in order to specify the
+      # drill down choice to which the representation is required, e.g.
+      #
+      #  my_calc.amee_drill(:before => :size)
+      #
       def amee_drill(options={})
         AMEE::Data::DrillDown.get(connection,"/data#{path}/drill?#{drill_options(options)}")
       end

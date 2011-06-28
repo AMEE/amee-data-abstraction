@@ -1,9 +1,31 @@
 module AMEE
   module DataAbstraction
-    # Term representing an adjustable usage
-    # When the value is changed, profile item value terms will be inactivated which
-    # are forbidden in the relevant usage, and optional/compulsory flags will be set on the terms.
+    
+    # Subclass of <tt>Input</tt> providing methods and attributes appropriate for
+    # representing adjustable calculation usages specifically.
+    # 
+    # Only one instance of <i>Usage</i> can be assocaited with a particular
+    # calucaltion object. When the value of <tt>self</tt> is changed, profile
+    # item value terms which are forbidden in the new usage will be inactivated
+    # and optional/compulsory flags are set on the remaining terms.
+    #
     class Usage < Input
+
+      # Initialization of <i>Usage</i> objects follows that of the parent
+      # <i>Input</i> class, with a number of differences.
+      #
+      # If the parent caluclation already contains a usage term, a <i>TwoUsages</i>
+      # exception is raised.
+      #
+      # The <tt>label<tt> attribute is set by default to <tt>:usage</tt>.
+      #
+      # The <tt>interface</tt> attribute of <tt>self</tt> is set to
+      # <tt>:drop_down</tt> by default, but can be manually configured if
+      # required.
+      #
+      # The <tt>inactive</tt> property of <tt>self</tt> is set to <tt>:invisible</tt>
+      # by default.
+      #
       def initialize(options={},&block)
         raise Exceptions::TwoUsages if options[:parent].current_usage
         label :usage
@@ -12,11 +34,17 @@ module AMEE
         interface :drop_down unless interface
       end
 
-      #When a term is forbidden in a usage, should it be hidden in generated UIs,
-      #or just disabled (greyed out)? Choose either :invisible or :disabled.
+      # Represents the method of handling forbidden terms. Should they be hidden
+      # in generated UIs or just disabled (greyed out)? Set the behaviour by
+      # passing either <tt>:invisible</tt> or <tt>:disabled</tt> as an argument. 
+      # Retrieve the defined behaviour by calling without an argument.
+      #
       attr_property :inactive
 
-      # Adjust the value, and then inactivate terms in the parent calculation as appropriate.
+      # Adjust the value of <tt>self</tt> indicating that a new usage should be
+      # switch to in the parent caluclation. This method has the effect of
+      # (de)activating terms in the parent calculation as appropriate.
+      #
       def value(*args)
         unless args.empty?
           @value=args.first
@@ -25,14 +53,17 @@ module AMEE
         return @value
       end
 
-      # Inactivate terms in the parent calculation as appropriate to the supplied usage
+      # Activate and deactivate terms in the parent calculation according to the
+      # compulsory/optional/forbidden status' of each in the usage indicated by
+      # <tt>usage</tt>
+      #
       def activate_selected(usage=nil)
         parent.profiles.in_use(usage).each do |term|
           case @inactive
           when :invisible
             term.show!
           when :disabled
-            term.ensable!
+            term.enable!
           end
         end
         parent.profiles.out_of_use(usage).each do |term|
@@ -45,7 +76,7 @@ module AMEE
         end
       end
 
-      # Get array of available values for the usage
+      # Returns an array of available valid values for <tt>self</tt>.
       def choices
         parent.amee_usages
       end
