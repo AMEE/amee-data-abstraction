@@ -95,7 +95,7 @@ module AMEE
       #
       #  my_calculation.fixed_usage 'byMass'
       #
-      #  my_calculation..fixed_usage        #=> 'byMass'
+      #  my_calculation.fixed_usage        #=> 'byMass'
       #
       attr_property :fixed_usage
 

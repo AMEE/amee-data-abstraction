@@ -48,40 +48,40 @@ module AMEE
       #
       #   my_input.validation 20
       #
-      #   my_input.send :valid?             #=> true
+      #   my_input.valid?             #=> true
       #
       #   my_input.value 'some string'
-      #   my_input.send :valid?             #=> false
+      #   my_input.valid?             #=> false
       #
       #   my_input.value 21
-      #   my_input.send :valid?             #=> false
+      #   my_input.valid?             #=> false
       #
       #   my_input.value 20
-      #   my_input.send :valid?             #=> true
+      #   my_input.valid?             #=> true
       #
       #   ---
       #
       #   my_input.validation lambda{ |value| value.is_a? Numeric }
       #
-      #   my_input.send :valid?             #=> true
+      #   my_input.valid?             #=> true
       #
       #   my_input.value 'some string'
-      #   my_input.send :valid?             #=> false
+      #   my_input.valid?             #=> false
       #
       #   my_input.value 12345
-      #   my_input.send :valid?             #=> true
+      #   my_input.valid?             #=> true
       #
       #   ---
       #
       #   my_input.validation lambda{ |value| value % 5 == 0 }
       #
-      #   my_input.send :valid?             #=> true
+      #   my_input.valid?             #=> true
       #
       #   my_input.value 21
-      #   my_input.send :valid?             #=> false
+      #   my_input.valid?             #=> false
       #
       #   my_input.value 20
-      #   my_input.send :valid?             #=> true
+      #   my_input.valid?             #=> true
       #
       attr_property :validation
 
