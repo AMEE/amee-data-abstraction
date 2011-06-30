@@ -425,7 +425,7 @@ describe OngoingCalculation do
     mycalc['distance'].unit.symbol.should eql 'km'
   end
 
-  it 'cannot blank individual term attributes with nil' do
+  it 'can blank individual term attributes with nil' do
     myproto=Transport.clone
     mycalc=myproto.begin_calculation
     mycalc.choose_without_validation!('fuel'=>'diesel','size'=>'large','distance'=>{:value =>5, :unit=> Unit.km})
@@ -436,11 +436,11 @@ describe OngoingCalculation do
     mycalc.choose_without_validation!('distance'=>{:value =>nil})
     mycalc['fuel'].value.should eql 'diesel'
     mycalc['size'].value.should eql 'large'
-    mycalc['distance'].value.should eql 5
+    mycalc['distance'].value.should be_nil
     mycalc['distance'].unit.symbol.should eql 'km'
   end
 
-    it 'can update individual term attributes' do
+    it 'can update individual term attributes without nullifying others' do
     myproto=Transport.clone
     mycalc=myproto.begin_calculation
     mycalc.choose_without_validation!('fuel'=>'diesel','size'=>'large','distance'=>{:value =>5, :unit=> Unit.km})

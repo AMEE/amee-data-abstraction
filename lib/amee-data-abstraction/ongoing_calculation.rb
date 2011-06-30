@@ -170,19 +170,17 @@ module AMEE
         self.profile_item_uid=new_profile_item_uid if new_profile_item_uid
         choice.each do |k,v|
           next unless self[k]
-          unless v.blank?
-            unless v.is_a? Hash
-              self[k].value v unless v.nil?
-            else
-              # <tt>unless</tt> clause so that single attributes can be updated
-              # without nullifying others. <tt>#nil?</tt> used, rather than
-              # <tt>#blank?</tt> so that intentional blanking of values is
-              # honoured.
-              #
-              self[k].value v[:value] unless v[:value].nil?
-              self[k].unit v[:unit] unless v[:unit].nil?
-              self[k].per_unit v[:per_unit] unless v[:per_unit].nil?
-            end
+          if v.is_a? Hash
+            # <tt>if has_key?</tt> clause included so that single attributes can
+            # be updated without nullifying others if their values are not
+            # explicitly passed. Intentional blanking of values is enabled by
+            # passing nil or "".
+            #
+            self[k].value v[:value] if v.has_key?(:value)
+            self[k].unit v[:unit] if v.has_key?(:unit)
+            self[k].per_unit v[:per_unit] if v.has_key?(:per_unit)
+          else
+            self[k].value v
           end
         end
       end

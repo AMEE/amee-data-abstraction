@@ -163,6 +163,15 @@ Quantify::Unit::NonSI.configure do
     unit.symbol = 'BTU'
   end
 
+  # Differentiate long and short ton symbols
+  Unit.ton_us.configure_as_canonical do |unit|
+    unit.symbol = 'ton (US)'
+  end
+
+  Unit.ton_uk.configure_as_canonical do |unit|
+    unit.symbol = 'ton (UK)'
+  end
+
   # AMEE uses 'day' rather than 'd' as the label for the time period, day
   Unit.day.canonical_label = 'day'
 
