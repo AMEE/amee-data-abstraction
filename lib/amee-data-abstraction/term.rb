@@ -46,9 +46,9 @@ module AMEE
     #                 This attribute is required only if the term represents an
     #                 item value definition in the AMEE platform
     #
-    # Other available attribute-like methods include <tt>interface</tt>,
-    # <tt>note</tt>, <tt>unit</tt>, <tt>per_unit</tt>, <tt>default_unit</tt>,
-    # <tt>default_per_unit</tt> and <tt>parent</tt>.
+    # Other available attribute-like methods include <tt>type</tt>,
+    # <tt>interface</tt>, <tt>note</tt>, <tt>unit</tt>, <tt>per_unit</tt>, 
+    # <tt>default_unit</tt>, <tt>default_per_unit</tt> and <tt>parent</tt>.
     #
     # Subclasses of the <i>Term</i> correspond to:
     # * <i>Input</i>
@@ -82,23 +82,14 @@ module AMEE
       #
       attr_property :name
 
-      # Object representing the value which <tt>self</tt> is considered to
-      # represent (e.g. the quantity or name of something). Set a value by
-      # passing an argument. Retrieve a value by calling without an argument,
-      # e.g.,
+      # Symbol representing the class the value should be parsed to.  If
+      # omitted a string is assumed, e.g.:
       #
-      #  my_term.value 12
-      #  my_term.value                      #=> 12
-      #
-      #
-      #  my_term.value 'Ford Escort'
-      #  my_term.value                      #=> 'Ford Escort'
-      #
-      #
-      #  my_term.value DateTime.civil(2010,12,31)
-      #  my_term.value                      #=> <Date: 4911123/2,0,2299161>
-      #
-      attr_property :value
+      # my_term.type :integer
+      # my_term.value "12"
+      # my_term.value                        # => 12
+      # my_term.value_before_cast            # => "12"
+      attr_property :type
 
       # String representing a the AMEE platform path for <tt>self</tt>. Set a
       # value by passing an argument. Retrieve a value by calling without an
@@ -131,6 +122,9 @@ module AMEE
       #  my_term.parent            #=> <AMEE::DataAbstraction::OngoingCalculation ... >
       #
       attr_accessor :parent
+      
+      # Stores pre-cast value
+      attr_accessor :value_before_cast
 
       # Initialize a new instance of <i>Term</i>.
       #
@@ -164,6 +158,7 @@ module AMEE
       def initialize(options={},&block)
         @parent=options[:parent]
         @value=nil
+        @type=nil
         @enabled=true
         @visible=true
         instance_eval(&block) if block
@@ -210,6 +205,30 @@ module AMEE
         return @interface
       end
 
+      # Object representing the value which <tt>self</tt> is considered to
+      # represent (e.g. the quantity or name of something). Set a value by
+      # passing an argument. Retrieve a value by calling without an argument,
+      # e.g.,
+      #
+      #  my_term.value 12
+      #  my_term.value                      #=> 12
+      #
+      #
+      #  my_term.value 'Ford Escort'
+      #  my_term.value                      #=> 'Ford Escort'
+      #
+      #
+      #  my_term.value DateTime.civil(2010,12,31)
+      #  my_term.value                      #=> <Date: 4911123/2,0,2299161>
+      #
+      def value(*args)
+        unless args.empty?
+          @value_before_cast = args.first
+          @value = @type ? self.class.convert_value_to_type(args.first, @type) : args.first
+        end
+        @value
+      end
+      
       # Symbols representing the attributes of <tt>self</tt> which are concerned
       # with quantity units.
       #
@@ -281,14 +300,14 @@ module AMEE
       # Otherwise, returns <tt>false</tt>.
       #
       def set?
-        !value.nil?
+        !value_before_cast.nil?
       end
 
       # Returns <tt>true</tt> if <tt>self</tt> does not have a populated value
       # attribute. Otherwise, returns <tt>false</tt>.
       #
       def unset?
-        value.nil?
+        value_before_cast.nil?
       end
 
       # Declare that the term's UI element should be disabled
@@ -415,6 +434,23 @@ module AMEE
         end
       end
       
+      def self.convert_value_to_type(value, type)
+        return nil if value.nil?
+        type = type.downcase.to_sym if type.is_a?(String)
+        
+        case type
+          when :string    then value.to_s
+          when :text      then value.to_s
+          when :integer   then value.to_i rescue value ? 1 : 0
+          when :fixnum    then value.to_i rescue value ? 1 : 0
+          when :float     then value.to_f rescue value ? 1 : 0
+          when :decimal   then value.to_d rescue value ? 1 : 0
+          when :datetime  then DateTime.parse(value.to_s) rescue nil
+          when :time      then Time.parse(value.to_s) rescue nil
+          when :date      then Date.parse(value.to_s) rescue nil
+          else value
+        end
+      end
     end
   end
 end

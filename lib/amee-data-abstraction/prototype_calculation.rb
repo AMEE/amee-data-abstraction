@@ -298,27 +298,15 @@ module AMEE
           path 'start_date'
           name 'Start date'
           interface :date
-          validation lambda{|value|
-            begin
-              Date.parse(value)
-              true
-            rescue
-              false
-            end
-          }
+          type :date
+          validation lambda{|v| v.is_a?(Time) || v.is_a?(Date) || (v.is_a?(String) && Date.parse(v) rescue false)}
         }
         metadatum {
           path 'end_date'
           name 'End date'
           interface :date
-          validation lambda{|value|
-            begin
-              Date.parse(value)
-              true
-            rescue
-              false
-            end
-          }
+          type :date
+          validation lambda{|v| v.is_a?(Time) || v.is_a?(Date) || (v.is_a?(String) && Date.parse(v) rescue false)}
         }
       end
 

@@ -191,4 +191,35 @@ describe Term do
   it "should be recognised as non numeric" do
     Term.new {path :hello; value 'bob'; default_unit :kg}.has_numeric_value?.should be_false
   end
+  
+  it "should convert the input to a String if the type is specified as such" do
+    Term.new {type :string; value 54}.value.should == "54"
+  end
+  
+  it "should convert the input to a Fixnum if the type is specified as such" do
+    Term.new {type :fixnum; value '54'}.value.should == 54
+  end
+  
+  it "should convert the input to a Float if the type is specified as such" do
+    Term.new {type :float; value '54'}.value.should == 54.0
+  end
+  
+  it "should convert the input to a Date if the type is specified as such" do
+    Term.new {type :date; value '2011-01-01'}.value.should == Date.parse("2011-01-01")
+  end
+  
+  it "should convert the input to a Time if the type is specified as such" do
+    Term.new {type :time; value "2011-01-01 10:00:00"}.value.should == Time.parse("2011-01-01 10:00:00")
+  end
+  
+  it "should convert the input to a DateTime if the type is specified as such" do
+    now = DateTime.now
+    Term.new {type :datetime; value now.to_s}.value.should === now
+  end
+  
+  it "should store the pre cast value" do
+    term = Term.new {type :float; value '54'}
+    term.value.should == 54.0
+    term.value_before_cast.should == "54"
+  end
 end
