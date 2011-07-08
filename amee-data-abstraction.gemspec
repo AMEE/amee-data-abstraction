@@ -20,5 +20,5 @@ Gem::Specification.new do |s|
   s.add_dependency("amee", ">= 2.6.0", "< 3.0")
   s.add_dependency("amee-internal", ">= 3.7.2", "< 4.0")
   s.add_dependency("uuidtools")
-  s.add_dependency("quantify", "1.0.0")
+  s.add_dependency("quantify", "1.1.0")
 end
