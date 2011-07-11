@@ -331,12 +331,21 @@ module AMEE
       private
 
       def construct_from_ivd(klass,ivd)
+        # Initialize boolean values as ruby boolean objects
+        if (ivd.valuetype == "BOOLEAN") && (ivd.default == ("true"||"TRUE"))
+          default_value = true
+        elsif (ivd.valuetype == "BOOLEAN") && (ivd.default == ("false"||"FALSE"))
+          default_value = false
+        else
+          default_value = ivd.default
+        end
+
         construct(klass) {
           path ivd.path
           name ivd.name
-          value ivd.default
           note ivd.meta.wikidoc
-          type ivd.valuetype
+          type ivd.valuetype.downcase
+          value default_value
           choices ivd.choices
           default_unit ivd.unit
           default_per_unit ivd.perunit

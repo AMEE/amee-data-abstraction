@@ -446,6 +446,7 @@ module AMEE
           when :fixnum    then value.to_i rescue 0
           when :float     then value.to_f rescue 0
           when :decimal   then value.to_s.to_d rescue 0
+          when :double    then value.to_s.to_d rescue 0
           when :datetime  then DateTime.parse(value.to_s) rescue nil
           when :time      then Time.parse(value.to_s) rescue nil
           when :date      then Date.parse(value.to_s) rescue nil

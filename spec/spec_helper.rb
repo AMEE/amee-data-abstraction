@@ -136,7 +136,7 @@ class AMEEMocker
     ivd.should_receive(:choices).and_return choices
     ivd.should_receive(:default).and_return default
     ivd.should_receive(:valuetype).and_return type
-    ivd.should_receive(:meta).and_return(item_value_definition_metadata(:wikidoc=>wikidoc)).should_receive(:wikidoc).and_return wikidoc
+    ivd.should_receive(:meta).and_return(item_value_definition_metadata(:wikidoc=>wikidoc))#.should_receive(:wikidoc).and_return wikidoc
     compulsories.each do |compulsory|
       ivd.should_receive(:compulsory?).with(compulsory).and_return(true)
       ivd.should_receive(:optional?).with(compulsory).and_return(false)

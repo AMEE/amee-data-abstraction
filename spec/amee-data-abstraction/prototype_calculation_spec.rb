@@ -1,4 +1,5 @@
 require File.dirname(File.dirname(__FILE__)) + '/spec_helper.rb'
+
 class PrototypeCalculation
   def call_me
     #stub, because flexmock doesn't work for new instances during constructor
@@ -61,9 +62,9 @@ describe PrototypeCalculation do
     mocker=AMEEMocker.new(self,:path=>'something')
     mocker.item_value_definitions.
       item_definition.data_category.
-      item_value_definition('first').
-      item_value_definition('second',[],[],[],[],:kg).
-      item_value_definition('third')
+      item_value_definition('first',[],[],[],[],nil,nil,true,false,nil,"DOUBLE").
+      item_value_definition('second',[],[],[],[],:kg,nil,true,false,nil,"DOUBLE").
+      item_value_definition('third',[],[],[],[],nil,nil,true,false,nil,"DOUBLE")
     pc=PrototypeCalculation.new {path '/something'; all_profiles}
     pc.profiles.labels.should eql [:first,:second,:third]
     pc.profiles.default_units.first.should be_nil
@@ -73,9 +74,9 @@ describe PrototypeCalculation do
     mocker=AMEEMocker.new(self,:path=>'something')
     mocker.item_value_definitions.
       item_definition.data_category.
-      item_value_definition('first',['bybob']).
-      item_value_definition('second',['bybob'],[],[],[],:MBTU,:year).
-      item_value_definition('third',[],[],['bybob'])
+      item_value_definition('first',['bybob'],[],[],[],nil,nil,true,false,nil,"DOUBLE").
+      item_value_definition('second',['bybob'],[],[],[],:MBTU,:year,true,false,nil,"DOUBLE").
+      item_value_definition('third',[],[],['bybob'],[],nil,nil,true,false,nil,"DOUBLE")
     pc=PrototypeCalculation.new {path '/something'; profiles_from_usage('bybob')}
     pc.profiles.labels.should eql [:first,:second]
     pc.profiles.default_units.first.should be_nil
@@ -86,9 +87,9 @@ describe PrototypeCalculation do
     mocker=AMEEMocker.new(self,:path=>'something')
     mocker.item_value_definitions.
       item_definition.data_category.
-      item_value_definition('first',['bybob'],[],[],['a','b']).
-      item_value_definition('second',['bybob']).
-      item_value_definition('third',[],[],['bybob'])
+      item_value_definition('first',['bybob'],[],[],['a','b'],nil,nil,true,false,nil,"DOUBLE").
+      item_value_definition('second',['bybob'],[],[],[],nil,nil,true,false,nil,"DOUBLE").
+      item_value_definition('third',[],[],['bybob'],[],nil,nil,true,false,nil,"DOUBLE")
     pc=PrototypeCalculation.new {path '/something'; profiles_from_usage('bybob')}
     pc[:first].choices.should eql ['a','b']
     pc[:first].interface.should eql :drop_down
@@ -99,9 +100,9 @@ describe PrototypeCalculation do
     mocker=AMEEMocker.new(self,:path=>'something')
     mocker.item_value_definitions.
       item_definition.data_category.
-      item_value_definition('first',['bybob'],[],[],['a','b'],nil,nil,true,false,"commercial").
-      item_value_definition('second',['bybob'],[],[],[],nil,nil,true,false,1200).
-      item_value_definition('third',['bybob'],[],[])
+      item_value_definition('first',['bybob'],[],[],['a','b'],nil,nil,true,false,"commercial","TEXT").
+      item_value_definition('second',['bybob'],[],[],[],nil,nil,true,false,1200,"INTEGER").
+      item_value_definition('third',['bybob'],[],[],[],nil,nil,true,false,nil,"DOUBLE")
     pc=PrototypeCalculation.new {path '/something'; profiles_from_usage('bybob')}
     pc[:first].value.should eql "commercial"
     pc[:second].value.should eql 1200
@@ -111,9 +112,9 @@ describe PrototypeCalculation do
     mocker=AMEEMocker.new(self,:path=>'something')
     mocker.item_value_definitions.
       item_definition.data_category.
-      item_value_definition('first',['bybob'],[],[],['a','b'],nil,nil,true,false,nil,nil,"Specify a number of something").
-      item_value_definition('second',['bybob'],[],[],[],nil,nil,true,false,nil,nil,"Specify a number of something else").
-      item_value_definition('third',['bybob'],[],[])
+      item_value_definition('first',['bybob'],[],[],['a','b'],nil,nil,true,false,nil,"TEXT","Specify a number of something").
+      item_value_definition('second',['bybob'],[],[],[],nil,nil,true,false,nil,"TEXT","Specify a number of something else").
+      item_value_definition('third',['bybob'],[],[],[],nil,nil,true,false,nil,"TEXT")
     pc=PrototypeCalculation.new {path '/something'; profiles_from_usage('bybob')}
     pc[:first].note.should eql "Specify a number of something"
     pc[:second].note.should eql "Specify a number of something else"
@@ -125,19 +126,20 @@ describe PrototypeCalculation do
       item_definition.data_category.
       item_value_definition('first',['bybob'],[],[],['a','b'],nil,nil,true,false,nil,"DECIMAL").
       item_value_definition('second',['bybob'],[],[],[],nil,nil,true,false,nil,"TEXT").
-      item_value_definition('third',['bybob'],[],[])
+      item_value_definition('third',['bybob'],[],[],[],nil,nil,true,false,'true',"BOOLEAN")
     pc=PrototypeCalculation.new {path '/something'; profiles_from_usage('bybob')}
-    pc[:first].type.should eql "DECIMAL"
-    pc[:second].type.should eql "TEXT"
-    pc[:third].type.should be_nil
+    pc[:first].type.should eql "decimal"
+    pc[:second].type.should eql "text"
+    pc[:third].type.should eql "boolean"
+    pc[:third].value.should be_true
   end
   it 'can select terms by usage with a longer list' do
     mocker=AMEEMocker.new(self,:path=>'something')
     mocker.item_value_definitions.
       item_definition.data_category.
-      item_value_definition('first',['bybob'],[],'byfrank').
-      item_value_definition('second',['bybob'],[],'byfrank').
-      item_value_definition('third',['byfrank'],[],['bybob'])
+      item_value_definition('first',['bybob'],[],'byfrank',[],nil,nil,true,false,nil,"TEXT").
+      item_value_definition('second',['bybob'],[],'byfrank',[],nil,nil,true,false,nil,"TEXT").
+      item_value_definition('third',['byfrank'],[],['bybob'],[],nil,nil,true,false,nil,"TEXT")
     pc=PrototypeCalculation.new {path '/something'; all_profiles ; fixed_usage 'bybob'}
     pc.profiles.in_use.labels.should eql [:first,:second]
     pc.profiles.out_of_use.labels.should eql [:third]
@@ -149,9 +151,9 @@ describe PrototypeCalculation do
     mocker=AMEEMocker.new(self,:path=>'something')
     mocker.item_value_definitions.
       item_definition.data_category.
-      item_value_definition('first',['bybob'],[],'byfrank',[],:kg,:mi).
-      item_value_definition('second',['bybob'],[],'byfrank',[],:km).
-      item_value_definition('third',['byfrank'],[],['bybob'],[],:lb,:h)
+      item_value_definition('first',['bybob'],[],'byfrank',[],:kg,:mi,true,false,nil,"TEXT").
+      item_value_definition('second',['bybob'],[],'byfrank',[],:km,nil,true,false,nil,"TEXT").
+      item_value_definition('third',['byfrank'],[],['bybob'],[],:lb,:h,true,false,nil,"TEXT")
     pc=PrototypeCalculation.new {path '/something'; usage{ value 'bybob'}}
     pc.profiles.labels.should eql [:first,:second,:third]
     pc.profiles.visible.labels.should eql [:first,:second]
@@ -186,12 +188,12 @@ describe PrototypeCalculation do
     mocker.return_value_definitions.
       item_value_definitions.
       item_definition.data_category.
-      item_value_definition('first',['bybob','byfrank'],[],[],nil,nil,nil,false,true).
-      item_value_definition('second',['bybob','byfrank'],[],[],nil,nil,nil,false,true).
-      item_value_definition('third',['bybob','byfrank'],[],[],nil,nil,nil,false,true).
-      item_value_definition('fourth',['bybob'],[],'byfrank').
-      item_value_definition('fifth',['bybob'],[],'byfrank',[],:lb).
-      item_value_definition('sixth',['byfrank'],[],['bybob']).
+      item_value_definition('first',['bybob','byfrank'],[],[],[],nil,nil,false,true,nil,"TEXT").
+      item_value_definition('second',['bybob','byfrank'],[],[],[],nil,nil,false,true,nil,"TEXT").
+      item_value_definition('third',['bybob','byfrank'],[],[],[],nil,nil,false,true,nil,"TEXT").
+      item_value_definition('fourth',['bybob'],[],'byfrank',[],nil,nil,true,false,nil,"TEXT").
+      item_value_definition('fifth',['bybob'],[],'byfrank',[],:lb,nil,true,false,nil,"TEXT").
+      item_value_definition('sixth',['byfrank'],[],['bybob'],[],nil,nil,true,false,nil,"TEXT").
       return_value_definition('seventh').
       return_value_definition('eighth').
       return_value_definition('ninth',:mi,:h)
