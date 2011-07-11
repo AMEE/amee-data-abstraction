@@ -95,6 +95,42 @@ describe PrototypeCalculation do
     pc[:second].choices.should be_empty
     pc[:second].interface.should eql :text_box
   end
+  it 'can generate profile terms with default values' do
+    mocker=AMEEMocker.new(self,:path=>'something')
+    mocker.item_value_definitions.
+      item_definition.data_category.
+      item_value_definition('first',['bybob'],[],[],['a','b'],nil,nil,true,false,"commercial").
+      item_value_definition('second',['bybob'],[],[],[],nil,nil,true,false,1200).
+      item_value_definition('third',['bybob'],[],[])
+    pc=PrototypeCalculation.new {path '/something'; profiles_from_usage('bybob')}
+    pc[:first].value.should eql "commercial"
+    pc[:second].value.should eql 1200
+    pc[:third].value.should be_nil
+  end
+  it 'can generate profile terms with annotations' do
+    mocker=AMEEMocker.new(self,:path=>'something')
+    mocker.item_value_definitions.
+      item_definition.data_category.
+      item_value_definition('first',['bybob'],[],[],['a','b'],nil,nil,true,false,nil,nil,"Specify a number of something").
+      item_value_definition('second',['bybob'],[],[],[],nil,nil,true,false,nil,nil,"Specify a number of something else").
+      item_value_definition('third',['bybob'],[],[])
+    pc=PrototypeCalculation.new {path '/something'; profiles_from_usage('bybob')}
+    pc[:first].note.should eql "Specify a number of something"
+    pc[:second].note.should eql "Specify a number of something else"
+    pc[:third].note.should be_nil
+  end
+  it 'can generate profile terms with types' do
+    mocker=AMEEMocker.new(self,:path=>'something')
+    mocker.item_value_definitions.
+      item_definition.data_category.
+      item_value_definition('first',['bybob'],[],[],['a','b'],nil,nil,true,false,nil,"DECIMAL").
+      item_value_definition('second',['bybob'],[],[],[],nil,nil,true,false,nil,"TEXT").
+      item_value_definition('third',['bybob'],[],[])
+    pc=PrototypeCalculation.new {path '/something'; profiles_from_usage('bybob')}
+    pc[:first].type.should eql "DECIMAL"
+    pc[:second].type.should eql "TEXT"
+    pc[:third].type.should be_nil
+  end
   it 'can select terms by usage with a longer list' do
     mocker=AMEEMocker.new(self,:path=>'something')
     mocker.item_value_definitions.

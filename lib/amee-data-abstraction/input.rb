@@ -97,7 +97,7 @@ module AMEE
       # the value is read-only.
       #
       def fixed val
-        @value= val
+        value(val)
         @fixed=true
         @optional=false
       end
@@ -132,7 +132,7 @@ module AMEE
           end
           @value=args.first
         end
-        return @value
+        super(@value)
       end
 
       # Returns true if <tt>self</tt> is configured to contain a fixed (read-only)
@@ -189,14 +189,12 @@ module AMEE
       end
 
       protected
-
       # Returns <tt>true</tt> if the value set for <tt>self</tt> is either blank
       # or passes custom validation criteria. Otherwise, returns <tt>false</tt>.
       #
       def valid?
-        validation.blank? || validation === value
+        validation.blank? || validation === @value_before_cast
       end
-
     end
   end
 end

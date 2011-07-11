@@ -74,7 +74,7 @@ module AMEE
           @value=args.first
           activate_selected(value)
         end
-        return @value
+        super(@value)
       end
 
       # Activate and deactivate terms in the parent calculation according to the

@@ -170,13 +170,7 @@ module AMEE
       def all_profiles
         amee_ivds.each do |ivd|
           next unless ivd.profile?
-          profile {
-            path ivd.path
-            name ivd.name
-            choices ivd.choices
-            default_unit ivd.unit
-            default_per_unit ivd.perunit
-          }
+          construct_from_ivd(Profile,ivd)
         end
       end
 
@@ -212,13 +206,7 @@ module AMEE
         self.fixed_usage usage
         amee_ivds.each do |ivd|
           next unless ivd.profile?
-          profile {
-            path ivd.path
-            name ivd.name
-            choices ivd.choices
-            default_unit ivd.unit
-            default_per_unit ivd.perunit
-          } if ivd.compulsory?(usage) || ivd.optional?(usage)
+          construct_from_ivd(Profile,ivd) if ivd.compulsory?(usage) || ivd.optional?(usage)
         end
       end
 
@@ -298,27 +286,15 @@ module AMEE
           path 'start_date'
           name 'Start date'
           interface :date
-          validation lambda{|value|
-            begin
-              Date.parse(value)
-              true
-            rescue
-              false
-            end
-          }
+          type :date
+          validation lambda{|v| v.is_a?(Time) || v.is_a?(Date) || (v.is_a?(String) && Date.parse(v) rescue false)}
         }
         metadatum {
           path 'end_date'
           name 'End date'
           interface :date
-          validation lambda{|value|
-            begin
-              Date.parse(value)
-              true
-            rescue
-              false
-            end
-          }
+          type :date
+          validation lambda{|v| v.is_a?(Time) || v.is_a?(Date) || (v.is_a?(String) && Date.parse(v) rescue false)}
         }
       end
 
@@ -353,6 +329,19 @@ module AMEE
       end
 
       private
+
+      def construct_from_ivd(klass,ivd)
+        construct(klass) {
+          path ivd.path
+          name ivd.name
+          value ivd.default
+          note ivd.meta.wikidoc
+          type ivd.valuetype
+          choices ivd.choices
+          default_unit ivd.unit
+          default_per_unit ivd.perunit
+        }
+      end
 
       # Construct a term of class klass, and evaluate a DSL block in its context.
       def construct(klass,options={},&block)
