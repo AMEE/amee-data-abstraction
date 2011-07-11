@@ -282,7 +282,7 @@ describe OngoingCalculation do
       start_and_end_dates
     }
     mycalc=myproto.begin_calculation
-    mycalc.choose!('fuel'=>'diesel','size'=>'large','distance'=>5,'start_date'=>"1976-10-19",'end_date'=>Date.parse("2011-1-1"))
+    mycalc.choose!('fuel'=>'diesel','size'=>'large','distance'=>5,'start_date'=>"1976-10-19",'end_date'=>DateTime.parse("2011-1-1"))
     mycalc.calculate!
     mycalc.outputs.first.value.should eql :somenumber
   end
@@ -305,7 +305,7 @@ describe OngoingCalculation do
       start_and_end_dates
     }
     mycalc=myproto.begin_calculation
-    mycalc.choose('fuel'=>'diesel','size'=>'large','distance'=>5,'start_date'=>"banana",'end_date'=>Date.parse("2011-1-1")).should be_false
+    mycalc.choose('fuel'=>'diesel','size'=>'large','distance'=>5,'start_date'=>"banana",'end_date'=>DateTime.parse("2011-1-1")).should be_false
     mycalc.invalidity_messages.keys.should eql [:start_date]
   end
 

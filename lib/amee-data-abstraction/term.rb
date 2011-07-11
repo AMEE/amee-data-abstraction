@@ -1,4 +1,3 @@
-
 # Authors::   James Hetherington, James Smith, Andrew Berkeley, George Palmer
 # Copyright:: Copyright (c) 2011 AMEE UK Ltd
 # License::   Permission is hereby granted, free of charge, to any person obtaining
@@ -21,6 +20,7 @@
 #             SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 # :title: Class: AMEE::DataAbstraction::Term
+require 'bigdecimal'
 
 module AMEE
   module DataAbstraction
@@ -441,10 +441,10 @@ module AMEE
         case type
           when :string    then value.to_s
           when :text      then value.to_s
-          when :integer   then value.to_i rescue value ? 1 : 0
-          when :fixnum    then value.to_i rescue value ? 1 : 0
-          when :float     then value.to_f rescue value ? 1 : 0
-          when :decimal   then value.to_d rescue value ? 1 : 0
+          when :integer   then value.to_i rescue 0
+          when :fixnum    then value.to_i rescue 0
+          when :float     then value.to_f rescue 0
+          when :decimal   then value.to_s.to_d rescue 0
           when :datetime  then DateTime.parse(value.to_s) rescue nil
           when :time      then Time.parse(value.to_s) rescue nil
           when :date      then Date.parse(value.to_s) rescue nil
