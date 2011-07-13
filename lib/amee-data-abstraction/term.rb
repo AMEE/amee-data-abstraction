@@ -436,7 +436,7 @@ module AMEE
       end
       
       def self.convert_value_to_type(value, type)
-        return nil if value.nil?
+        return nil if value.blank?
         type = type.downcase.to_sym if type.is_a?(String)
         
         case type

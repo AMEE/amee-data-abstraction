@@ -130,9 +130,8 @@ module AMEE
             raise Exceptions::FixedValueInterference if fixed?
             parent.dirty! if parent and parent.is_a? OngoingCalculation
           end
-          @value=args.first
         end
-        super(@value)
+        super
       end
 
       # Returns true if <tt>self</tt> is configured to contain a fixed (read-only)
