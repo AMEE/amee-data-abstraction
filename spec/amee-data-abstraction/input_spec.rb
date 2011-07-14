@@ -18,6 +18,34 @@ describe Input do
    j.value 'marking'
    j.value.should eql 'marking'
  end
+ it "can accept a numeric symbol validation" do
+   i=Input.new{validation :numeric}
+   i.value 3
+   lambda{i.validate!}.should_not raise_error
+   i.value '3'
+   lambda{i.validate!}.should_not raise_error
+   i.value 'e'
+   lambda{i.validate!}.should raise_error Exceptions::ChoiceValidation
+ end
+ it "can accept a date symbol validation" do
+   i=Input.new{validation :date}
+   i.value Date.today
+   lambda{i.validate!}.should_not raise_error
+   i.value '2011-01-01'
+   lambda{i.validate!}.should_not raise_error
+   i.value 'e'
+   lambda{i.validate!}.should raise_error Exceptions::ChoiceValidation
+ end
+
+ it "can accept a time symbol validation" do
+   i=Input.new{validation :datetime}
+   i.value DateTime.now
+   lambda{i.validate!}.should_not raise_error
+   i.value '2011-01-01 09:00:00'
+   lambda{i.validate!}.should_not raise_error
+   i.value 'e'
+   lambda{i.validate!}.should raise_error Exceptions::ChoiceValidation
+ end
  it 'can have custom validation message' do
    i=Input.new{label :woof; validation /bark/; validation_message {"#{value} does not match pattern /bark/"}}
    i.value 'marking'

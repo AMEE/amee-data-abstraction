@@ -41,54 +41,11 @@ module AMEE
         [[nil,nil]]+choices.map{|x|[x.underscore.humanize,x] unless x.nil? }.compact
       end
 
-      # Represents a custom object or pattern to be called via === to determine
-      # the whether value set for <tt>self</tt> should be considered acceptable.
-      # If validation is specified using a <i>Proc</i> object, the term value 
-      # should be initialized as the block variable. E.g.,
-      #
-      #   my_input.validation 20
-      #
-      #   my_input.valid?             #=> true
-      #
-      #   my_input.value 'some string'
-      #   my_input.valid?             #=> false
-      #
-      #   my_input.value 21
-      #   my_input.valid?             #=> false
-      #
-      #   my_input.value 20
-      #   my_input.valid?             #=> true
-      #
-      #   ---
-      #
-      #   my_input.validation lambda{ |value| value.is_a? Numeric }
-      #
-      #   my_input.valid?             #=> true
-      #
-      #   my_input.value 'some string'
-      #   my_input.valid?             #=> false
-      #
-      #   my_input.value 12345
-      #   my_input.valid?             #=> true
-      #
-      #   ---
-      #
-      #   my_input.validation lambda{ |value| value % 5 == 0 }
-      #
-      #   my_input.valid?             #=> true
-      #
-      #   my_input.value 21
-      #   my_input.valid?             #=> false
-      #
-      #   my_input.value 20
-      #   my_input.valid?             #=> true
-      #
-      attr_property :validation
-
       # Initialization of <i>Input</i> objects follows that of the parent
       # <i>Term</i> class.
       #
       def initialize(options={},&block)
+        @validation = nil
         validation_message {"#{name} is invalid."}
         super
       end
@@ -132,6 +89,66 @@ module AMEE
           end
         end
         super
+      end
+      
+      # Represents a custom object, symbol or pattern (to be called via ===) to 
+      # determine the whether value set for <tt>self</tt> should be considered 
+      # acceptable.  The following symbols are acceptable :numeric, :date or
+      # :datetime  If validation is specified using a <i>Proc</i> object, the term 
+      # value should be initialized as the block variable. E.g.,
+      #
+      #   my_input.validation 20
+      #
+      #   my_input.valid?             #=> true
+      #
+      #   my_input.value 'some string'
+      #   my_input.valid?             #=> false
+      #
+      #   my_input.value 21
+      #   my_input.valid?             #=> false
+      #
+      #   my_input.value 20
+      #   my_input.valid?             #=> true
+      #
+      #   ---
+      #
+      #   my_input.validation lambda{ |value| value.is_a? Numeric }
+      #
+      #   my_input.valid?             #=> true
+      #
+      #   my_input.value 'some string'
+      #   my_input.valid?             #=> false
+      #
+      #   my_input.value 12345
+      #   my_input.valid?             #=> true
+      #
+      #   ---
+      #
+      #   my_input.validation :numeric
+      #
+      #   my_input.valid?             #=> false
+      #
+      #   my_input.value 21
+      #   my_input.valid?             #=> true
+      #
+      #   my_input.value "20"
+      #   my_input.valid?             #=> true
+      #
+      #   my_input.value "e"
+      #   my_input.valid?             #=> false
+      def validation(*args)
+        unless args.empty?
+          if args.first.is_a?(Symbol)
+            @validation = case args.first
+              when :numeric then lambda{|v| v.is_a?(Fixnum) || v.is_a?(Integer) || v.is_a?(Float) || v.is_a?(BigDecimal) || (v.is_a?(String) && v.match(/^[\d\.]+$/))}
+              when :date then lambda{|v| v.is_a?(Date) || v.is_a?(DateTime) || Date.parse(v) rescue nil}
+              when :datetime then lambda{|v| v.is_a?(Time) || v.is_a?(DateTime) || DateTime.parse(v) rescue nil}
+            end
+          else
+            @validation = args.first
+          end
+        end
+        @validation
       end
 
       # Returns true if <tt>self</tt> is configured to contain a fixed (read-only)
