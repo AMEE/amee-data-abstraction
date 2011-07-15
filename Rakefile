@@ -33,7 +33,7 @@ class Jeweler
           raise "Unclean staging area! Be sure to commit or .gitignore everything first. See `git status` above."
         end
         repo.checkout('stable')
-        repo.push
+        repo.push('origin', 'stable')
         if release_not_tagged?
           output.puts "Tagging #{release_tag}"
           repo.add_tag(release_tag)
