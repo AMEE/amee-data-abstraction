@@ -2,7 +2,7 @@ GEM
   remote: http://rubygems.org/
   remote: http://amee:aeC5ahx4@gems.amee.com/
   specs:
-    activesupport (2.3.12)
+    activesupport (2.3.11)
     amee (2.6.0)
       activesupport (~> 2.3.5)
       json
@@ -11,12 +11,18 @@ GEM
       rspec_spinner
     amee-internal (3.7.2)
       amee (>= 2.6.0, < 3.0)
-    flexmock (0.8.6)
-    json (1.5.1)
+    flexmock (0.9.0)
+    git (1.2.5)
+    jeweler (1.6.4)
+      bundler (~> 1.0)
+      git (>= 1.2.5)
+      rake
+    json (1.5.3)
     log4r (1.1.9)
     nokogiri (1.4.3.1)
     quantify (1.1.0)
       activesupport
+    rake (0.8.7)
     rcov (0.9.9)
     rspec (1.3.0)
     rspec_spinner (1.1.3)
@@ -30,7 +36,9 @@ PLATFORMS
 DEPENDENCIES
   amee (>= 2.6.0, < 3.0)
   amee-internal (>= 3.7.2, < 4.0)
-  flexmock (= 0.8.6)
+  bundler (~> 1.0.0)
+  flexmock (> 0.8.6)
+  jeweler (~> 1.6.4)
   quantify (= 1.1.0)
   rcov
   rspec (= 1.3.0)
