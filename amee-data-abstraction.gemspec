@@ -24,6 +24,7 @@ Gem::Specification.new do |s|
     "README",
     "Rakefile",
     "VERSION",
+    "amee-data-abstraction.gemspec",
     "examples/_calculator_form.erb",
     "examples/calculation_controller.rb",
     "init.rb",
