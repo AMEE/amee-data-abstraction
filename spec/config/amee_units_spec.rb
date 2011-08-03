@@ -15,6 +15,7 @@ describe "AMEE units" do
   # #loaded? (if the happen to be derivable) or otherwise raise an error.
 
   it "should include commonly used SI units" do
+    pp Unit.units_by_label
     Unit.metre.should be_loaded
     Unit.second.should be_loaded
     Unit.kg.should be_loaded

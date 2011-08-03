@@ -122,7 +122,8 @@ Quantify::Unit.configure do
            :reyn,
            :rem,
            :rood,
-           :rutherford,
+           :rd,
+           :Rd,
            :rydberg,
            :sphere,
            :sthene,
@@ -133,7 +134,26 @@ Quantify::Unit.configure do
            :unified_atomic_mass,
            :sidereal_year,
            :tog,
-           :clo ]
+           :clo,
+           'percent',
+           'amagat',
+           'bequerel',
+           'coloumb',
+           'farad',
+           'gray',
+           'henry',
+           'katal',
+           'lumen',
+           'lux',
+           'siemens',
+           'sievert',
+           'steridian',
+           'tesla',
+           'weber',
+           'candela',
+           'curie',
+           'bbl_imp',
+           'bbl_dry_us']
 
 end
 
