@@ -369,7 +369,11 @@ module AMEE
 
       # Returns a pretty print string representation of <tt>self</tt>
       def inspect
-        "[#{self.class} #{label} : #{value}]"
+        elements = {:label => label, :value => value, :unit => unit,
+                    :per_unit => per_unit, :type => type,
+                    :disabled => disabled?, :visible => visible?}
+        attr_list = elements.map {|k,v| "#{k}: #{v.inspect}" } * ', '
+        "<#{self.class.name} #{attr_list}>"
       end
 
       # Returns <tt>true</tt> if <tt>self</tt> occurs before the term with a label
