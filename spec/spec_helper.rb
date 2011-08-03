@@ -6,15 +6,6 @@ $:.unshift(File.dirname(__FILE__) + '/../lib')
 require 'amee'
 require 'amee-internal'
 require 'amee-data-abstraction'
-require 'bundler'
-
-begin
-  Bundler.setup(:default, :development)
-rescue Bundler::BundlerError => e
-  $stderr.puts e.message
-  $stderr.puts "Run `bundle install` to install missing gems"
-  exit e.status_code
-end
 
 Spec::Runner.configure do |config|
   config.mock_with :flexmock
