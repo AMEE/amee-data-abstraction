@@ -129,7 +129,7 @@ module AMEE
 
       # Prettyprint a string representation of <tt>self</tt>, together with associated terms
       def inspect
-        elements = {:label => label.inspect, :terms => terms.map{|t| "<Term label:#{t.label}, value:#{t.value.inspect}>"}}
+        elements = {:label => label.inspect, :terms => terms.map{|t| "<#{t.class.name.demodulize} label:#{t.label}, value:#{t.value.inspect}>"}}
         attr_list = elements.map {|k,v| "#{k}: #{v}" } * ', '
         "<#{self.class.name} #{attr_list}>"
       end
