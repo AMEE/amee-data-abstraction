@@ -13,14 +13,21 @@ describe Term do
     Term.new {call_me}
     Term.called.should be_true
   end
+
   it "has label" do
     Term.new {label :hello}.label.should eql :hello
   end
+
   it "has name" do
     Term.new {name :hello}.name.should eql :hello
   end
+
   it "has path" do
     Term.new {path :hello}.path.should eql :hello
+  end
+
+  it "has note" do
+    Term.new {note 'hello'}.note.should eql 'hello'
   end
 
   it 'has parent' do
@@ -176,4 +183,203 @@ describe Term do
     Term.new {path :hello; value 12; default_unit :kg; per_unit :h}.to_s(:pluralized_name).should == '12 kilograms per hour'
     Term.new {path :hello; value 12; per_unit :h}.to_s(:pluralized_name).should == '12 per hour'
   end
+
+  it "should be recognised as numeric" do
+    Term.new {path :hello; value 12; default_unit :kg}.has_numeric_value?.should be_true
+  end
+
+  it "should be recognised as non numeric" do
+    Term.new {path :hello; value 'bob'; default_unit :kg}.has_numeric_value?.should be_false
+  end
+  
+  it "should convert the input to a String if the type is specified as such" do
+    Term.new {type :string; value 54}.value.should == "54"
+  end
+  
+  it "should convert the input to a Fixnum if the type is specified as such" do
+    Term.new {type :fixnum; value '54'}.value.should == 54
+  end
+  
+  it "should convert the input to a Float if the type is specified as such" do
+    Term.new {type :float; value '54'}.value.should == 54.0
+  end
+  
+  it "should convert the input to a Date if the type is specified as such" do
+    Term.new {type :date; value '2011-01-01'}.value.should == Date.parse("2011-01-01")
+  end
+  
+  it "should convert the input to a Time if the type is specified as such" do
+    Term.new {type :time; value "2011-01-01 10:00:00"}.value.should == Time.parse("2011-01-01 10:00:00")
+  end
+  
+  it "should convert the input to a DateTime if the type is specified as such" do
+    now = DateTime.now
+    Term.new {type :datetime; value now.to_s}.value.should === now
+  end
+  
+  it "should store the pre cast value" do
+    term = Term.new {type :float; value '54'}
+    term.value.should == 54.0
+    term.value_before_cast.should == "54"
+  end
+
+    it "should return self if no unit or per unit attribute" do
+    @term = Term.new { value 20 }
+    @term.unit.should be_nil
+    @term.per_unit.should be_nil
+    @term.value.should eql 20
+    new_term = @term.convert_unit(:unit => :t)
+    new_term.should === @term
+    new_term.value.should eql 20
+    new_term.unit.should be_nil
+    new_term.per_unit.should be_nil
+  end
+
+  it "should return self if not a numeric unit" do
+    @term = Term.new { value 'plane'; unit :kg }
+    @term.unit.label.should eql 'kg'
+    @term.value.should eql 'plane'
+    new_term = @term.convert_unit(:unit => :t)
+    new_term.should === @term
+  end
+
+  it "should convert unit" do
+    @term = Term.new { value 20; unit :kg }
+    @term.unit.symbol.should eql 'kg'
+    @term.value.should eql 20
+    new_term = @term.convert_unit(:unit => :t)
+    new_term.unit.symbol.should eql 't'
+    new_term.value.should eql 0.020
+  end
+
+  it "should convert per unit" do
+    @term = Term.new { value 20; unit :kg; per_unit :min }
+    @term.unit.symbol.should eql 'kg'
+    @term.per_unit.symbol.should eql 'min'
+    @term.value.should eql 20
+    new_term = @term.convert_unit(:per_unit => :h)
+    new_term.unit.symbol.should eql 'kg'
+    new_term.per_unit.symbol.should eql 'h'
+    new_term.value.should eql 1200.0
+  end
+
+  it "should convert unit and per unit" do
+    @term = Term.new { value 20; unit :kg; per_unit :min }
+    @term.unit.symbol.should eql 'kg'
+    @term.per_unit.symbol.should eql 'min'
+    @term.value.should eql 20
+    new_term = @term.convert_unit( :unit => :t, :per_unit => :h )
+    new_term.unit.symbol.should eql 't'
+    new_term.per_unit.symbol.should eql 'h'
+    new_term.value.should eql 1.2000
+  end
+
+  it "should convert unit if value a string" do
+    @term = Term.new { value "20"; unit :kg }
+    @term.unit.symbol.should eql 'kg'
+    @term.value.should eql "20"
+    new_term = @term.convert_unit(:unit => :t)
+    new_term.unit.symbol.should eql 't'
+    new_term.value.should eql 0.020
+  end
+
+  it "should convert per unit if value a string" do
+    @term = Term.new { value "20"; unit :kg; per_unit :min }
+    @term.unit.symbol.should eql 'kg'
+    @term.per_unit.symbol.should eql 'min'
+    @term.value.should eql "20"
+    new_term = @term.convert_unit(:per_unit => :h)
+    new_term.unit.symbol.should eql 'kg'
+    new_term.per_unit.symbol.should eql 'h'
+    new_term.value.should eql 1200.0
+  end
+
+  it "should convert unit and per unit if value a string" do
+    @term = Term.new { value "20"; unit :kg; per_unit :min }
+    @term.unit.symbol.should eql 'kg'
+    @term.per_unit.symbol.should eql 'min'
+    @term.value.should eql "20"
+    new_term = @term.convert_unit( :unit => :t, :per_unit => :h )
+    new_term.unit.symbol.should eql 't'
+    new_term.per_unit.symbol.should eql 'h'
+    new_term.value.should eql 1.2000
+  end
+
+  it "should raise error if trying to convert to non dimensionally equivalent unit" do
+    @term = Term.new { value 20; unit :kg; per_unit :min }
+    @term.unit.symbol.should eql 'kg'
+    @term.per_unit.symbol.should eql 'min'
+    @term.value.should eql 20
+    lambda{new_term = @term.convert_unit( :unit => :J, :per_unit => :h )}.should raise_error
+  end
+
+  it "should raise error if trying to convert to non dimensionally equivalent unit" do
+    @term = Term.new { value 20; unit :kg; per_unit :min }
+    @term.unit.symbol.should eql 'kg'
+    @term.per_unit.symbol.should eql 'min'
+    @term.value.should eql 20
+    lambda{new_term = @term.convert_unit( :unit => :J, :per_unit => :h )}.should raise_error
+  end
+
+  describe "quantities" do
+
+    it "should convert term with unit to quantity object" do
+      @term = Term.new { value 20; unit :kg }
+      quantity = @term.to_quantity
+      quantity.unit.name.should eql "kilogram"
+      quantity.unit.symbol.should eql "kg"
+      quantity.value.should eql 20.0
+      quantity.to_s.should eql "20.0 kg"
+    end
+
+    it "should convert term with per unit to quantity object" do
+      @term = Term.new { value 20; per_unit :h }
+      quantity = @term.to_quantity
+      quantity.unit.name.should eql "per hour"
+      quantity.unit.symbol.should eql "h^-1"
+      quantity.value.should eql 20.0
+      quantity.to_s.should eql "20.0 h^-1"
+    end
+
+    it "should convert term with unit and per unit to quantity object" do
+      @term = Term.new { value 20; unit :kg; per_unit :h }
+      quantity = @term.to_quantity
+      quantity.unit.name.should eql "kilogram per hour"
+      quantity.unit.symbol.should eql "kg h^-1"
+      quantity.value.should eql 20.0
+      quantity.to_s.should eql "20.0 kg h^-1"
+    end
+
+    it "should return nil with no unit or per unit" do
+      @term = Term.new { value 20 }
+      quantity = @term.to_quantity
+      quantity.should eql 20
+      quantity.should be_a Integer
+    end
+
+    it "should return nil with non numeric term" do
+      @term = Term.new { value "taxi" }
+      quantity = @term.to_quantity
+      quantity.should be_nil
+    end
+
+    it "should convert term with unit to quantity object with alias method" do
+      @term = Term.new { value 20; unit :kg }
+      quantity = @term.to_q
+      quantity.unit.name.should eql "kilogram"
+      quantity.unit.symbol.should eql "kg"
+      quantity.value.should eql 20.0
+      quantity.to_s.should eql "20.0 kg"
+    end
+
+    it "should convert term with per unit to quantity object with alias method" do
+      @term = Term.new { value 20; per_unit :h }
+      quantity = @term.to_q
+      quantity.unit.name.should eql "per hour"
+      quantity.unit.symbol.should eql "h^-1"
+      quantity.value.should eql 20.0
+      quantity.to_s.should eql "20.0 h^-1"
+    end
+  end
+  
 end

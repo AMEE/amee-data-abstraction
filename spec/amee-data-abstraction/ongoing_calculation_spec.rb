@@ -115,22 +115,24 @@ describe OngoingCalculation do
     mycalc.calculate!
     mycalc.outputs.first.value.should eql :somenumber
   end
+
   #This exception has been removed, to support the case where the persistence module
   #had a saved calculation from before a configuration file changed. We might want to
   #do something more sophisticated.
-#  it 'raises exception if choice supplied for invalid term' do
-#    mycalc=Transport.begin_calculation
-#    mocker=AMEEMocker.new(self,:path=>'transport/car/generic',
-#      :choices=>['diesel','petrol'],
-#      :result=>:somenumber,
-#      :params=>{'distance'=>5})
-#    mocker.drill
-#    mocker.select('fuel'=>'diesel')
-#    mocker.choices=['large','small']
-#    mocker.drill
-#    lambda{mycalc.choose!('fuel'=>'diesel','banana'=>'large','distance'=>5)}.
-#      should raise_exception Exceptions::NoSuchTerm
-#  end
+  #it 'raises exception if choice supplied for invalid term' do
+  #  mycalc=Transport.begin_calculation
+  #  mocker=AMEEMocker.new(self,:path=>'transport/car/generic',
+  #    :choices=>['diesel','petrol'],
+  #    :result=>:somenumber,
+  #    :params=>{'distance'=>5})
+  #  mocker.drill
+  #  mocker.select('fuel'=>'diesel')
+  #  mocker.choices=['large','small']
+  #  mocker.drill
+  #  lambda{mycalc.choose!('fuel'=>'diesel','banana'=>'large','distance'=>5)}.
+  #    should raise_exception Exceptions::NoSuchTerm
+  #end
+
   it 'can be supplied just a UID, and recover PIVs and drill values from AMEE' do
     mycalc=Transport.begin_calculation
     mocker=AMEEMocker.new(self,:path=>'transport/car/generic',
@@ -147,12 +149,14 @@ describe OngoingCalculation do
     mycalc[:distance].value.should eql 5
     mycalc.outputs.first.value.should eql :somenumber
   end
+
   it 'refuses to load values from AMEE which conflict with local drill values' do
     mycalc=Transport.begin_calculation
     mocker=AMEEMocker.new(self,:path=>'transport/car/generic',
       :result=>:somenumber,
       :existing=>{'distance'=>7},
-      :params=>{'distance'=>7},:choices=>['petrol','diesel'])
+      :params=>{'distance'=>7},
+      :choices=>['petrol','diesel'])
     mocker.drill
     mocker.select('fuel'=>'diesel')
     mocker.choices=['large','small']
@@ -167,6 +171,7 @@ describe OngoingCalculation do
     mycalc.calculate!
     mycalc.outputs.first.value.should eql :somenumber
   end
+
   it 'lets local profile values replace and update those in amee' do
     mocker=AMEEMocker.new(self,:path=>'transport/car/generic',
       :result=>:somenumber,
@@ -187,6 +192,7 @@ describe OngoingCalculation do
     mycalc.calculate!
     mycalc[:distance].value.should eql 9
   end
+
   it 'can be calculated, then recalculated, loading from AMEE the second time' do
     mocker=AMEEMocker.new(self,:path=>'transport/car/generic',
       :choices=>['diesel','petrol'],
@@ -212,6 +218,7 @@ describe OngoingCalculation do
     mycalc.calculate!
     mycalc[:distance].value.should eql 9
   end
+
   it 'can be calculated, then change drill, recreating the second time' do
     mocker=AMEEMocker.new(self,:path=>'transport/car/generic',
       :choices=>['diesel','petrol'],
@@ -236,6 +243,7 @@ describe OngoingCalculation do
     mycalc.calculate!
     mycalc[:distance].value.should eql 5
   end
+
   it 'memoizes profile information, but not across a pass' do
     mycalc=Transport.begin_calculation
     mocker=AMEEMocker.new(self,:path=>'transport/car/generic',
@@ -253,13 +261,14 @@ describe OngoingCalculation do
     mycalc[:distance].value.should eql 5
     mycalc.outputs.first.value.should eql :somenumber
   end
+
   it 'creates profile item with start end dates if appropriate metadata provided' do
     mocker=AMEEMocker.new(self,:path=>'transport/car/generic',
       :choices=>['diesel','petrol'],
       :result=>:somenumber,
       :params=>{'distance'=>5,
-        :start_date=>Date.parse("1976-10-19"),
-        :end_date=>Date.parse("2011-1-1")})
+                :start_date=>Date.parse("1976-10-19"),
+                :end_date=>Date.parse("2011-1-1")})
     mocker.drill
     mocker.select('fuel'=>'diesel')
     mocker.choices=['large','small']
@@ -273,16 +282,17 @@ describe OngoingCalculation do
       start_and_end_dates
     }
     mycalc=myproto.begin_calculation
-    mycalc.choose!('fuel'=>'diesel','size'=>'large','distance'=>5,'start_date'=>"1976-10-19",'end_date'=>"2011-1-1")
+    mycalc.choose!('fuel'=>'diesel','size'=>'large','distance'=>5,'start_date'=>"1976-10-19",'end_date'=>DateTime.parse("2011-1-1"))
     mycalc.calculate!
     mycalc.outputs.first.value.should eql :somenumber
   end
+
   it 'does not accept start end dates if inappropriate value provided' do
     mocker=AMEEMocker.new(self,:path=>'transport/car/generic',
       :choices=>['diesel','petrol'],
       :result=>:somenumber,
       :params=>{'distance'=>5,
-        :end_date=>Date.parse("2011-1-1")})
+                :end_date=>Date.parse("2011-1-1")})
     mocker.drill
     mocker.select('fuel'=>'diesel')
     mocker.choices=['large','small']
@@ -295,14 +305,15 @@ describe OngoingCalculation do
       start_and_end_dates
     }
     mycalc=myproto.begin_calculation
-    mycalc.choose('fuel'=>'diesel','size'=>'large','distance'=>5,'start_date'=>"banana",'end_date'=>"2011-1-1").should be_false
+    mycalc.choose('fuel'=>'diesel','size'=>'large','distance'=>5,'start_date'=>"banana",'end_date'=>DateTime.parse("2011-1-1")).should be_false
     mycalc.invalidity_messages.keys.should eql [:start_date]
   end
-  it 'starts off dirty' do
-    
+
+  it 'starts off dirty' do  
     mycalc=Transport.begin_calculation
     mycalc.should be_dirty
   end
+
   it 'becomes clean when you calculate' do
     mocker=AMEEMocker.new(self,:path=>'transport/car/generic',
       :choices=>['diesel','petrol'],
@@ -324,6 +335,7 @@ describe OngoingCalculation do
     mycalc.outputs.first.value.should eql :somenumber
     mycalc.should_not be_dirty
   end
+
   it 'becomes dirty again if you reset something after you calculate' do
     mocker=AMEEMocker.new(self,:path=>'transport/car/generic',
       :choices=>['diesel','petrol'],
@@ -347,6 +359,7 @@ describe OngoingCalculation do
     mycalc.choose!('distance'=>7)
     mycalc.should be_dirty
   end
+
   it 'provides error message and raises exception from choose! if choice invalid' do
     mocker=AMEEMocker.new(self,:path=>'transport/car/generic',
       :choices=>['diesel','petrol'],
@@ -363,6 +376,7 @@ describe OngoingCalculation do
     lambda{mycalc.choose!('fuel'=>'diesel','size'=>'marge','distance'=>5)}.should raise_error Exceptions::ChoiceValidation
     mycalc.invalidity_messages.keys.should eql [:size]
   end
+
   it 'provides error message and returns false from choose if choice invalid' do
     mocker=AMEEMocker.new(self,:path=>'transport/car/generic',
       :choices=>['diesel','petrol'],
@@ -379,6 +393,7 @@ describe OngoingCalculation do
     mycalc.choose('fuel'=>'diesel','size'=>'marge','distance'=>5).should be_false
     mycalc.invalidity_messages.keys.should eql [:size]
   end
+
   it 'returns true from choose if choices valid' do
     mocker=AMEEMocker.new(self,:path=>'transport/car/generic',
       :choices=>['diesel','petrol'],
@@ -393,6 +408,87 @@ describe OngoingCalculation do
     mocker.drill
     mycalc=Transport.begin_calculation
     mycalc.choose('fuel'=>'diesel','size'=>'large','distance'=>5).should be_true
+  end
+
+  it 'can blank individual term attributes with empty string' do
+    myproto=Transport.clone
+    mycalc=myproto.begin_calculation
+    mycalc.choose_without_validation!('fuel'=>'diesel','size'=>'large','distance'=>{:value =>5, :unit=> Unit.km})
+    mycalc['fuel'].value.should eql 'diesel'
+    mycalc['size'].value.should eql 'large'
+    mycalc['distance'].value.should eql 5
+    mycalc['distance'].unit.symbol.should eql 'km'
+    mycalc.choose_without_validation!('distance'=>{:value =>""})
+    mycalc['fuel'].value.should eql 'diesel'
+    mycalc['size'].value.should eql 'large'
+    mycalc['distance'].value.should eql ""
+    mycalc['distance'].unit.symbol.should eql 'km'
+  end
+
+  it 'can blank individual term attributes with nil' do
+    myproto=Transport.clone
+    mycalc=myproto.begin_calculation
+    mycalc.choose_without_validation!('fuel'=>'diesel','size'=>'large','distance'=>{:value =>5, :unit=> Unit.km})
+    mycalc['fuel'].value.should eql 'diesel'
+    mycalc['size'].value.should eql 'large'
+    mycalc['distance'].value.should eql 5
+    mycalc['distance'].unit.symbol.should eql 'km'
+    mycalc.choose_without_validation!('distance'=>{:value =>nil})
+    mycalc['fuel'].value.should eql 'diesel'
+    mycalc['size'].value.should eql 'large'
+    mycalc['distance'].value.should be_nil
+    mycalc['distance'].unit.symbol.should eql 'km'
+  end
+
+    it 'can update individual term attributes without nullifying others' do
+    myproto=Transport.clone
+    mycalc=myproto.begin_calculation
+    mycalc.choose_without_validation!('fuel'=>'diesel','size'=>'large','distance'=>{:value =>5, :unit=> Unit.km})
+    mycalc['fuel'].value.should eql 'diesel'
+    mycalc['size'].value.should eql 'large'
+    mycalc['distance'].value.should eql 5
+    mycalc['distance'].unit.symbol.should eql 'km'
+    mycalc.choose_without_validation!('fuel'=>'biodiesel')
+    mycalc['fuel'].value.should eql 'biodiesel'
+    mycalc['size'].value.should eql 'large'
+    mycalc['distance'].value.should eql 5
+    mycalc['distance'].unit.symbol.should eql 'km'
+    mycalc.choose_without_validation!('distance'=>{:value =>25})
+    mycalc['fuel'].value.should eql 'biodiesel'
+    mycalc['size'].value.should eql 'large'
+    mycalc['distance'].value.should eql 25
+    mycalc['distance'].unit.symbol.should eql 'km'
+    mycalc.choose_without_validation!('distance'=>{:unit =>Unit.mi})
+    mycalc['fuel'].value.should eql 'biodiesel'
+    mycalc['size'].value.should eql 'large'
+    mycalc['distance'].value.should eql 25
+    mycalc['distance'].unit.symbol.should eql 'mi'
+    mycalc.choose_without_validation!('distance'=>{:value=>250,:unit =>Unit.ft})
+    mycalc['fuel'].value.should eql 'biodiesel'
+    mycalc['size'].value.should eql 'large'
+    mycalc['distance'].value.should eql 250
+    mycalc['distance'].unit.symbol.should eql 'ft'
+  end
+
+  it 'clears invalid terms' do
+    mocker=AMEEMocker.new(self,:path=>'transport/car/generic',
+      :choices=>['diesel','petrol'],
+      :result=>:somenumber,
+      :params=>{'distance'=>5})
+    mocker.drill
+    mocker.select('fuel'=>'diesel')
+    mocker.choices=['large','small']
+    mocker.drill
+    mocker.select('size'=>'marge')
+    mocker.choices=[]
+    mocker.drill
+    mycalc=Transport.begin_calculation
+    mycalc.choose('fuel'=>'diesel','size'=>'marge','distance'=>5).should be_false
+    mycalc.invalidity_messages.keys.should eql [:size]
+    mycalc[:size].value.should eql 'marge'
+    mycalc.clear_invalid_terms!
+    mycalc.invalidity_messages.keys.should be_empty
+    mycalc[:size].value.should be_nil
   end
 end
 
