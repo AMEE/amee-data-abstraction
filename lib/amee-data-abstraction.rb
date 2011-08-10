@@ -2,7 +2,6 @@
 # Released as Open Source Software under the BSD 3-Clause license. See LICENSE.txt for details.
 
 require 'amee'
-require 'amee-internal'
 require 'uuidtools'
 require 'quantify'
 
