@@ -65,9 +65,9 @@ Jeweler::Tasks.new do |gem|
   # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
   gem.name = "amee-data-abstraction"
   gem.homepage = "http://github.com/AMEE/amee-data-abstraction"
-  gem.license = "MIT"
-  gem.summary = %Q{Calculation and form building tool hiding details of AMEE API}
-  gem.description = %Q{Part of the AMEE AppKit this gem provides a data abstraction layer, decreasing the amount and detail of development required}
+  gem.license = "BSD 3-Clause"
+  gem.summary = %Q{Calculation and form building tool hiding details of AMEEconnect}
+  gem.description = %Q{Part of the AMEEappkit this gem provides a data abstraction layer, decreasing the amount and detail of development required}
   gem.email = "help@amee.com"
   gem.authors = ["James Hetherington", "Andrew Berkeley", "James Smith", "George Palmer"]
   # dependencies defined in Gemfile
