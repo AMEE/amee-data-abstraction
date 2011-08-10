@@ -1,32 +1,35 @@
-
-Authors
-   James Hetherington, James Smith, Andrew Berkeley, George Palmer
-
-Copyright
-   Copyright (c) 2011 AMEE UK Ltd
-
-License
-   Permission is hereby granted, free of charge, to any person obtaining a copy
-   of this software and associated documentation files (the "Software"), to deal
-   in the Software without restriction, including without limitation the rights
-   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
-   of the Software, and to permit persons to whom the Software is furnished to do
-   so, subject to the following conditions:
-
-   The above copyright notice and this permission notice shall be include in all
-   copies or substantial portions of the Software.
-
-   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-   SOFTWARE.
-
+== amee-data-abstraction
 
 The amee-data-abstraction gem provides an easy-to-use, highly configurable interface
 for providing AMEE-driven calculations to Rails applications.
+
+Licensed under the BSD 3-Clause license (See LICENSE.txt for details)
+
+Authors: James Hetherington, James Smith, Andrew Berkeley, George Palmer
+
+Copyright: Copyright (c) 2011 AMEE UK Ltd
+
+Homepage: http://github.com/AMEE/amee-data-abstraction
+
+Documentation: http://rubydoc.info/gems/amee-data-abstraction
+
+== INSTALLATION
+
+ gem install amee-data-abstraction
+
+== REQUIREMENTS
+
+ * ruby 1.8.7
+ * rubygems >= 1.5
+
+ All gem requirements should be installed as part of the rubygems installation process 
+ above, but are listed here for completeness.
+
+ * amee ~> 3.0
+ * uuidtools = 2.1.2
+ * quantify = 1.1.0
+ 
+== USAGE
 
 The library provides several useful functions:
 
@@ -52,7 +55,8 @@ with calculations or calculation components (inputs, outputs, etc.).
 8. Provides support for handling alternative units, including full configurability.
 
 
-Brief introduction
+=== Brief introduction
+
 The calculations provided by AMEE categories are represented by instances of the
 class AMEE::DataAbstraction::Calculation.
 
@@ -71,7 +75,8 @@ AMEE::DataAbstraction::CalculationSet, in order to provide rapid access to any
 defined calculation templates and instantiating of a new instance of a real
 calcualtion.
 
-=Example usage
+=== Example usage
+
 Configure a calculation
 
   include AMEE::DataAbstraction
@@ -108,7 +113,8 @@ Submit to AMEE for calculation
   my_calculation[:co2].to_s     #=> "2456 kg"
 
 
-=Configuring mutliple application calculation prototypes
+=== Configuring mutliple application calculation prototypes
+
 Typical practice is initialize the calculation prototypes required for an
 application via a configuration file which creates the required calculation
 templates within an instance of CalculationSet. If the calculation set is assigned
@@ -156,7 +162,8 @@ From this global calculation set, initialize a new calculation
 
                           #=> <AMEE::DataAbstraction::OngoingCalculation ... >
 
-=Configuring a connection to AMEE
+=== Configuring a connection to AMEE
+
 The AMEE::DataAbstraction module uses the 'amee' ruby gem to interact with AMEE.
 The standard method for configuring and instantiating a connection to the AMEE
 API is to provide authentication credentials in the /config/amee.yml file,
