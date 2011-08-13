@@ -4,7 +4,6 @@ require 'rspec_spinner'
 require 'flexmock'
 $:.unshift(File.dirname(__FILE__) + '/../lib')
 require 'amee'
-require 'amee-internal'
 require 'amee-data-abstraction'
 
 Spec::Runner.configure do |config|
