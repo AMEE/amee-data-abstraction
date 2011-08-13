@@ -480,15 +480,11 @@ module AMEE
       #   my_term.to_s :label               #=> "12345 ton_us"
       #
       def to_s(format=:symbol)
-        string = "#{value}"
-        if unit and per_unit
-          string += " #{(unit/per_unit).send(format)}"
-        elsif unit
-          string += " #{unit.send(format)}"
-        elsif per_unit
-          string += " #{(1/per_unit).send(format)}"
+        if has_numeric_value?
+          self.to_quantity.to_s(format)
+        else
+          "#{value}"
         end
-        return string
       end
 
       # Checks that the units included in <tt>units</tt> are dimensionally
