@@ -161,27 +161,27 @@ describe Term do
   end
 
   it "should represent term as string with unit symbol if no argument provided" do
-    Term.new {path :hello; value 12; default_unit :kg}.to_s.should == '12 kg'
-    Term.new {path :hello; value 12; default_unit :kg; per_unit :h}.to_s.should == '12 kg h^-1'
-    Term.new {path :hello; value 12; per_unit :h}.to_s.should == '12 h^-1'
+    Term.new {path :hello; value 12; default_unit :kg}.to_s.should == '12.0 kg'
+    Term.new {path :hello; value 12; default_unit :kg; per_unit :h}.to_s.should == '12.0 kg h^-1'
+    Term.new {path :hello; value 12; per_unit :h}.to_s.should == '12.0 h^-1'
   end
 
   it "should represent term as string with unit label" do
-    Term.new {path :hello; value 12; default_unit :kg}.to_s(:label).should == '12 kg'
-    Term.new {path :hello; value 12; default_unit :kg; per_unit :h}.to_s(:label).should == '12 kg/h'
-    Term.new {path :hello; value 12; per_unit :h}.to_s(:label).should == '12 h^-1'
+    Term.new {path :hello; value 12; default_unit :kg}.to_s(:label).should == '12.0 kg'
+    Term.new {path :hello; value 12; default_unit :kg; per_unit :h}.to_s(:label).should == '12.0 kg/h'
+    Term.new {path :hello; value 12; per_unit :h}.to_s(:label).should == '12.0 h^-1'
   end
 
   it "should represent term as string with unit name" do
-    Term.new {path :hello; value 12; default_unit :kg}.to_s(:name).should == '12 kilogram'
-    Term.new {path :hello; value 12; default_unit :kg; per_unit :h}.to_s(:name).should == '12 kilogram per hour'
-    Term.new {path :hello; value 12; per_unit :h}.to_s(:name).should == '12 per hour'
+    Term.new {path :hello; value 12; default_unit :kg}.to_s(:name).should == '12.0 kilograms'
+    Term.new {path :hello; value 12; default_unit :kg; per_unit :h}.to_s(:name).should == '12.0 kilograms per hour'
+    Term.new {path :hello; value 12; per_unit :h}.to_s(:name).should == '12.0 per hour'
   end
 
   it "should represent term as string with unit pluralized name" do
-    Term.new {path :hello; value 12; default_unit :kg}.to_s(:pluralized_name).should == '12 kilograms'
-    Term.new {path :hello; value 12; default_unit :kg; per_unit :h}.to_s(:pluralized_name).should == '12 kilograms per hour'
-    Term.new {path :hello; value 12; per_unit :h}.to_s(:pluralized_name).should == '12 per hour'
+    Term.new {path :hello; value 12; default_unit :kg}.to_s(:pluralized_name).should == '12.0 kilograms'
+    Term.new {path :hello; value 12; default_unit :kg; per_unit :h}.to_s(:pluralized_name).should == '12.0 kilograms per hour'
+    Term.new {path :hello; value 12; per_unit :h}.to_s(:pluralized_name).should == '12.0 per hour'
   end
 
   it "should be recognised as numeric" do
@@ -380,6 +380,18 @@ describe Term do
       quantity.value.should eql 20.0
       quantity.to_s.should eql "20.0 h^-1"
     end
+  end
+
+  it "should recognise similar terms" do
+    @term1 = Term.new { value 20; per_unit :h }
+    @term2 = Term.new { value 20; per_unit :h }
+    (@term1 == @term2).should be_true
+  end
+
+  it "should recognise dissimilar terms" do
+    @term1 = Term.new { value 20; per_unit :h }
+    @term2 = Term.new { value 40; per_unit :h }
+    (@term1 == @term2).should be_false
   end
   
 end

@@ -235,6 +235,12 @@ module AMEE
         reset_invalidity_messages
       end
 
+      def ==(other_calc)
+        !terms.inject(false) do |boolean,term|
+          boolean || term != other_calc[term.label]
+        end && label == other_calc.label
+      end
+
       private
 
       # Empty the hash of error messages for term choices.
@@ -416,12 +422,9 @@ module AMEE
       #
       def create_profile_item
         raise Exceptions::AlreadyHaveProfileItem unless profile_item_uid.blank?
-        location = AMEE::Profile::Item.create(profile_category,
-          # call <tt>#data_item_uid</tt> on drill object rather than <tt>self</tt> 
-          # since there exists no profile item value yet
-          amee_drill.data_item_uid,
-          profile_options.merge(:get_item=>false,:name=>amee_name))
-        self.profile_item_uid=location.split('/').last
+        item = AMEE::Profile::Item.create(profile_category,amee_drill.data_item_uid,
+          profile_options.merge(:get_item => true, :representation => 'full', :name => amee_name))
+        self.profile_item_uid=item.uid
       end
 
       # Methods which should be memoized once per interaction with AMEE to minimise

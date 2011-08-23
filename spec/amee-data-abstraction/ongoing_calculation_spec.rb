@@ -490,5 +490,6 @@ describe OngoingCalculation do
     mycalc.invalidity_messages.keys.should be_empty
     mycalc[:size].value.should be_nil
   end
+
 end
 

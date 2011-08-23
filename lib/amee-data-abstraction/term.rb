@@ -341,6 +341,12 @@ module AMEE
         @visible=true
       end
 
+      def ==(other_term)
+        !TermsList::TermProperties.inject(false) do |boolean,prop|
+          boolean || self.send(prop) != other_term.send(prop)
+        end
+      end
+
       # Returns <tt>true</tt> if <tt>self</tt> has a numeric value. That is, can 
       # it have statistics applied? This method permits handling of term summing,
       #  averaging, etc. Otherwise, returns <tt>false</tt>.
