@@ -2,7 +2,7 @@ source "http://rubygems.org"
 
 gem "amee", "~> 3.0"
 gem 'uuidtools', '2.1.2'
-gem 'quantify', '1.1.0'
+gem 'quantify', '1.2.0'
 
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.

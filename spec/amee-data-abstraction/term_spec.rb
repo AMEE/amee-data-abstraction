@@ -162,7 +162,7 @@ describe Term do
 
   it "should represent term as string with unit symbol if no argument provided" do
     Term.new {path :hello; value 12; default_unit :kg}.to_s.should == '12.0 kg'
-    Term.new {path :hello; value 12; default_unit :kg; per_unit :h}.to_s.should == '12.0 kg h^-1'
+    Term.new {path :hello; value 12; default_unit :kg; per_unit :h}.to_s.should == '12.0 kg/h'
     Term.new {path :hello; value 12; per_unit :h}.to_s.should == '12.0 h^-1'
   end
 
@@ -182,6 +182,14 @@ describe Term do
     Term.new {path :hello; value 12; default_unit :kg}.to_s(:pluralized_name).should == '12.0 kilograms'
     Term.new {path :hello; value 12; default_unit :kg; per_unit :h}.to_s(:pluralized_name).should == '12.0 kilograms per hour'
     Term.new {path :hello; value 12; per_unit :h}.to_s(:pluralized_name).should == '12.0 per hour'
+  end
+
+  it "should represent term as string with no units" do
+    Term.new {path :hello; value 12}.to_s(:pluralized_name).should == '12'
+    Term.new {path :hello; value 12}.to_s(:name).should == '12'
+    Term.new {path :hello; value 12}.to_s(:symbol).should == '12'
+    Term.new {path :hello; value 12}.to_s(:label).should == '12'
+    Term.new {path :hello; value 12}.to_s.should == '12'
   end
 
   it "should be recognised as numeric" do
@@ -345,9 +353,9 @@ describe Term do
       @term = Term.new { value 20; unit :kg; per_unit :h }
       quantity = @term.to_quantity
       quantity.unit.name.should eql "kilogram per hour"
-      quantity.unit.symbol.should eql "kg h^-1"
+      quantity.unit.symbol.should eql "kg/h"
       quantity.value.should eql 20.0
-      quantity.to_s.should eql "20.0 kg h^-1"
+      quantity.to_s.should eql "20.0 kg/h"
     end
 
     it "should return nil with no unit or per unit" do

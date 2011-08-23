@@ -468,7 +468,7 @@ module AMEE
       #   my_term.to_s :label               #=> "12345 ton_us"
       #
       def to_s(format=:symbol)
-        if has_numeric_value?
+        if has_numeric_value? && (unit || per_unit)
           self.to_quantity.to_s(format)
         else
           "#{value}"
