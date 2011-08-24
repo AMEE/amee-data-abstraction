@@ -127,8 +127,8 @@ module AMEE
       # Return a string representing the AMEE Explorer URL which is assocaited
       # with <tt>self</tt>
       #
-      def explorer_url
-         "http://explorer.amee.com/categories#{path}"
+      def discover_url
+         "http://discover.amee.com/categories#{path}"
       end
        
       protected
