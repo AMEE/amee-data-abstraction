@@ -23,6 +23,9 @@ describe Calculation do
   it 'should generate an discover URL' do
     Transport.discover_url.should eql 'http://discover.amee.com/categories/transport/car/generic'
   end
+  it 'should redirect to discover URL' do
+    Transport.explorer_url.should eql 'http://discover.amee.com/categories/transport/car/generic'
+  end
   it 'can return a term via []' do
     Transport[:co2].label.should eql :co2
   end

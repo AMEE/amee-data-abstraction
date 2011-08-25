@@ -130,6 +130,11 @@ module AMEE
       def discover_url
          "http://discover.amee.com/categories#{path}"
       end
+
+      def explorer_url
+         Rails.logger.info "#explorer_url method deprecated. Use #discover_url" if defined? Rails
+         discover_url
+      end
        
       protected
 
