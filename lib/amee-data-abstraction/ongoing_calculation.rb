@@ -422,9 +422,9 @@ module AMEE
       #
       def create_profile_item
         raise Exceptions::AlreadyHaveProfileItem unless profile_item_uid.blank?
-        item = AMEE::Profile::Item.create(profile_category,amee_drill.data_item_uid,
-          profile_options.merge(:get_item => true, :representation => 'full', :name => amee_name))
-        self.profile_item_uid=item.uid
+        @profile_item = AMEE::Profile::Item.create(profile_category,amee_drill.data_item_uid,
+          profile_options.merge(:get_item => true, :name => amee_name))
+        self.profile_item_uid = @profile_item.uid
       end
 
       # Methods which should be memoized once per interaction with AMEE to minimise

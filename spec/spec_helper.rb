@@ -176,6 +176,20 @@ class AMEEMocker
     return self
   end
 
+  def create_and_get
+    mock_pi=test.flexmock(
+      :amounts=>test.flexmock(:find=>{:value=>result}),
+      :data_item_uid=>dataitemuid,
+      :uid=>uid
+    )
+    test.flexmock(AMEE::Profile::Item).should_receive(:create).
+      with(catuid,dataitemuid,
+      {:get_item=>true,:name=>:sometimestamp}.merge(params)).
+      at_least.once.
+      and_return(mock_pi)
+    return self
+  end
+
   def create
     test.flexmock(AMEE::Profile::Item).should_receive(:create).
       with(catuid,dataitemuid,

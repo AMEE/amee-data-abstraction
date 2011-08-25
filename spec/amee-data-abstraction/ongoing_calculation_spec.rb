@@ -91,7 +91,7 @@ describe OngoingCalculation do
     mocker.select('size'=>'large')
     mocker.choices=[]
     mocker.drill
-    mocker.profile_list.profile_category.timestamp.create.get
+    mocker.profile_list.profile_category.timestamp.create_and_get
     mycalc=Transport.begin_calculation
     mycalc.choose!('fuel'=>'diesel','size'=>'large','distance'=>5)
     mycalc.calculate!
@@ -109,7 +109,7 @@ describe OngoingCalculation do
     mocker.select('size'=>'large')
     mocker.choices=[]
     mocker.drill
-    mocker.profile_list.profile_category.timestamp.create.get
+    mocker.profile_list.profile_category.timestamp.create_and_get
     mycalc=ElectricityAndTransport[:transport].begin_calculation
     mycalc.choose!('fuel'=>'diesel','size'=>'large','distance'=>5,'department'=>'stuff')
     mycalc.calculate!
@@ -166,7 +166,7 @@ describe OngoingCalculation do
     mocker.profile_list.get(true,true).delete
     existing_uid=mocker.uid
     mocker.select('size'=>'small')
-    mocker.drill.profile_category.timestamp.create.get
+    mocker.drill.profile_category.timestamp.create_and_get
     mycalc.choose!(:profile_item_uid=>existing_uid,'fuel'=>'diesel','size'=>'small','distance'=>7)
     mycalc.calculate!
     mycalc.outputs.first.value.should eql :somenumber
@@ -205,7 +205,7 @@ describe OngoingCalculation do
     mocker.select('size'=>'large')
     mocker.choices=[]
     mocker.drill
-    mocker.profile_list.profile_category.timestamp.create
+    mocker.profile_list.profile_category.timestamp.create_and_get
 
     mocker.existing={'distance'=>5}
     mocker.params={'distance'=>9}
@@ -235,7 +235,7 @@ describe OngoingCalculation do
 
     mocker.select('size'=>'small')
     mocker.drill.create.get
-
+    
     mycalc=Transport.begin_calculation
     mycalc.choose!('fuel'=>'diesel','size'=>'large','distance'=>5)
     mycalc.calculate!
@@ -276,7 +276,7 @@ describe OngoingCalculation do
     mocker.select('size'=>'large')
     mocker.choices=[]
     mocker.drill
-    mocker.profile_list.profile_category.timestamp.create.get
+    mocker.profile_list.profile_category.timestamp.create_and_get
     myproto=Transport.clone
     myproto.instance_eval{
       start_and_end_dates
@@ -326,7 +326,7 @@ describe OngoingCalculation do
     mocker.select('size'=>'large')
     mocker.choices=[]
     mocker.drill
-    mocker.profile_list.profile_category.timestamp.create.get
+    mocker.profile_list.profile_category.timestamp.create_and_get
     mycalc=Transport.begin_calculation
     mycalc.should be_dirty
     mycalc.choose!('fuel'=>'diesel','size'=>'large','distance'=>5)
@@ -348,7 +348,7 @@ describe OngoingCalculation do
     mocker.select('size'=>'large')
     mocker.choices=[]
     mocker.drill
-    mocker.profile_list.profile_category.timestamp.create.get
+    mocker.profile_list.profile_category.timestamp.create_and_get
     mycalc=Transport.begin_calculation
     mycalc.should be_dirty
     mycalc.choose!('fuel'=>'diesel','size'=>'large','distance'=>5)
