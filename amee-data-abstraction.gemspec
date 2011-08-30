@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{amee-data-abstraction}
-  s.version = "1.0.0"
+  s.version = "1.1.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["James Hetherington", "Andrew Berkeley", "James Smith", "George Palmer"]
-  s.date = %q{2011-08-11}
+  s.date = %q{2011-08-30}
   s.description = %q{Part of the AMEEappkit this gem provides a data abstraction layer, decreasing the amount and detail of development required}
   s.email = %q{help@amee.com}
   s.extra_rdoc_files = [
@@ -82,7 +82,7 @@ Gem::Specification.new do |s|
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<amee>, ["~> 3.0"])
       s.add_runtime_dependency(%q<uuidtools>, ["= 2.1.2"])
-      s.add_runtime_dependency(%q<quantify>, ["= 1.1.0"])
+      s.add_runtime_dependency(%q<quantify>, ["= 1.2.0"])
       s.add_development_dependency(%q<bundler>, ["~> 1.0.0"])
       s.add_development_dependency(%q<jeweler>, ["~> 1.6.4"])
       s.add_development_dependency(%q<rspec>, ["= 1.3.0"])
@@ -92,7 +92,7 @@ Gem::Specification.new do |s|
     else
       s.add_dependency(%q<amee>, ["~> 3.0"])
       s.add_dependency(%q<uuidtools>, ["= 2.1.2"])
-      s.add_dependency(%q<quantify>, ["= 1.1.0"])
+      s.add_dependency(%q<quantify>, ["= 1.2.0"])
       s.add_dependency(%q<bundler>, ["~> 1.0.0"])
       s.add_dependency(%q<jeweler>, ["~> 1.6.4"])
       s.add_dependency(%q<rspec>, ["= 1.3.0"])
@@ -103,7 +103,7 @@ Gem::Specification.new do |s|
   else
     s.add_dependency(%q<amee>, ["~> 3.0"])
     s.add_dependency(%q<uuidtools>, ["= 2.1.2"])
-    s.add_dependency(%q<quantify>, ["= 1.1.0"])
+    s.add_dependency(%q<quantify>, ["= 1.2.0"])
     s.add_dependency(%q<bundler>, ["~> 1.0.0"])
     s.add_dependency(%q<jeweler>, ["~> 1.6.4"])
     s.add_dependency(%q<rspec>, ["= 1.3.0"])
