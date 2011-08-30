@@ -234,7 +234,7 @@ describe OngoingCalculation do
     mocker.profile_list.profile_category.timestamp.create_and_get.get(true,true).delete
 
     mocker.select('size'=>'small')
-    mocker.drill.create.get
+    mocker.drill.create_and_get
     
     mycalc=Transport.begin_calculation
     mycalc.choose!('fuel'=>'diesel','size'=>'large','distance'=>5)
