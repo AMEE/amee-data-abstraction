@@ -132,7 +132,7 @@ module AMEE
       end
 
       def explorer_url
-         Rails.logger.info "#explorer_url method deprecated. Use #discover_url" if defined? Rails
+         ::Rails.logger.info "#explorer_url method deprecated. Use #discover_url" if defined? Rails
          discover_url
       end
        
