@@ -1,12 +1,8 @@
 require 'rubygems'
-require 'spec'
-require 'rspec_spinner'
-require 'flexmock'
-$:.unshift(File.dirname(__FILE__) + '/../lib')
-require 'amee'
+require 'rspec'
 require 'amee-data-abstraction'
 
-Spec::Runner.configure do |config|
+RSpec.configure do |config|
   config.mock_with :flexmock
 end
 

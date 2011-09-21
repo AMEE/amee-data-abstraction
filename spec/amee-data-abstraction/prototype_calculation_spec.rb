@@ -5,7 +5,9 @@ class PrototypeCalculation
     #stub, because flexmock doesn't work for new instances during constructor
     @@called=true
   end
-  cattr_accessor :called
+  def self.called
+    @@called
+  end
 end
 describe PrototypeCalculation do
   it 'can create an instance' do

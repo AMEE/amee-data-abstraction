@@ -4,7 +4,9 @@ class CalculationSet
     #stub, because flexmock doesn't work for new instances during constructor
     @@called=true
   end
-  cattr_accessor :called
+  def self.called
+    @@called
+  end
 end
 describe CalculationSet do
   it 'can create an instance' do

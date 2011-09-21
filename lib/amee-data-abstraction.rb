@@ -27,4 +27,10 @@ require File.dirname(__FILE__) + '/amee-data-abstraction/metadatum'
 module AMEE::DataAbstraction
   # Connection to AMEE server.
   mattr_accessor :connection
+  
+  if defined?(Rails)
+    def self.connection
+      AMEE::Rails.connection
+    end
+  end
 end

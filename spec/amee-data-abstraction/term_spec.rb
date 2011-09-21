@@ -5,7 +5,9 @@ class Term
     #stub, because flexmock doesn't work for new instances during constructor
     @@called=true
   end
-  cattr_accessor :called
+  def self.called
+    @@called
+  end
 end
 
 describe Term do
