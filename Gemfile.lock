@@ -2,7 +2,7 @@ GEM
   remote: http://rubygems.org/
   specs:
     activesupport (3.0.10)
-    amee (3.0.1)
+    amee (4.0.0)
       activesupport (~> 3.0.10)
       json
       log4r
@@ -18,7 +18,7 @@ GEM
     json (1.5.4)
     log4r (1.1.9)
     nokogiri (1.4.3.1)
-    quantify (1.2.1)
+    quantify (2.0.0)
       activesupport (~> 3.0.10)
       i18n
     rake (0.9.2)
@@ -38,11 +38,11 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  amee (~> 3.0)
+  amee (~> 4.0)
   bundler (~> 1.0.0)
   flexmock (> 0.8.6)
   jeweler (~> 1.6.4)
-  quantify (~> 1.2.1)
+  quantify (~> 2.0.0)
   rcov
   rdoc
   rspec (= 2.6.0)
