@@ -1,8 +1,8 @@
 source "http://rubygems.org"
 
-gem "amee", "~> 3.0"
+gem "amee", "~> 4.0"
 gem 'uuidtools', '2.1.2'
-gem 'quantify', '~> 1.2.1'
+gem 'quantify', '~> 2.0.0'
 
 group :development do
   gem "bundler", "~> 1.0.0"
