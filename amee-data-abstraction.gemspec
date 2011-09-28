@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{amee-data-abstraction}
-  s.version = "1.1.0"
+  s.version = "2.0.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["James Hetherington", "Andrew Berkeley", "James Smith", "George Palmer"]
-  s.date = %q{2011-08-30}
+  s.date = %q{2011-09-28}
   s.description = %q{Part of the AMEEappkit this gem provides a data abstraction layer, decreasing the amount and detail of development required}
   s.email = %q{help@amee.com}
   s.extra_rdoc_files = [
@@ -28,7 +28,6 @@ Gem::Specification.new do |s|
     "amee-data-abstraction.gemspec",
     "examples/_calculator_form.erb",
     "examples/calculation_controller.rb",
-    "init.rb",
     "lib/amee-data-abstraction.rb",
     "lib/amee-data-abstraction/calculation.rb",
     "lib/amee-data-abstraction/calculation_set.rb",
@@ -48,7 +47,6 @@ Gem::Specification.new do |s|
     "lib/core-extensions/hash.rb",
     "lib/core-extensions/ordered_hash.rb",
     "lib/core-extensions/proc.rb",
-    "rails/init.rb",
     "spec/amee-data-abstraction/calculation_set_spec.rb",
     "spec/amee-data-abstraction/calculation_spec.rb",
     "spec/amee-data-abstraction/drill_spec.rb",
@@ -73,43 +71,43 @@ Gem::Specification.new do |s|
   s.homepage = %q{http://github.com/AMEE/amee-data-abstraction}
   s.licenses = ["BSD 3-Clause"]
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.6.2}
+  s.rubygems_version = %q{1.4.2}
   s.summary = %q{Calculation and form building tool hiding details of AMEEconnect}
 
   if s.respond_to? :specification_version then
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<amee>, ["~> 3.0"])
+      s.add_runtime_dependency(%q<amee>, ["~> 4.0"])
       s.add_runtime_dependency(%q<uuidtools>, ["= 2.1.2"])
-      s.add_runtime_dependency(%q<quantify>, ["= 1.2.0"])
+      s.add_runtime_dependency(%q<quantify>, ["~> 2.0.0"])
       s.add_development_dependency(%q<bundler>, ["~> 1.0.0"])
       s.add_development_dependency(%q<jeweler>, ["~> 1.6.4"])
-      s.add_development_dependency(%q<rspec>, ["= 1.3.0"])
-      s.add_development_dependency(%q<rcov>, [">= 0"])
-      s.add_development_dependency(%q<rspec_spinner>, ["= 1.1.3"])
+      s.add_development_dependency(%q<rspec>, ["= 2.6.0"])
       s.add_development_dependency(%q<flexmock>, ["> 0.8.6"])
+      s.add_development_dependency(%q<rcov>, [">= 0"])
+      s.add_development_dependency(%q<rdoc>, [">= 0"])
     else
-      s.add_dependency(%q<amee>, ["~> 3.0"])
+      s.add_dependency(%q<amee>, ["~> 4.0"])
       s.add_dependency(%q<uuidtools>, ["= 2.1.2"])
-      s.add_dependency(%q<quantify>, ["= 1.2.0"])
+      s.add_dependency(%q<quantify>, ["~> 2.0.0"])
       s.add_dependency(%q<bundler>, ["~> 1.0.0"])
       s.add_dependency(%q<jeweler>, ["~> 1.6.4"])
-      s.add_dependency(%q<rspec>, ["= 1.3.0"])
-      s.add_dependency(%q<rcov>, [">= 0"])
-      s.add_dependency(%q<rspec_spinner>, ["= 1.1.3"])
+      s.add_dependency(%q<rspec>, ["= 2.6.0"])
       s.add_dependency(%q<flexmock>, ["> 0.8.6"])
+      s.add_dependency(%q<rcov>, [">= 0"])
+      s.add_dependency(%q<rdoc>, [">= 0"])
     end
   else
-    s.add_dependency(%q<amee>, ["~> 3.0"])
+    s.add_dependency(%q<amee>, ["~> 4.0"])
     s.add_dependency(%q<uuidtools>, ["= 2.1.2"])
-    s.add_dependency(%q<quantify>, ["= 1.2.0"])
+    s.add_dependency(%q<quantify>, ["~> 2.0.0"])
     s.add_dependency(%q<bundler>, ["~> 1.0.0"])
     s.add_dependency(%q<jeweler>, ["~> 1.6.4"])
-    s.add_dependency(%q<rspec>, ["= 1.3.0"])
-    s.add_dependency(%q<rcov>, [">= 0"])
-    s.add_dependency(%q<rspec_spinner>, ["= 1.1.3"])
+    s.add_dependency(%q<rspec>, ["= 2.6.0"])
     s.add_dependency(%q<flexmock>, ["> 0.8.6"])
+    s.add_dependency(%q<rcov>, [">= 0"])
+    s.add_dependency(%q<rdoc>, [">= 0"])
   end
 end
 
