@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["James Hetherington", "Andrew Berkeley", "James Smith", "George Palmer"]
-  s.date = %q{2011-09-28}
+  s.date = %q{2011-09-29}
   s.description = %q{Part of the AMEEappkit this gem provides a data abstraction layer, decreasing the amount and detail of development required}
   s.email = %q{help@amee.com}
   s.extra_rdoc_files = [
