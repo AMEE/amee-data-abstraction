@@ -12,3 +12,7 @@ group :development do
   gem 'rcov'
   gem 'rdoc'
 end
+
+group :test do
+  gem "builder"
+end
