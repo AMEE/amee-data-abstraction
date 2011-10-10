@@ -35,6 +35,23 @@ module AMEE
         choice_validation_message
       end
 
+      # Returns the list of available choices for <tt>self</tt>. A custom list of
+      # choices can be provided as an argument, in which case these will override
+      # the list provided by the AMEE platform
+      #
+      def choices(*args)
+        if args.empty?
+          if @choices.blank?
+            c=parent.amee_drill(:before=>label).choices
+            c.length==1 ? [value] : c
+          else
+            @choices
+          end
+        else
+          @choices = [args].flatten
+        end
+      end
+
       private
 
       # Returns <tt>true</tt> if the value set for <tt>self</tt> is one of the
@@ -42,12 +59,6 @@ module AMEE
       #
       def valid?
         super && (choices.include? value)
-      end
-
-      # Returns the list of available choices for <tt>self</tt>.
-      def choices
-        c=parent.amee_drill(:before=>label).choices
-        c.length==1 ? [value] : c #Intention is to get autodrilled, drill will result in a UID
       end
 
       # Returns <tt>true</tt> if <tt>self</tt> is the "first unset" drill, i.e.
