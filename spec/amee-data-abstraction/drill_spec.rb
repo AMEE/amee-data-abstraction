@@ -14,7 +14,7 @@ describe Drill do
     t[:fuel].value 'diesel'
     t[:size].send(:choices).should eql ['large','small']
   end
-  it 'is enabled iff it is the next choice or has been chosen' do
+  it 'is enabled if it is the next choice or has been chosen' do
     t=Transport.begin_calculation
     t[:fuel].enabled?.should be_true
     t[:size].enabled?.should be_false
