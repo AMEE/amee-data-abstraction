@@ -24,6 +24,14 @@ describe OngoingCalculation do
     d.outputs.set.labels.should eql [:co2]
     d.outputs.unset.labels.should eql []
   end
+  it 'can clear outputs' do
+    d=Electricity.begin_calculation
+    d.outputs.unset.labels.should eql [:co2]
+    d[:co2].value 5
+    d[:co2].value.should eql 5
+    d.clear_outputs
+    d[:co2].value.should be_nil
+  end
   it 'can have values chosen' do
     AMEEMocker.new(self,:path=>'business/energy/electricity/grid',
       :selections=>[['country','argentina']],

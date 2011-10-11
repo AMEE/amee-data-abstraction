@@ -81,6 +81,21 @@ class AMEEMocker
     return self
   end
 
+  # This represents the skipping of drill choices which occur on an AMEE drill
+  # down when only one choice exists for a given drill - it skips to the next,
+  # offering the next set of choices or a uid. In these cases, the skipped drill
+  # is set as an automatic selection
+  def drill_with_skip(skipped_selections=[])
+    test.flexmock(AMEE::Data::DrillDown).
+      should_receive(:get).
+      with(connection,
+      "/data/#{path}/drill?#{selections.map{|k,v|"#{k}=#{v}"}.join('&')}").
+      at_least.once.
+      and_return(test.flexmock(:choices=>choices,:selections=>Hash[selections].merge(skipped_selections),
+        :data_item_uid=>dataitemuid))
+    return self
+  end
+
   def profile_list
     test.flexmock(AMEE::Profile::ProfileList).should_receive(:new).
       with(connection).at_least.once.
