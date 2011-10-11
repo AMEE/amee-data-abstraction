@@ -42,8 +42,14 @@ module AMEE
       def choices(*args)
         if args.empty?
           if @choices.blank?
-            c=parent.amee_drill(:before=>label).choices
-            c.length==1 ? [value] : c
+            drill_down = parent.amee_drill(:before=>label)
+            if single_choice = drill_down.selections[path]
+              disable!
+              [single_choice]
+            else
+              enable!
+              drill_down.choices
+            end
           else
             @choices
           end

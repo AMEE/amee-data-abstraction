@@ -235,6 +235,10 @@ module AMEE
         reset_invalidity_messages
       end
 
+      def clear_outputs
+        outputs.each {|output| output.value nil }
+      end
+
       def ==(other_calc)
         !terms.inject(false) do |boolean,term|
           boolean || term != other_calc[term.label]
@@ -325,6 +329,7 @@ module AMEE
           load_drills
         rescue Exceptions::Syncronization
           delete_profile_item
+          clear_outputs
         end
         load_metadata
         # We could create an unsatisfied PI, and just check drilled? here
@@ -463,7 +468,7 @@ module AMEE
       #
       def delete_profile_item
         AMEE::Profile::Item.delete(connection,profile_item_path)
-        self.profile_item_uid=false
+        self.profile_item_uid=nil
         @profile_item=nil
       end
 
@@ -509,6 +514,8 @@ module AMEE
         @profile_category||=AMEE::Profile::Category.get(connection, profile_category_path)
       end
 
+      public
+      
       # Automatically set the value of a drill term if there is only one choice
       def autodrill
         
@@ -528,8 +535,6 @@ module AMEE
           end
         end
       end
-
-      public
 
       # Instantiate an <tt>AMEE::Data::DrillDown</tt> object representing the
       # drill down sequence defined by the drill terms associated with
