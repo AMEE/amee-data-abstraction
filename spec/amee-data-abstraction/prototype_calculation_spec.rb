@@ -21,6 +21,11 @@ describe PrototypeCalculation do
     pc=PrototypeCalculation.new {drill{label :alpha}}
     pc[:alpha].should be_a Drill
   end
+  it 'can set custom drill choices in the DSL block' do
+    pc=PrototypeCalculation.new {drill{label :alpha; choices "ball","cat","dog"}}
+    pc[:alpha].should be_a Drill
+    pc[:alpha].choices.should eql ["ball","cat","dog"]
+  end
   it 'can''t make a DSL block term without a label' do
     lambda{
       pc=PrototypeCalculation.new {drill}
