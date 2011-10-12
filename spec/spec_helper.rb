@@ -262,7 +262,7 @@ class AMEEMocker
   def update
     test.flexmock(AMEE::Profile::Item).should_receive(:update).
       with(connection,pipath,
-      {:get_item=>false}.merge(existing).merge(params)).
+      {:get_item=>true}.merge(existing).merge(params)).
       at_least.once
     return self
   end

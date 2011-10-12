@@ -287,7 +287,7 @@ module AMEE
       # and units for any unset <i>Profile</i> terms (profile item values) from
       # the AMEE platform
       #
-      def load_profile_item_values  
+      def load_profile_item_values
         return unless profile_item
         profiles.unset.each do |term|
           ameeval=profile_item.values.find { |value| value[:path] == term.path }
@@ -309,6 +309,7 @@ module AMEE
       def load_drills
         return unless profile_item
         drills.each do |term|
+          next unless term.value.nil? || term.dirty?
           ameeval=data_item.value(term.path)
           raise Exceptions::Syncronization if term.set? && ameeval!=term.value
           term.value ameeval
@@ -456,10 +457,8 @@ module AMEE
       # <i>Profile</i> term values and attributes
       #
       def set_profile_item_values
-        AMEE::Profile::Item.update(connection,profile_item_path, 
-          profile_options.merge(:get_item=>false))
-        #Clear the memoised profile item, to reload with updated values
-        @profile_item=nil
+        @profile_item = AMEE::Profile::Item.update(connection,profile_item_path, 
+          profile_options.merge(:get_item=>true))
       end
 
       # Delete the profile item which is associated with <tt>self</tt> from the

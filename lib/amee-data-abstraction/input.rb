@@ -11,6 +11,8 @@ module AMEE
     #
     class Input < Term
 
+      attr_accessor :dirty
+
       # Returns the valid choices for this input
       # (Abstract, implemented only for subclasses of input.)
       def choices
@@ -29,6 +31,7 @@ module AMEE
         @validation = nil
         validation_message {"#{name} is invalid."}
         super
+        @dirty = false
       end
 
       # Configures the value of <tt>self</tt> to be fixed to <tt>val</tt>, i.e.
@@ -66,7 +69,7 @@ module AMEE
         unless args.empty?
           if args.first.to_s != @value.to_s
             raise Exceptions::FixedValueInterference if fixed?
-            parent.dirty! if parent and parent.is_a? OngoingCalculation
+            mark_as_dirty
           end
         end
         super
@@ -184,6 +187,10 @@ module AMEE
       def disabled?
         super || fixed?
       end
+      
+      def dirty?
+        @dirty
+      end
 
       protected
       # Returns <tt>true</tt> if the value set for <tt>self</tt> is either blank
@@ -191,6 +198,11 @@ module AMEE
       #
       def valid?
         validation.blank? || validation === @value_before_cast
+      end
+      
+      def mark_as_dirty
+        @dirty = true
+        parent.dirty! if parent and parent.is_a? OngoingCalculation
       end
     end
   end
