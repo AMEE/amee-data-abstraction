@@ -74,4 +74,13 @@ describe Input do
    i=Input.new{fixed 5}
    i.disabled?.should eql true
  end
+ it "should start with dirty set as false" do
+   i=Input.new{fixed 5}
+   i.dirty?.should eql false
+ end
+ it "should be dirty when the value is changed" do
+   i=Input.new
+   i.value 5
+   i.dirty?.should eql true
+ end
 end
