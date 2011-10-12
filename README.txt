@@ -166,8 +166,8 @@ From this global calculation set, initialize a new calculation
 
 The AMEE::DataAbstraction module uses the 'amee' ruby gem to interact with AMEE.
 The standard method for configuring and instantiating a connection to the AMEE
-API is to provide authentication credentials in the /config/amee.yml file,
-structured thus:
+API is to provide authentication credentials in the /config/amee.yml file.  It is
+recommended to use one of the caching options in order to reduce API calls:
 
   ---
   production:

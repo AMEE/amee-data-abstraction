@@ -1,6 +1,6 @@
 source "http://rubygems.org"
 
-gem "amee", "~> 4.0"
+gem "amee", "~> 4.1.5"
 gem 'uuidtools', '2.1.2'
 gem 'quantify', '~> 2.0.0'
 
