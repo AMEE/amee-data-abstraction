@@ -51,7 +51,7 @@ module AMEE
       @@sets = {}
       
       def self.find(name)
-        @@sets[name] ||= load_set(name)
+        @@sets[name.to_sym] ||= load_set(name)
       end
       
       private
