@@ -1,4 +1,4 @@
-Transport=AMEE::DataAbstraction::PrototypeCalculation.new{
+calculation {
   name 'transport'
   label :transport
   path '/transport/car/generic'

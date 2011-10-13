@@ -1,4 +1,5 @@
-require File.dirname(File.dirname(__FILE__)) + '/spec_helper.rb'
+require 'spec_helper'
+
 class CalculationSet
   def call_me
     #stub, because flexmock doesn't work for new instances during constructor
@@ -9,14 +10,19 @@ class CalculationSet
   end
 end
 describe CalculationSet do
+  
+  before :all do
+    @calc_set = CalculationSet.find(:electricity_and_transport)
+  end
+  
   it 'can create an instance' do
-    ElectricityAndTransport.should be_a CalculationSet
+    @calc_set.should be_a CalculationSet
   end
   it 'can create an instance' do
-    ElectricityAndTransport.calculations.should be_a ActiveSupport::OrderedHash
+    @calc_set.calculations.should be_a ActiveSupport::OrderedHash
   end
   it 'can access a calculation by key' do
-    ElectricityAndTransport[:transport].should be_a PrototypeCalculation
+    @calc_set[:transport].should be_a PrototypeCalculation
   end
   it 'can construct a calculation' do
     CalculationSet.new {calculation {label :mycalc}}[:mycalc].should be_a PrototypeCalculation

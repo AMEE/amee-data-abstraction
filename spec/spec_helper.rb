@@ -1,5 +1,7 @@
 require 'rubygems'
 require 'rspec'
+
+$:.unshift(File.dirname(__FILE__) + '/../lib')
 require 'amee-data-abstraction'
 
 RSpec.configure do |config|
@@ -8,8 +10,14 @@ end
 
 AMEE::DataAbstraction.connection=FlexMock.new('connection') #Global connection mock, shouldn't receive anything, as we mock the individual amee-ruby calls in the tests
 
-Dir.glob(File.dirname(__FILE__) + '/fixtures/*') do |filename|
-  require filename
+# Fake up Rails.root to be fixtures directory
+class Rails
+  def self.root
+    File.dirname(__FILE__) + '/fixtures'
+  end
+  def self.logger
+    nil
+  end
 end
 
 include AMEE::DataAbstraction
