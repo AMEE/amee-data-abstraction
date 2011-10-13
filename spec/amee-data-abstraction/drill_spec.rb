@@ -1,4 +1,5 @@
-require File.dirname(File.dirname(__FILE__)) + '/spec_helper.rb'
+require 'spec_helper'
+
 describe Drill do
   
   it 'knows its options when it is the first choice' do

@@ -1,4 +1,5 @@
-require File.dirname(File.dirname(__FILE__)) + '/spec_helper.rb'
+require 'spec_helper'
+
 describe OngoingCalculation do
   it 'can return set and unset inputs' do
     d=Electricity.begin_calculation
