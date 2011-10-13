@@ -46,6 +46,24 @@ module AMEE
         instance_eval(&block) if block
       end
 
+      # Collection methods
+
+      @@sets = {}
+      
+      def self.find(name)
+        @@sets[name] ||= load_set(name)
+      end
+      
+      private
+      
+      def self.load_set(name)
+        CalculationSet.new {
+          instance_eval(File.open("#{::Rails.root}/config/calculations/#{name.to_s}.rb").read)
+        }
+      end
+      
+      public
+
       # Access the @calculations instance variable ordered hash. Keys are labels
       # assocaited with each prototype calculation; values are the instantiated
       # <i>PrototypeCalculation</i> objects

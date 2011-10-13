@@ -9,6 +9,10 @@ class Term
 end
 
 describe Term do
+  before :all do
+    @calc = CalculationSet.find(:transport)[:transport]
+  end
+  
   it 'can be initialized via DSL block' do
     Term.new {call_me}
     Term.called.should be_true
@@ -31,7 +35,7 @@ describe Term do
   end
 
   it 'has parent' do
-    Transport[:distance].parent.should eql Transport
+    @calc[:distance].parent.should eql @calc
   end
   it "has name defaulting to label" do
     Term.new {label :hello}.name.should eql 'Hello'
@@ -85,10 +89,10 @@ describe Term do
     t.hidden?.should be_false
   end
   it 'knows which terms come before or after it' do
-    Transport.terms.
+    @calc.terms.
       select{|x|x.before?(:distance)}.map(&:label).
       should eql [:fuel,:size]
-    Transport.terms.
+    @calc.terms.
       select{|x|x.after?(:distance)}.map(&:label).
       should eql [:co2]
   end

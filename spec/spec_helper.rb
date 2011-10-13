@@ -23,10 +23,6 @@ class Rails
   end
 end
 
-Dir.glob(Rails.root + '/config/calculations/*') do |filename|
-  require filename
-end
-
 include AMEE::DataAbstraction
 
 class AMEEMocker
