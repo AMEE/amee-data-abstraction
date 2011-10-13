@@ -12,7 +12,17 @@ end
 
 AMEE::DataAbstraction.connection=FlexMock.new('connection') #Global connection mock, shouldn't receive anything, as we mock the individual amee-ruby calls in the tests
 
-Dir.glob(File.dirname(__FILE__) + '/fixtures/*') do |filename|
+# Fake up Rails.root to be fixtures directory
+class Rails
+  def self.root
+    File.dirname(__FILE__) + '/fixtures'
+  end
+  def self.logger
+    nil
+  end
+end
+
+Dir.glob(Rails.root + '/config/calculations/*') do |filename|
   require filename
 end
 
