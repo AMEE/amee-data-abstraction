@@ -155,6 +155,14 @@ module AMEE
         !optional?(usage)
       end
 
+      def optional!
+        @optional=true
+      end
+
+      def compulsory!
+        @optional=false
+      end
+
       # Check that the value of <tt>self</tt> is valid. If invalid, and is defined
       # as part of a calculation, add the invalidity message to the parent
       # calculation's error list. Otherwise, raise a <i>ChoiceValidation</i>
