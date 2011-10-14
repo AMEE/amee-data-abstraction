@@ -1,4 +1,4 @@
-Electricity=AMEE::DataAbstraction::PrototypeCalculation.new { # The application has support for an electricity calculation. :electricity is the internal label used to refer to it
+calculation { # The application has support for an electricity calculation. :electricity is the internal label used to refer to it
   label :electricity
   name "Electricity Consumption"
   path '/business/energy/electricity/grid'

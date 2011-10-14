@@ -1,4 +1,4 @@
-require File.dirname(File.dirname(__FILE__)) + '/spec_helper.rb'
+require 'spec_helper'
 
 class PrototypeCalculation
   def call_me
@@ -8,8 +8,12 @@ class PrototypeCalculation
   cattr_accessor :called
 end
 describe PrototypeCalculation do
+  before :all do
+    @calc = CalculationSet.find(:transport)[:transport]
+  end
+  
   it 'can create an instance' do
-    Transport.should be_a PrototypeCalculation
+    @calc.should be_a PrototypeCalculation
   end
   it 'can be initialized with a DSL block' do
     PrototypeCalculation.new {call_me}
@@ -38,17 +42,17 @@ describe PrototypeCalculation do
     pc[:alpha].should be_a Output
   end
   it 'can construct an ongoing calculation' do
-    Transport.begin_calculation.should be_a OngoingCalculation
+    @calc.begin_calculation.should be_a OngoingCalculation
   end
   it 'should make the terms of the ongoing calculation be their own instances' do
-    oc=Transport.begin_calculation
+    oc=@calc.begin_calculation
     oc[:distance].value :somevalue
     oc[:distance].value.should eql :somevalue
-    Transport[:distance].value.should be_nil
+    @calc[:distance].value.should be_nil
   end
   it 'should copy name, path, label when cloning ongoing' do
     [:path,:name,:label].each do |property|
-      Transport.begin_calculation.send(property).should eql Transport.send(property)
+      @calc.begin_calculation.send(property).should eql @calc.send(property)
     end
   end
   it 'can autogenerate drill terms for itself, based on talking to amee' do
@@ -227,7 +231,7 @@ describe PrototypeCalculation do
     pc.terms.default_per_units.compact.map(&:name).should include 'hour'
   end
   it 'transfers memoised amee information to constructed ongoing calculations' do
-    t=Transport.clone
+    t=@calc.clone
     flexmock(AMEE::Data::Category).should_receive(:get).
       with(AMEE::DataAbstraction.connection,'/data/transport/car/generic').
       once.and_return(true)
@@ -235,7 +239,7 @@ describe PrototypeCalculation do
     t.begin_calculation.send(:amee_data_category)
   end
   it 'can auto-create start and end date metadata' do
-    t=Transport.clone
+    t=@calc.clone
     t.instance_eval{
       start_and_end_dates
     }
