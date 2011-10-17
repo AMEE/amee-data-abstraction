@@ -274,15 +274,14 @@ module AMEE
         #
         define_method("alternative_#{field}s") do |*args|
           ivar = "@alternative_#{field}s"
-          default = send("default_#{field}".to_sym)
           unless args.empty?
-            args << default if default
             units = args.map {|arg| Unit.for(arg) }
             Term.validate_dimensional_equivalence?(*units)
             instance_variable_set(ivar, units)
           else
             return instance_variable_get(ivar) if instance_variable_get(ivar)
-            return instance_variable_set(ivar, (default.alternatives << default)) if default
+            default = send("default_#{field}".to_sym)
+            return instance_variable_set(ivar, (default.alternatives)) if default
           end
         end
 

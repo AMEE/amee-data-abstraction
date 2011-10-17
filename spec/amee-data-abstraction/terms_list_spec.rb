@@ -12,7 +12,7 @@ describe TermsList do
 
   it 'should give properties' do
     @calc.terms.labels.should eql [:fuel,:size,:distance,:co2]
-    @calc.terms.paths.should eql ['fuel','size','distance',:default]
+    @calc.terms.paths.should eql ['fuel','size','distance','default']
     @calc.terms.names.should eql ['Fuel Type','Vehicle Size','Distance Driven','Carbon Dioxide']
   end
 
