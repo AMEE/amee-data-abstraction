@@ -11,6 +11,11 @@ class Term
 end
 
 describe Term do
+
+  before :all do
+    @calc = CalculationSet.find("transport")[:transport]
+  end
+
   it 'can be initialized via DSL block' do
     Term.new {call_me}
     Term.called.should be_true
@@ -30,6 +35,10 @@ describe Term do
 
   it "has note" do
     Term.new {note 'hello'}.note.should eql 'hello'
+  end
+
+  it "has note with no '\"' character" do
+     Term.new {note 'hello "some quote"'}.note.should eql "hello 'some quote'"
   end
 
   it 'has parent' do

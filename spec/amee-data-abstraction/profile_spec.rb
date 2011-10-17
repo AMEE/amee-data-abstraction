@@ -1,6 +1,7 @@
 require File.dirname(File.dirname(__FILE__)) + '/spec_helper.rb'
 
 describe Profile do
+
  it 'defaults to be a text-box' do
    i=Profile.new
    i.text_box?.should be_true
@@ -10,7 +11,7 @@ describe Profile do
     mocker.item_value_definitions.
       item_definition.data_category.
     item_value_definition('distance',['someusage'],['someotherusage'])
-    t=Transport.clone
+    t=CalculationSet.find("transport")[:transport].clone
     t[:distance].compulsory?('someusage').should eql true
     t[:distance].compulsory?('someotherusage').should eql false
     t[:distance].optional?('someotherusage').should eql true

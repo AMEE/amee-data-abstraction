@@ -10,6 +10,11 @@ class PrototypeCalculation
   end
 end
 describe PrototypeCalculation do
+
+  before :all do
+    @calc = CalculationSet.find("transport")[:transport]
+  end
+  
   it 'can create an instance' do
     Transport.should be_a PrototypeCalculation
   end

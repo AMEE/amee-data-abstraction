@@ -1,6 +1,10 @@
 require File.dirname(File.dirname(__FILE__)) + '/spec_helper.rb'
 describe Calculation do
-  
+
+  before :all do
+    @calc = CalculationSet.find("transport")[:transport]
+  end
+
   it 'can create an instance' do
     Transport.should be_a Calculation
   end
@@ -8,7 +12,7 @@ describe Calculation do
     Transport.terms.labels.should eql [:fuel,:size,:distance,:co2]
   end
   it 'should have amee paths for the terms' do
-    Transport.terms.paths.should eql ['fuel','size','distance',:default]
+    Transport.terms.paths.should eql ['fuel','size','distance','default']
   end
   it 'should have human names for the terms' do
     Transport.terms.names.

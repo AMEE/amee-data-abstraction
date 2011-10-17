@@ -1,12 +1,17 @@
 require File.dirname(File.dirname(__FILE__)) + '/spec_helper.rb'
 
 describe TermsList do
+
+  before :all do
+    @calc = CalculationSet.find("transport")[:transport]
+  end
+
   it 'should be returned from calculations' do
     Transport.terms.should be_a TermsList
   end
   it 'should give properties' do
     Transport.terms.labels.should eql [:fuel,:size,:distance,:co2]
-    Transport.terms.paths.should eql ['fuel','size','distance',:default]
+    Transport.terms.paths.should eql ['fuel','size','distance','default']
     Transport.terms.names.should eql ['Fuel Type','Vehicle Size','Distance Driven','Carbon Dioxide']
   end
   it 'should select by class' do

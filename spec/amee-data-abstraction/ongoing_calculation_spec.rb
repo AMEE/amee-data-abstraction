@@ -1,5 +1,12 @@
 require File.dirname(File.dirname(__FILE__)) + '/spec_helper.rb'
 describe OngoingCalculation do
+
+  before :all do
+    @elec = CalculationSet.find("electricity")[:electricity]
+    @transport = CalculationSet.find("transport")[:transport]
+    @elec_and_transport = CalculationSet.find("electricity_and_transport")
+  end
+
   it 'can return set and unset inputs' do
     d=Electricity.begin_calculation
     d.inputs.set.labels.should eql [:country]

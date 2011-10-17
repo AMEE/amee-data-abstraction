@@ -1,6 +1,10 @@
 require File.dirname(File.dirname(__FILE__)) + '/spec_helper.rb'
 describe Drill do
 
+  before :all do
+    @calc = CalculationSet.find("transport")[:transport]
+  end
+
   it 'knows its options when it is the first choice' do
     AMEEMocker.new(self,:path=>'transport/car/generic',
       :selections=>[],

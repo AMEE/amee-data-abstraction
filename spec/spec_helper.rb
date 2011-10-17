@@ -2,8 +2,28 @@ require 'rubygems'
 require 'rspec'
 require 'amee-data-abstraction'
 
-RSpec.configure do |config|
+# Fake up Rails.root to be fixtures directory
+class Rails
+  def self.root
+    File.dirname(__FILE__) + '/fixtures'
+  end
+  def self.logger
+    nil
+  end
+end
+
+Spec::Runner.configure do |config|
   config.mock_with :flexmock
+  config.after(:each) do
+    delete_lock_files
+  end
+end
+
+def delete_lock_files
+  config_dir = Dir.new("#{Rails.root}/config/calculations")
+  config_dir.each do |file|
+    File.delete("#{config_dir.path}/#{file}") if file =~ /lock/
+  end
 end
 
 AMEE::DataAbstraction.connection=FlexMock.new('connection') #Global connection mock, shouldn't receive anything, as we mock the individual amee-ruby calls in the tests
