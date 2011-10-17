@@ -1,12 +1,13 @@
 require 'spec_helper'
 
 describe OngoingCalculation do
+
   before :all do
     @elec = CalculationSet.find("electricity")[:electricity]
     @transport = CalculationSet.find("transport")[:transport]
     @elec_and_transport = CalculationSet.find("electricity_and_transport")
   end
-  
+
   it 'can return set and unset inputs' do
     d=@elec.begin_calculation
     d.inputs.set.labels.should eql [:country]

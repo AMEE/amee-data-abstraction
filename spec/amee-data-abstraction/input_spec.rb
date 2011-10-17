@@ -1,6 +1,7 @@
 require 'spec_helper'
 
 describe Input do
+  
   it 'can be given a fixed value' do
     i=Input.new{fixed 6}
     i.value.should eql 6
@@ -68,6 +69,17 @@ describe Input do
     lambda{i.validate!}.should_not raise_error
     i.value 'e'
     lambda{i.validate!}.should raise_error Exceptions::ChoiceValidation
+  end
+
+  it "should start with dirty set as false" do
+    i=Input.new{fixed 5}
+    i.dirty?.should eql false
+  end
+
+  it "should be dirty when the value is changed" do
+    i=Input.new
+    i.value 5
+    i.dirty?.should eql true
   end
 
   it 'can have custom validation message' do
