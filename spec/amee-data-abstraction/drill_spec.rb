@@ -4,7 +4,7 @@ describe Drill do
   
   
   before :all do
-    @calc = CalculationSet.find(:transport)[:transport]
+    @calc = CalculationSet.find(TRANSPORT_CONFIG)[:transport]
   end
   
   it 'knows its options when it is the first choice' do

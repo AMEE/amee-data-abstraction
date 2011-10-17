@@ -84,16 +84,6 @@ module AMEE
       #
       attr_property :path
 
-      # String representing an annotation for <tt>self</tt>. Set a value by
-      # passing an argument. Retrieve a value by calling without an argument,
-      # e.g.,
-      #
-      #  my_term.note 'Enter the mass of cement produced in the reporting period'
-      #
-      #  my_term.note                       #=> 'Enter the mass of cement ...'
-      #
-      attr_property :note
-
       # Symbol representing the owning parent calculation of <tt>self</tt>. Set
       # the owning calculation object by passing as an argument. Retrieve it by
       # calling without an argument, e.g.,
@@ -211,6 +201,19 @@ module AMEE
         end
         @value
       end
+
+      # String representing an annotation for <tt>self</tt>. Set a value by
+      # passing an argument. Retrieve a value by calling without an argument,
+      # e.g.,
+      #
+      #  my_term.note 'Enter the mass of cement produced in the reporting period'
+      #
+      #  my_term.note                       #=> 'Enter the mass of cement ...'
+      #
+      def note(string=nil)
+        instance_variable_set("@note",string.gsub('"',"'")) unless string.nil?
+        instance_variable_get("@note")
+      end
       
       # Symbols representing the attributes of <tt>self</tt> which are concerned
       # with quantity units.
@@ -264,6 +267,11 @@ module AMEE
       end
 
       [:unit,:per_unit].each do |field|
+
+        # If no argument provided, returns the alternative units which are valid
+        # for <tt>self</tt>. If a list of units are provided as an argument, these
+        # override the dynamically assigned alternative units for <tt>self</tt>.
+        #
         define_method("alternative_#{field}s") do |*args|
           ivar = "@alternative_#{field}s"
           unless args.empty?
@@ -277,6 +285,9 @@ module AMEE
           end
         end
 
+        # Returns the list of unit choices for <tt>self</tt>, including both the
+        # default unit and all alternative units.
+        #
         define_method("#{field}_choices") do |*args|
           choices = send("alternative_#{field}s".to_sym)
           default = send("default_#{field}".to_sym)
@@ -509,6 +520,7 @@ module AMEE
           else value
         end
       end
+      
     end
   end
 end

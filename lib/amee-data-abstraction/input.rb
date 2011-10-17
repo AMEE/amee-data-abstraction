@@ -155,10 +155,12 @@ module AMEE
         !optional?(usage)
       end
 
+      # Manually set the term as optional
       def optional!
         @optional=true
       end
 
+      # Manually set the term as compuslory
       def compulsory!
         @optional=false
       end

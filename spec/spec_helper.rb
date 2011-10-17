@@ -7,12 +7,6 @@ require 'amee'
 $:.unshift(File.dirname(__FILE__) + '/../lib')
 require 'amee-data-abstraction'
 
-Spec::Runner.configure do |config|
-  config.mock_with :flexmock
-end
-
-AMEE::DataAbstraction.connection=FlexMock.new('connection') #Global connection mock, shouldn't receive anything, as we mock the individual amee-ruby calls in the tests
-
 # Fake up Rails.root to be fixtures directory
 class Rails
   def self.root
@@ -22,6 +16,26 @@ class Rails
     nil
   end
 end
+
+Spec::Runner.configure do |config|
+  config.mock_with :flexmock
+  config.after(:each) do
+    delete_lock_files
+  end
+end
+
+def delete_lock_files
+  config_dir = Dir.new("#{Rails.root}/config/calculations")
+  config_dir.each do |file|
+    File.delete("#{config_dir.path}/#{file}") if file =~ /lock/
+  end
+end
+
+AMEE::DataAbstraction.connection=FlexMock.new('connection') #Global connection mock, shouldn't receive anything, as we mock the individual amee-ruby calls in the tests
+
+TRANSPORT_CONFIG = "transport"
+ELECTRICITY_CONFIG = "electricity"
+ELECTRICITY_AND_TRANSPORT_CONFIG = "electricity_and_transport"
 
 include AMEE::DataAbstraction
 

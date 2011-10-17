@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe TermsList do
   before :all do
-    @calc = CalculationSet.find(:transport)[:transport]
+    @calc = CalculationSet.find(TRANSPORT_CONFIG)[:transport]
   end
   
   it 'should be returned from calculations' do
@@ -10,7 +10,7 @@ describe TermsList do
   end
   it 'should give properties' do
     @calc.terms.labels.should eql [:fuel,:size,:distance,:co2]
-    @calc.terms.paths.should eql ['fuel','size','distance',:default]
+    @calc.terms.paths.should eql ['fuel','size','distance','default']
     @calc.terms.names.should eql ['Fuel Type','Vehicle Size','Distance Driven','Carbon Dioxide']
   end
   it 'should select by class' do

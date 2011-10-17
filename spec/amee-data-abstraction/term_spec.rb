@@ -10,7 +10,7 @@ end
 
 describe Term do
   before :all do
-    @calc = CalculationSet.find(:transport)[:transport]
+    @calc = CalculationSet.find(TRANSPORT_CONFIG)[:transport]
   end
   
   it 'can be initialized via DSL block' do
@@ -33,6 +33,11 @@ describe Term do
   it "has note" do
     Term.new {note 'hello'}.note.should eql 'hello'
   end
+
+  it "has note with no '\"' character" do
+     Term.new {note 'hello "some quote"'}.note.should eql "hello 'some quote'"
+  end
+
 
   it 'has parent' do
     @calc[:distance].parent.should eql @calc
