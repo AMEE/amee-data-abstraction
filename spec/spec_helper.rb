@@ -14,7 +14,7 @@ class Rails
   end
 end
 
-Spec::Runner.configure do |config|
+RSpec.configure do |config|
   config.mock_with :flexmock
   config.after(:each) do
     delete_lock_files
