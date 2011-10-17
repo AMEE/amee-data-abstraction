@@ -1,29 +1,34 @@
 require 'spec_helper'
 
 describe TermsList do
+
   before :all do
-    @calc = CalculationSet.find(:transport)[:transport]
+    @calc = CalculationSet.find("transport")[:transport]
   end
-  
+
   it 'should be returned from calculations' do
     @calc.terms.should be_a TermsList
   end
+
   it 'should give properties' do
     @calc.terms.labels.should eql [:fuel,:size,:distance,:co2]
     @calc.terms.paths.should eql ['fuel','size','distance',:default]
     @calc.terms.names.should eql ['Fuel Type','Vehicle Size','Distance Driven','Carbon Dioxide']
   end
+
   it 'should select by class' do
     @calc.terms.drills.labels.should eql [:fuel,:size]
     @calc.terms.profiles.labels.should eql [:distance]
     @calc.terms.outputs.labels.should eql [:co2]
   end
+
   it 'should select by property' do
     t=@calc.begin_calculation
     t[:distance].value 5
     t.terms.set.labels.should eql [:distance]
     t.terms.unset.labels.should eql [:fuel,:size,:co2]
   end
+
   it 'should select by chain' do
     t=@calc.begin_calculation
     t[:fuel].value 'diesel'
@@ -32,6 +37,7 @@ describe TermsList do
     t.terms.set.drills.labels.should eql [:fuel]
     t.terms.unset.drills.labels.should eql [:size]
   end
+
   it 'should select by order' do
     t=@calc.clone
     t.terms.before(:distance).labels.
@@ -39,6 +45,7 @@ describe TermsList do
     t.terms.after(:distance).labels.
       should eql [:co2]
   end
+  
   it 'can select terms by usage' do
     mocker=AMEEMocker.new self,:path=>'transport/car/generic'
     mocker.item_value_definitions.

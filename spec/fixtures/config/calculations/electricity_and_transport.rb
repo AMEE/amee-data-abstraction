@@ -21,7 +21,7 @@ calculation{
   }
   output {
     label :co2
-    path :default
+    path 'default'
   }
 }
 
@@ -47,7 +47,7 @@ calculation {
   }
   output {
     label :co2
-    path :default
+    path 'default'
     name 'Carbon Dioxide'
   }
 }

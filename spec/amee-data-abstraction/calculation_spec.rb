@@ -1,11 +1,11 @@
 require 'spec_helper'
 
 describe Calculation do
-  
+
   before :all do
-    @calc = CalculationSet.find(:transport)[:transport]
+    @calc = CalculationSet.find("transport")[:transport]
   end
-  
+
   it 'can create an instance' do
     @calc.should be_a Calculation
   end
@@ -13,7 +13,7 @@ describe Calculation do
     @calc.terms.labels.should eql [:fuel,:size,:distance,:co2]
   end
   it 'should have amee paths for the terms' do
-    @calc.terms.paths.should eql ['fuel','size','distance',:default]
+    @calc.terms.paths.should eql ['fuel','size','distance','default']
   end
   it 'should have human names for the terms' do
     @calc.terms.names.

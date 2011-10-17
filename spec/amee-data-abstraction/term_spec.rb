@@ -11,10 +11,11 @@ class Term
 end
 
 describe Term do
+
   before :all do
-    @calc = CalculationSet.find(:transport)[:transport]
+    @calc = CalculationSet.find("transport")[:transport]
   end
-  
+
   it 'can be initialized via DSL block' do
     Term.new {call_me}
     Term.called.should be_true
@@ -34,6 +35,10 @@ describe Term do
 
   it "has note" do
     Term.new {note 'hello'}.note.should eql 'hello'
+  end
+
+  it "has note with no '\"' character" do
+     Term.new {note 'hello "some quote"'}.note.should eql "hello 'some quote'"
   end
 
   it 'has parent' do
@@ -141,10 +146,42 @@ describe Term do
     per_units.should include "joule", "british thermal unit", "megawatt hour"
   end
 
+  it "has unit choices which include default and alternative" do
+    term = Term.new {path :hello; default_unit :kg; default_per_unit :kWh}
+    units = term.alternative_units.map(&:name)
+    units.should include "gigagram", "pound", "tonne"
+    units.should_not include "kilogram", "kelvin"
+
+    units = term.unit_choices.map(&:name)
+    units.first.should eql "kilogram"
+    units.should include "kilogram", "gigagram", "pound", "tonne"
+    units.should_not include "kelvin"
+
+    per_units = term.alternative_per_units.map(&:name)
+    per_units.should include "joule", "british thermal unit", "megawatt hour"
+    per_units.should_not include "kilowatt hour"
+
+    per_units = term.per_unit_choices.map(&:name)
+    per_units.first.should eql "kilowatt hour"
+    per_units.should include "kilowatt hour", "joule", "british thermal unit", "megawatt hour"
+  end
+
   it "has limited set of alternative units if specified" do
     term = Term.new {path :hello; default_unit :kg; alternative_units :t, :ton_us, :lb}
     units = term.alternative_units.map(&:name)
     units.should include "tonne", "pound", "short ton"
+    units.should_not include "gigagram", "ounce", "gram"
+  end
+
+  it "has unit choices which include default and alternative with limited set of alternative units" do
+    term = Term.new {path :hello; default_unit :kg; alternative_units :t, :ton_us, :lb}
+    units = term.alternative_units.map(&:name)
+    units.should include "tonne", "pound", "short ton"
+    units.should_not include "kilogram", "gigagram", "ounce", "gram"
+
+    units = term.unit_choices.map(&:name)
+    units.first.should eql "kilogram"
+    units.should include "kilogram", "tonne", "pound", "short ton"
     units.should_not include "gigagram", "ounce", "gram"
   end
 

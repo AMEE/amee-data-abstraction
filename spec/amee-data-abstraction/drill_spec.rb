@@ -3,9 +3,9 @@ require 'spec_helper'
 describe Drill do
   
   before :all do
-    @calc = CalculationSet.find(:transport)[:transport]
+    @calc = CalculationSet.find("transport")[:transport]
   end
-  
+
   it 'knows its options when it is the first choice' do
     AMEEMocker.new(self,:path=>'transport/car/generic',
       :selections=>[],
@@ -34,7 +34,7 @@ describe Drill do
     t[:size].enabled?.should be_true
   end
 
-  it 'is valid iff assigned a choice in the choices' do
+  it 'is valid if assigned a choice in the choices' do
     AMEEMocker.new(self,:path=>'transport/car/generic',
       :selections=>[],
       :choices=>['diesel','petrol']).drill
