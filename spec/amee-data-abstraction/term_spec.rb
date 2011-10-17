@@ -10,7 +10,7 @@ end
 
 describe Term do
   before :all do
-    @calc = CalculationSet.find(TRANSPORT_CONFIG)[:transport]
+    @calc = CalculationSet.find("transport")[:transport]
   end
   
   it 'can be initialized via DSL block' do

@@ -33,10 +33,6 @@ end
 
 AMEE::DataAbstraction.connection=FlexMock.new('connection') #Global connection mock, shouldn't receive anything, as we mock the individual amee-ruby calls in the tests
 
-TRANSPORT_CONFIG = "transport"
-ELECTRICITY_CONFIG = "electricity"
-ELECTRICITY_AND_TRANSPORT_CONFIG = "electricity_and_transport"
-
 include AMEE::DataAbstraction
 
 class AMEEMocker

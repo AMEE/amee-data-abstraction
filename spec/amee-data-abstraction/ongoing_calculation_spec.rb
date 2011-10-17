@@ -2,9 +2,9 @@ require 'spec_helper'
 
 describe OngoingCalculation do
   before :all do
-    @elec = CalculationSet.find(ELECTRICITY_CONFIG)[:electricity]
-    @transport = CalculationSet.find(TRANSPORT_CONFIG)[:transport]
-    @elec_and_transport = CalculationSet.find(ELECTRICITY_AND_TRANSPORT_CONFIG)
+    @elec = CalculationSet.find("electricity")[:electricity]
+    @transport = CalculationSet.find("transport")[:transport]
+    @elec_and_transport = CalculationSet.find("electricity_and_transport")
   end
   
   it 'can return set and unset inputs' do

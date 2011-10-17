@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe TermsList do
   before :all do
-    @calc = CalculationSet.find(TRANSPORT_CONFIG)[:transport]
+    @calc = CalculationSet.find("transport")[:transport]
   end
   
   it 'should be returned from calculations' do

@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Calculation do
   
   before :all do
-    @calc = CalculationSet.find(TRANSPORT_CONFIG)[:transport]
+    @calc = CalculationSet.find("transport")[:transport]
   end
   
   it 'can create an instance' do

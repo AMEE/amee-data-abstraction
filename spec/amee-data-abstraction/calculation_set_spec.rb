@@ -11,7 +11,7 @@ describe CalculationSet do
   
   before :all do
     CalculationSet.sets.clear
-    @calc_set = CalculationSet.find(ELECTRICITY_AND_TRANSPORT_CONFIG)
+    @calc_set = CalculationSet.find("electricity_and_transport")
   end
   
   it 'can create an instance' do
