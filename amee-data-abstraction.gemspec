@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{amee-data-abstraction}
-  s.version = "1.2.0"
+  s.version = "1.3.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["James Hetherington", "Andrew Berkeley", "James Smith", "George Palmer"]
-  s.date = %q{2011-10-10}
+  s.date = %q{2011-10-18}
   s.description = %q{Part of the AMEEappkit this gem provides a data abstraction layer, decreasing the amount and detail of development required}
   s.email = %q{help@amee.com}
   s.extra_rdoc_files = [
@@ -64,9 +64,10 @@ Gem::Specification.new do |s|
     "spec/core-extensions/hash_spec.rb",
     "spec/core-extensions/ordered_hash_spec.rb",
     "spec/core-extensions/proc_spec.rb",
-    "spec/fixtures/electricity.rb",
-    "spec/fixtures/electricity_and_transport.rb",
-    "spec/fixtures/transport.rb",
+    "spec/fixtures/config/calculations/electricity.rb",
+    "spec/fixtures/config/calculations/electricity_and_transport.rb",
+    "spec/fixtures/config/calculations/transport.rb",
+    "spec/fixtures/config/electricity.rb",
     "spec/spec.opts",
     "spec/spec_helper.rb"
   ]
