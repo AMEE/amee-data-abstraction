@@ -82,7 +82,6 @@ module AMEE
       def self.load_set(name)
         CalculationSet.new(name,:file => name) do
           instance_eval(File.open(self.config_path).read)
-          generate_lock_file unless lock_file_exists?
         end
       end
 
