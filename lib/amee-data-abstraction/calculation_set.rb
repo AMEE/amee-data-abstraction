@@ -213,9 +213,9 @@ module AMEE
             if term.is_a?(AMEE::DataAbstraction::Input)
               string += "    fixed \"#{term.value}\"\n" if term.fixed? && !term.value.blank?
               if term.is_a?(AMEE::DataAbstraction::Drill)
-                string += "    choices \"#{term.choices.join('\',\'')}\"\n" if term.instance_variable_defined?("@choices")  && !term.choices.blank?
+                string += "    choices \"#{term.choices.join('","')}\"\n" if term.instance_variable_defined?("@choices")  && !term.choices.blank?
               elsif term.is_a?(AMEE::DataAbstraction::Profile)
-                string += "    choices [\"#{term.choices.join('\"','\"')}\"]\n" if term.instance_variable_defined?("@choices")  && !term.choices.blank?
+                string += "    choices [\"#{term.choices.join('","')}\"]\n" if term.instance_variable_defined?("@choices")  && !term.choices.blank?
               end
               string += "    optional!\n" if term.optional?
             end
