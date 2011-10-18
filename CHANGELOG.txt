@@ -1,4 +1,7 @@
 = Changelog
 
+== 1.3.0
+  * Reconfigure storage and API for Calculation Sets
+
 == 1.0.0
   * Initial public release
