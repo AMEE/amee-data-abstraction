@@ -114,4 +114,10 @@ describe Input do
     i.dirty?.should eql true
   end
 
+  it "should be clean when the value is changed and then marked as clean" do
+    i=Input.new
+    i.value 5
+    i.clean!
+    i.dirty?.should be_false
+  end
 end

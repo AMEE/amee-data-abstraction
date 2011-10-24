@@ -225,7 +225,7 @@ describe OngoingCalculation do
 
     mocker.existing={'distance'=>5}
     mocker.params={'distance'=>9}
-    mocker.update.get(true)
+    mocker.update.get(true, true)
 
     mycalc=@transport.begin_calculation
     mycalc.choose!('fuel'=>'diesel','size'=>'large','distance'=>5)
