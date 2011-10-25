@@ -248,6 +248,13 @@ describe CalculationSet do
     CalculationSet.find_prototype_calculation(:my_other_calc).should be_a PrototypeCalculation
   end
 
+  it "can find a prototype calc without calc set" do
+    # Shouldn't be loaded
+    CalculationSet.sets[:autoloaded].should be_nil
+    # Should be autoloaded (along with the rest) when find_prototype_calculation is used
+    CalculationSet.find_prototype_calculation(:autocalc).should be_a PrototypeCalculation
+  end
+
   it "returns nil where no prototype calcualtion is found" do
     CalculationSet.find_prototype_calculation(:fuel).should be_nil
   end
