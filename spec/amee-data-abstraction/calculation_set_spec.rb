@@ -86,6 +86,16 @@ describe CalculationSet do
       set = CalculationSet.find('transport')
     end
 
+    it "should only call load_set once for the same set" do
+      CalculationSet.sets[:transport].should be_nil
+      CalculationSet.sets.count.should == 0
+      set_a = CalculationSet.find('transport')
+      CalculationSet.sets.count.should == 1
+      set_b = CalculationSet.find('transport')
+      CalculationSet.sets.count.should == 1
+      set_a.should be(set_b)
+    end
+
     it "should not call load_set if set exists in class hash" do
       CalculationSet.sets[:transport].should be_nil
       set = CalculationSet.find('transport')
