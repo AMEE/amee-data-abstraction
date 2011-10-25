@@ -1,6 +1,6 @@
-Transport=AMEE::DataAbstraction::PrototypeCalculation.new{
-  name 'transport'
-  label :transport
+calculation {
+  name 'autocalc'
+  label :autocalc
   path '/transport/car/generic'
 
   drill {
@@ -20,7 +20,7 @@ Transport=AMEE::DataAbstraction::PrototypeCalculation.new{
   }
   output {
     label :co2
-    path :default
+    path 'default'
     name 'Carbon Dioxide'
   }
 }

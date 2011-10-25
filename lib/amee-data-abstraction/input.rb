@@ -158,6 +158,16 @@ module AMEE
         !optional?(usage)
       end
 
+      # Manually set the term as optional
+      def optional!
+        @optional=true
+      end
+
+      # Manually set the term as compuslory
+      def compulsory!
+        @optional=false
+      end
+
       # Check that the value of <tt>self</tt> is valid. If invalid, and is defined
       # as part of a calculation, add the invalidity message to the parent
       # calculation's error list. Otherwise, raise a <i>ChoiceValidation</i>
@@ -190,6 +200,10 @@ module AMEE
       
       def dirty?
         @dirty
+      end
+      
+      def clean!
+        @dirty = false
       end
 
       protected

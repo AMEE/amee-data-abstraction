@@ -1,7 +1,15 @@
-require File.dirname(File.dirname(__FILE__)) + '/spec_helper.rb'
+require 'spec_helper'
+
 describe OngoingCalculation do
+
+  before :all do
+    @elec = CalculationSet.find("electricity")[:electricity]
+    @transport = CalculationSet.find("transport")[:transport]
+    @elec_and_transport = CalculationSet.find("electricity_and_transport")
+  end
+
   it 'can return set and unset inputs' do
-    d=Electricity.begin_calculation
+    d=@elec.begin_calculation
     d.inputs.set.labels.should eql [:country]
     d.inputs.unset.labels.should eql [:energy_used]
     d[:energy_used].value :somevalue
@@ -9,7 +17,7 @@ describe OngoingCalculation do
     d.inputs.unset.labels.should eql []
   end
   it 'can return set and unset terms' do
-    d=Electricity.begin_calculation
+    d=@elec.begin_calculation
     d.set.labels.should eql [:country]
     d.unset.labels.should eql [:energy_used,:co2]
     d[:energy_used].value :somevalue
@@ -17,7 +25,7 @@ describe OngoingCalculation do
     d.unset.labels.should eql [:co2]
   end
   it 'can return set and unset outputs' do
-    d=Electricity.begin_calculation
+    d=@elec.begin_calculation
     d.outputs.set.labels.should eql []
     d.outputs.unset.labels.should eql [:co2]
     d[:co2].value 5
@@ -25,7 +33,7 @@ describe OngoingCalculation do
     d.outputs.unset.labels.should eql []
   end
   it 'can clear outputs' do
-    d=Electricity.begin_calculation
+    d=@elec.begin_calculation
     d.outputs.unset.labels.should eql [:co2]
     d[:co2].value 5
     d[:co2].value.should eql 5
@@ -37,7 +45,7 @@ describe OngoingCalculation do
       :selections=>[['country','argentina']],
       :choices=>[]).drill
 
-    d=Electricity.begin_calculation
+    d=@elec.begin_calculation
 
     d.inputs.set.values.should eql ['argentina']
     d.inputs.unset.values.should eql [nil]
@@ -51,7 +59,7 @@ describe OngoingCalculation do
     AMEEMocker.new(self,:path=>'business/energy/electricity/grid',
       :selections=>[['country','argentina']],
       :choices=>[]).drill
-    d=Electricity.begin_calculation
+    d=@elec.begin_calculation
     d.satisfied?.should be_false
     d.choose!(:energy_used=>5.0)
     d.satisfied?.should be_true
@@ -66,7 +74,7 @@ describe OngoingCalculation do
     mocker.select('size'=>'large')
     mocker.choices=[]
     mocker.drill
-    t=Transport.begin_calculation
+    t=@transport.begin_calculation
     t.terms.labels.should eql [:fuel,:size,:distance,:co2]
     t.satisfied?.should be_false
 
@@ -75,13 +83,13 @@ describe OngoingCalculation do
     t.inputs.unset.labels.should eql [:size,:distance]
     t.satisfied?.should be_false
 
-    t2=Transport.begin_calculation
+    t2=@transport.begin_calculation
     t2.choose!('fuel'=>'diesel','size'=>'large')
     t2.inputs.set.labels.should eql [:fuel,:size]
     t2.inputs.unset.labels.should eql [:distance]
     t2.satisfied?.should be_false
 
-    t3=Transport.begin_calculation
+    t3=@transport.begin_calculation
     t3.choose!('fuel'=>'diesel','size'=>'large','distance'=>5)
     t3.inputs.set.labels.should eql [:fuel,:size,:distance]
     t3.inputs.unset.labels.should eql []
@@ -100,7 +108,7 @@ describe OngoingCalculation do
     mocker.choices=[]
     mocker.drill
     mocker.profile_list.profile_category.timestamp.create_and_get
-    mycalc=Transport.begin_calculation
+    mycalc=@transport.begin_calculation
     mycalc.choose!('fuel'=>'diesel','size'=>'large','distance'=>5)
     mycalc.calculate!
     mycalc.outputs.first.value.should eql :somenumber
@@ -118,7 +126,7 @@ describe OngoingCalculation do
     mocker.choices=[]
     mocker.drill
     mocker.profile_list.profile_category.timestamp.create_and_get
-    mycalc=ElectricityAndTransport[:transport].begin_calculation
+    mycalc=@elec_and_transport[:transport].begin_calculation
     mycalc.choose!('fuel'=>'diesel','size'=>'large','distance'=>5,'department'=>'stuff')
     mycalc.calculate!
     mycalc.outputs.first.value.should eql :somenumber
@@ -142,7 +150,7 @@ describe OngoingCalculation do
   #end
 
   it 'can be supplied just a UID, and recover PIVs and drill values from AMEE' do
-    mycalc=Transport.begin_calculation
+    mycalc=@transport.begin_calculation
     mocker=AMEEMocker.new(self,:path=>'transport/car/generic',
       :result=>:somenumber,
       :existing=>{'distance'=>5},:choices=>['petrol','diesel'])
@@ -159,7 +167,7 @@ describe OngoingCalculation do
   end
 
   it 'refuses to load values from AMEE which conflict with local drill values' do
-    mycalc=Transport.begin_calculation
+    mycalc=@transport.begin_calculation
     mocker=AMEEMocker.new(self,:path=>'transport/car/generic',
       :result=>:somenumber,
       :existing=>{'distance'=>7},
@@ -195,7 +203,7 @@ describe OngoingCalculation do
     mocker.choices=[]
     mocker.drill
     mocker.profile_list.update.get(true)
-    mycalc=Transport.begin_calculation
+    mycalc=@transport.begin_calculation
     mycalc.choose!(:profile_item_uid=>mocker.uid,'fuel'=>'diesel','size'=>'large','distance'=>9)
     mycalc.calculate!
     mycalc[:distance].value.should eql 9
@@ -217,9 +225,9 @@ describe OngoingCalculation do
 
     mocker.existing={'distance'=>5}
     mocker.params={'distance'=>9}
-    mocker.update.get(true)
+    mocker.update.get(true, true)
 
-    mycalc=Transport.begin_calculation
+    mycalc=@transport.begin_calculation
     mycalc.choose!('fuel'=>'diesel','size'=>'large','distance'=>5)
     mycalc.calculate!
     mycalc.choose!('fuel'=>'diesel','size'=>'large','distance'=>9)
@@ -244,7 +252,7 @@ describe OngoingCalculation do
     mocker.select('size'=>'small')
     mocker.drill.create_and_get
     
-    mycalc=Transport.begin_calculation
+    mycalc=@transport.begin_calculation
     mycalc.choose!('fuel'=>'diesel','size'=>'large','distance'=>5)
     mycalc.calculate!
     mycalc.choose!('fuel'=>'diesel','size'=>'small')
@@ -253,7 +261,7 @@ describe OngoingCalculation do
   end
 
   it 'memoizes profile information, but not across a pass' do
-    mycalc=Transport.begin_calculation
+    mycalc=@transport.begin_calculation
     mocker=AMEEMocker.new(self,:path=>'transport/car/generic',
       :result=>:somenumber,
       :existing=>{'distance'=>5},:choices=>['petrol','diesel'])
@@ -285,7 +293,7 @@ describe OngoingCalculation do
     mocker.choices=[]
     mocker.drill
     mocker.profile_list.profile_category.timestamp.create_and_get
-    myproto=Transport.clone
+    myproto=@transport.clone
     myproto.instance_eval{
       start_and_end_dates
     }
@@ -308,7 +316,7 @@ describe OngoingCalculation do
     mocker.select('size'=>'large')
     mocker.choices=[]
     mocker.drill
-    myproto=Transport.clone
+    myproto=@transport.clone
     myproto.instance_eval{
       start_and_end_dates
     }
@@ -318,7 +326,7 @@ describe OngoingCalculation do
   end
 
   it 'starts off dirty' do  
-    mycalc=Transport.begin_calculation
+    mycalc=@transport.begin_calculation
     mycalc.should be_dirty
   end
 
@@ -335,7 +343,7 @@ describe OngoingCalculation do
     mocker.choices=[]
     mocker.drill
     mocker.profile_list.profile_category.timestamp.create_and_get
-    mycalc=Transport.begin_calculation
+    mycalc=@transport.begin_calculation
     mycalc.should be_dirty
     mycalc.choose!('fuel'=>'diesel','size'=>'large','distance'=>5)
     mycalc.calculate!
@@ -357,7 +365,7 @@ describe OngoingCalculation do
     mocker.choices=[]
     mocker.drill
     mocker.profile_list.profile_category.timestamp.create_and_get
-    mycalc=Transport.begin_calculation
+    mycalc=@transport.begin_calculation
     mycalc.should be_dirty
     mycalc.choose!('fuel'=>'diesel','size'=>'large','distance'=>5)
     mycalc.calculate!
@@ -380,7 +388,7 @@ describe OngoingCalculation do
     mocker.select('size'=>'marge')
     mocker.choices=[]
     mocker.drill
-    mycalc=Transport.begin_calculation
+    mycalc=@transport.begin_calculation
     lambda{mycalc.choose!('fuel'=>'diesel','size'=>'marge','distance'=>5)}.should raise_error Exceptions::ChoiceValidation
     mycalc.invalidity_messages.keys.should eql [:size]
   end
@@ -397,7 +405,7 @@ describe OngoingCalculation do
     mocker.select('size'=>'marge')
     mocker.choices=[]
     mocker.drill
-    mycalc=Transport.begin_calculation
+    mycalc=@transport.begin_calculation
     mycalc.choose('fuel'=>'diesel','size'=>'marge','distance'=>5).should be_false
     mycalc.invalidity_messages.keys.should eql [:size]
   end
@@ -414,12 +422,12 @@ describe OngoingCalculation do
     mocker.select('size'=>'large')
     mocker.choices=[]
     mocker.drill
-    mycalc=Transport.begin_calculation
+    mycalc=@transport.begin_calculation
     mycalc.choose('fuel'=>'diesel','size'=>'large','distance'=>5).should be_true
   end
 
   it 'can blank individual term attributes with empty string' do
-    myproto=Transport.clone
+    myproto=@transport.clone
     mycalc=myproto.begin_calculation
     mycalc.choose_without_validation!('fuel'=>'diesel','size'=>'large','distance'=>{:value =>5, :unit=> Unit.km})
     mycalc['fuel'].value.should eql 'diesel'
@@ -434,7 +442,7 @@ describe OngoingCalculation do
   end
 
   it 'can blank individual term attributes with nil' do
-    myproto=Transport.clone
+    myproto=@transport.clone
     mycalc=myproto.begin_calculation
     mycalc.choose_without_validation!('fuel'=>'diesel','size'=>'large','distance'=>{:value =>5, :unit=> Unit.km})
     mycalc['fuel'].value.should eql 'diesel'
@@ -449,7 +457,7 @@ describe OngoingCalculation do
   end
 
     it 'can update individual term attributes without nullifying others' do
-    myproto=Transport.clone
+    myproto=@transport.clone
     mycalc=myproto.begin_calculation
     mycalc.choose_without_validation!('fuel'=>'diesel','size'=>'large','distance'=>{:value =>5, :unit=> Unit.km})
     mycalc['fuel'].value.should eql 'diesel'
@@ -490,7 +498,7 @@ describe OngoingCalculation do
     mocker.select('size'=>'marge')
     mocker.choices=[]
     mocker.drill
-    mycalc=Transport.begin_calculation
+    mycalc=@transport.begin_calculation
     mycalc.choose('fuel'=>'diesel','size'=>'marge','distance'=>5).should be_false
     mycalc.invalidity_messages.keys.should eql [:size]
     mycalc[:size].value.should eql 'marge'

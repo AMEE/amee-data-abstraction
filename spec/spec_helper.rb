@@ -1,15 +1,43 @@
 require 'rubygems'
 require 'rspec'
+
+$:.unshift(File.dirname(__FILE__) + '/../lib')
 require 'amee-data-abstraction'
+
+# Fake up Rails.root to be fixtures directory
+class Rails
+  def self.root
+    File.dirname(__FILE__) + '/fixtures'
+  end
+  def self.logger
+    nil
+  end
+end
 
 RSpec.configure do |config|
   config.mock_with :flexmock
+  config.after(:each) do
+    delete_lock_files
+  end
+end
+
+def delete_lock_files
+  config_dir = Dir.new("#{Rails.root}/config/calculations")
+  config_dir.each do |file|
+    File.delete("#{config_dir.path}/#{file}") if file =~ /lock/
+  end
 end
 
 AMEE::DataAbstraction.connection=FlexMock.new('connection') #Global connection mock, shouldn't receive anything, as we mock the individual amee-ruby calls in the tests
 
-Dir.glob(File.dirname(__FILE__) + '/fixtures/*') do |filename|
-  require filename
+# Fake up Rails.root to be fixtures directory
+class Rails
+  def self.root
+    File.dirname(__FILE__) + '/fixtures'
+  end
+  def self.logger
+    nil
+  end
 end
 
 include AMEE::DataAbstraction
@@ -233,10 +261,16 @@ class AMEEMocker
           mock_di.should_receive(:value).with(k).and_return(v).once
         end
       end
-      test.flexmock(AMEE::Data::Item).should_receive(:get).
-        with(connection,dipath,{}).
-        at_least.once.
-        and_return(mock_di)
+      if once
+        test.flexmock(AMEE::Data::Item).should_receive(:get).
+          with(connection,dipath,{}).
+          at_least.once.
+          and_return(mock_di)
+      else
+        test.flexmock(AMEE::Data::Item).should_receive(:get).
+          with(connection,dipath,{}).
+          and_return(mock_di)
+      end
     end
     if once
       test.flexmock(AMEE::Profile::Item).should_receive(:get).
@@ -244,10 +278,9 @@ class AMEEMocker
       at_least.once.
       and_return(mock_pi)
     else
-    test.flexmock(AMEE::Profile::Item).should_receive(:get).
-      with(connection,pipath,{}).
-      at_least.once.
-      and_return(mock_pi)
+      test.flexmock(AMEE::Profile::Item).should_receive(:get).
+        with(connection,pipath,{}).
+        and_return(mock_pi)
     end
     return self
   end

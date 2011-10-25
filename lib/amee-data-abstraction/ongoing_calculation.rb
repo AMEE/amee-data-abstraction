@@ -79,6 +79,7 @@ module AMEE
       # for results to be valid.
       #
       def clean!
+        inputs.each{|i| i.clean!}
         @dirty=false
       end
 
@@ -258,7 +259,7 @@ module AMEE
       def load_outputs
         outputs.each do |output|
           res=nil
-          if output.path==:default
+          if output.path.to_s=='default'
             res= profile_item.amounts.find{|x| x[:default] == true}
           else
             res= profile_item.amounts.find{|x| x[:type] == output.path}
