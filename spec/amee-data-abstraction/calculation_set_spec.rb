@@ -86,6 +86,16 @@ describe CalculationSet do
       set = CalculationSet.find('transport')
     end
 
+    it "should only call load_set once for the same set" do
+      CalculationSet.sets[:transport].should be_nil
+      CalculationSet.sets.count.should == 0
+      set_a = CalculationSet.find('transport')
+      CalculationSet.sets.count.should == 1
+      set_b = CalculationSet.find('transport')
+      CalculationSet.sets.count.should == 1
+      set_a.should be(set_b)
+    end
+
     it "should not call load_set if set exists in class hash" do
       CalculationSet.sets[:transport].should be_nil
       set = CalculationSet.find('transport')
@@ -246,6 +256,13 @@ describe CalculationSet do
     CalculationSet.find_prototype_calculation(:transport).should be_a PrototypeCalculation
     CalculationSet.find_prototype_calculation(:your_calc).should be_a PrototypeCalculation
     CalculationSet.find_prototype_calculation(:my_other_calc).should be_a PrototypeCalculation
+  end
+
+  it "can find a prototype calc without calc set" do
+    # Shouldn't be loaded
+    CalculationSet.sets[:autoloaded].should be_nil
+    # Should be autoloaded (along with the rest) when find_prototype_calculation is used
+    CalculationSet.find_prototype_calculation(:autocalc).should be_a PrototypeCalculation
   end
 
   it "returns nil where no prototype calcualtion is found" do

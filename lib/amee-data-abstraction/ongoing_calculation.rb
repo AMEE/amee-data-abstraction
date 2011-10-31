@@ -79,6 +79,7 @@ module AMEE
       # for results to be valid.
       #
       def clean!
+        inputs.each{|i| i.clean!}
         @dirty=false
       end
 

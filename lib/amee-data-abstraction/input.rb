@@ -201,6 +201,10 @@ module AMEE
       def dirty?
         @dirty
       end
+      
+      def clean!
+        @dirty = false
+      end
 
       protected
       # Returns <tt>true</tt> if the value set for <tt>self</tt> is either blank

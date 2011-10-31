@@ -261,10 +261,16 @@ class AMEEMocker
           mock_di.should_receive(:value).with(k).and_return(v).once
         end
       end
-      test.flexmock(AMEE::Data::Item).should_receive(:get).
-        with(connection,dipath,{}).
-        at_least.once.
-        and_return(mock_di)
+      if once
+        test.flexmock(AMEE::Data::Item).should_receive(:get).
+          with(connection,dipath,{}).
+          at_least.once.
+          and_return(mock_di)
+      else
+        test.flexmock(AMEE::Data::Item).should_receive(:get).
+          with(connection,dipath,{}).
+          and_return(mock_di)
+      end
     end
     if once
       test.flexmock(AMEE::Profile::Item).should_receive(:get).
@@ -272,10 +278,9 @@ class AMEEMocker
       at_least.once.
       and_return(mock_pi)
     else
-    test.flexmock(AMEE::Profile::Item).should_receive(:get).
-      with(connection,pipath,{}).
-      at_least.once.
-      and_return(mock_pi)
+      test.flexmock(AMEE::Profile::Item).should_receive(:get).
+        with(connection,pipath,{}).
+        and_return(mock_pi)
     end
     return self
   end

@@ -65,10 +65,18 @@ module AMEE
         set.generate_lock_file(output_path)
       end
 
+      DEFAULT_RAILS_CONFIG_DIR = "config/calculations"
+
       # Find a specific prototype calculation instance without specifying the set
       # to which it belongs.
       #
       def self.find_prototype_calculation(label)
+        # Make sure all sets are loaded first
+        default_config_dir = defined?(::Rails) ? "#{::Rails.root}/#{DEFAULT_RAILS_CONFIG_DIR}" : DEFAULT_RAILS_CONFIG_DIR
+        Dir.glob(default_config_dir + "/*.rb").each do |name|
+          find(name)
+        end
+        # Then search them
         @@sets.each_pair do |name,set|
           set = find(name)
           return set[label] if set[label]
@@ -85,14 +93,12 @@ module AMEE
         end
       end
 
-      DEFFAULT_RAILS_CONFIG_DIR = "config/calculations"
-
       # Find the config file assocaited with <tt>name</tt>. The method first checks
       # the default Rails configuration location (config/calculations) then the
       # file path described by <tt>name</tt> relative to the Rails root and by
       # absolute path.
       def self.find_config_file(name)
-        default_config_dir = defined?(::Rails) ? "#{::Rails.root}/#{DEFFAULT_RAILS_CONFIG_DIR}" : nil
+        default_config_dir = defined?(::Rails) ? "#{::Rails.root}/#{DEFAULT_RAILS_CONFIG_DIR}" : nil
         if defined?(::Rails) && File.exists?("#{default_config_dir}/#{name.to_s}.rb")
           "#{default_config_dir}/#{name.to_s}.rb"
         elsif defined?(::Rails) && File.exists?("#{default_config_dir}/#{name.to_s}")
