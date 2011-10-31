@@ -369,7 +369,7 @@ module AMEE
       #  averaging, etc. Otherwise, returns <tt>false</tt>.
       #
       def has_numeric_value?
-        set? and Float(value) rescue false
+        ![:string, :text, :datetime, :time, :date ].include?(type) && set? && Float(value) rescue false
       end
 
       # Returns a pretty print string representation of <tt>self</tt>

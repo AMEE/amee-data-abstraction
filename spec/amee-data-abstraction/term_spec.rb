@@ -239,8 +239,16 @@ describe Term do
     Term.new {path :hello; value 12; default_unit :kg}.has_numeric_value?.should be_true
   end
 
+  it "string should be recognised as numeric if type not explicitly declared" do
+    Term.new {path :hello; value "12"; default_unit :kg}.has_numeric_value?.should be_true
+  end
+
   it "should be recognised as non numeric" do
     Term.new {path :hello; value 'bob'; default_unit :kg}.has_numeric_value?.should be_false
+  end
+
+  it "string should be recognised as non numeric if type declared" do
+    Term.new {path :hello; value '12'; default_unit :kg; type :string}.has_numeric_value?.should be_false
   end
   
   it "should convert the input to a String if the type is specified as such" do
