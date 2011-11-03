@@ -106,6 +106,30 @@ describe CalculationSet do
       set = CalculationSet.find('transport')
     end
 
+    it "should load set from master file" do
+      CalculationSet.load_set('transport')
+      CalculationSet.sets[:transport].should be_a CalculationSet
+    end
+
+    it "should use lock file if exists" do
+      set = CalculationSet.load_set('transport')
+      set.should be_a CalculationSet
+      set.generate_lock_file
+      set.lock_file_exists?.should be_true
+      set.file.should eql "#{Rails.root}/config/calculations/transport.rb"
+      set.config_path.should eql "#{Rails.root}/config/calculations/transport.lock.rb"
+    end
+
+    it "should use master config file if instructed" do
+      set = CalculationSet.load_set('transport')
+      set.should be_a CalculationSet
+      set.generate_lock_file
+      set.lock_file_exists?.should be_true
+      set.file.should eql "#{Rails.root}/config/calculations/transport.rb"
+      set.config_path.should eql "#{Rails.root}/config/calculations/transport.lock.rb"
+      set.config_path(:lock => false).should eql "#{Rails.root}/config/calculations/transport.rb"
+    end
+
    it "should generate set from file name using find method" do
       CalculationSet.sets[:transport].should be_nil
       set = CalculationSet.find('transport')

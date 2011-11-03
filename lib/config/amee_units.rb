@@ -67,7 +67,8 @@ Quantify::Unit.configure do
                      "BTU_FiftyNineF",
                      "ton_us",
                      "ton_uk",
-                     "d" ]
+                     "d",
+                     "lbmol"]
 
   uneeded_units = []
 

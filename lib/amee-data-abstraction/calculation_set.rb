@@ -61,7 +61,7 @@ module AMEE
       # filename will be based upon the master file with the extension .lock.rb.
       #
       def self.regenerate_lock_file(name,output_path=nil)
-        set = CalculationSet.find(name)
+        set = load_set(name, :lock => false)
         set.generate_lock_file(output_path)
       end
 
@@ -86,11 +86,15 @@ module AMEE
 
       protected
 
-      # Load a calculation set based on a filename or full path.
-      def self.load_set(name)
-        CalculationSet.new(name,:file => name) do
-          instance_eval(File.open(self.config_path).read)
+      # Load a calculation set based on a filename or full path. Set
+      # <tt>:lock => false</tt> to specify loading directly from master
+      # configuration file.
+      #
+      def self.load_set(name,options={})
+        set = CalculationSet.new(name,:file => name) do
+          instance_eval(File.open(self.config_path(options)).read)
         end
+        set
       end
 
       # Find the config file assocaited with <tt>name</tt>. The method first checks
@@ -177,10 +181,12 @@ module AMEE
 
       # Returns the path to the configuration file for <tt>self</tt>. If a .lock
       # file exists, this takes precedence, otherwise the master config file
-      # described by the <tt>#file</tt> attribute is returned.
+      # described by the <tt>#file</tt> attribute is returned. This arrangement
+      # can be overridden by passing <tt>:lock => false</tt>
       #
-      def config_path
-        lock_file_exists? ? lock_file_path : @file
+      def config_path(options={})
+        options[:lock] = true unless options[:lock] == false
+        lock_file_exists? && options[:lock] ? lock_file_path : @file
       end
 
       # Returns the path to the configuration lock file

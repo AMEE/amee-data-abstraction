@@ -369,7 +369,11 @@ module AMEE
       #  averaging, etc. Otherwise, returns <tt>false</tt>.
       #
       def has_numeric_value?
-        ![:string, :text, :datetime, :time, :date ].include?(type) && set? && Float(value) rescue false
+        is_numeric? && set? && Float(value) rescue false
+      end
+
+      def is_numeric?
+        ![:string, :text, :datetime, :time, :date ].include?(type)
       end
 
       # Returns a pretty print string representation of <tt>self</tt>
@@ -424,23 +428,26 @@ module AMEE
       #   my_term.convert_unit(:unit => <Quantify::Unit::SI ... >)
       #
       # If <tt>self</tt> does not hold a numeric value or either a unit or per
-      # unit attribute, <tt.self</tt> is returned.
+      # unit attribute, <tt>self</tt> is returned.
       #
       def convert_unit(options={})
-        return self unless has_numeric_value? and (unit or per_unit)
+        return self unless is_numeric? && (unit || per_unit)
+
         new = clone
-        if options[:unit] and unit
-          new_unit = Unit.for(options[:unit])
-          Term.validate_dimensional_equivalence?(unit,new_unit)
-          new.value Quantity.new(new.value,new.unit).to(new_unit).value
-          new.unit options[:unit]
+        if has_numeric_value?
+          if options[:unit] && unit
+            new_unit = Unit.for(options[:unit])
+            Term.validate_dimensional_equivalence?(unit,new_unit)
+            new.value Quantity.new(new.value,new.unit).to(new_unit).value
+          end
+          if options[:per_unit] && per_unit
+            new_per_unit = Unit.for(options[:per_unit])
+            Term.validate_dimensional_equivalence?(per_unit,new_per_unit)
+            new.value Quantity.new(new.value,(1/new.per_unit)).to(Unit.for(new_per_unit)).value
+          end
         end
-        if options[:per_unit] and per_unit
-          new_per_unit = Unit.for(options[:per_unit])
-          Term.validate_dimensional_equivalence?(per_unit,new_per_unit)
-          new.value Quantity.new(new.value,(1/new.per_unit)).to(Unit.for(new_per_unit)).value
-          new.per_unit options[:per_unit]
-        end
+        new.unit options[:unit] if options[:unit]
+        new.per_unit options[:per_unit] if options[:per_unit]
         return new
       end
 
