@@ -174,6 +174,13 @@ From this global calculation set, initialize a new calculation
 
                           #=> <AMEE::DataAbstraction::OngoingCalculation ... >
 
+=== Locking the calculation configuration
+Depending on the nature of the configuration file(s) used a call to the AMEE platform may be required in order to retrieve all of the information required to represent the specified calculations. This might be the case for example, when using the terms_from_amee and similar convenience methods: details such as term names, paths, units and default values are collected from the platform once at start up. In order to avoid this call every time an application is started, a .lock file can be generated which contains a complete description of the configuration information. To generate lock files use:
+
+    rake amee:calculations:lock[<filename>]
+
+    rake amee:calculations:lock_all
+
 === Configuring a connection to AMEE
 
 The AMEE::DataAbstraction module uses the 'amee' ruby gem to interact with AMEE.
