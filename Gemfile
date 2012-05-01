@@ -1,14 +1,7 @@
 source "http://rubygems.org"
 
-gem "amee", "~> 3.0"
-gem 'uuidtools', '2.1.2'
-gem 'quantify', '~> 1.2.1'
+# use the gemspec for this gem when defining the
+# dependencies instead of managing it in two places
+# http://viget.com/extend/bundler-best-practices
 
-group :development do
-  gem "bundler", "~> 1.0.0"
-  gem "jeweler", "~> 1.6.4"
-  gem 'rspec', '2.6.0'
-  gem 'flexmock', '> 0.8.6'
-  gem 'rcov'
-  gem 'rdoc'
-end
+gemspec
