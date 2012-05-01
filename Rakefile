@@ -3,7 +3,7 @@
 
 # encoding: utf-8
 
-require 'rubygems'
+
 require 'bundler'
 begin
   Bundler.setup(:default, :development)
@@ -71,13 +71,6 @@ Jeweler::Tasks.new do |gem|
   # dependencies defined in Gemfile
 end
 Jeweler::RubygemsDotOrgTasks.new
-
-require 'rcov/rcovtask'
-desc "Generate code coverage"
-RSpec::Core::RakeTask.new(:coverage) do |t|
-  t.rcov = true
-  t.rcov_opts = ['--exclude', 'spec']
-end
 
 require 'rdoc/task'
 RDoc::Task.new do |rd|

@@ -319,8 +319,8 @@ describe CalculationSet do
     mocker=AMEEMocker.new(self,:path=>'something')
     mocker.item_value_definitions.usages(['bybob','byfrank']).
       item_definition.data_category.
-      item_value_definition('first',['bybob'],[],'byfrank',[],nil,nil,true,false,nil,"TEXT").
-      item_value_definition('second',['bybob'],[],'byfrank',[],nil,nil,true,false,nil,"TEXT").
+      item_value_definition('first',['bybob'],[], ['byfrank'],[],nil,nil,true,false,nil,"TEXT").
+      item_value_definition('second',['bybob'],[],['byfrank'],[],nil,nil,true,false,nil,"TEXT").
       item_value_definition('third',['byfrank'],[],['bybob'],[],nil,nil,true,false,nil,"TEXT")
     cs=CalculationSet.new('my_set') {
       calculations_all_usages('/something') { |usage|

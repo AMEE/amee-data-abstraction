@@ -171,6 +171,7 @@ module AMEE
       #
       def calculations_all_usages(apath,options={},&dsl_block)
         dummycalc=PrototypeCalculation.new{path apath}
+        
         dummycalc.amee_usages.each do |usage|
           calculation(options){
             path apath
