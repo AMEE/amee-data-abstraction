@@ -87,8 +87,8 @@ Gem::Specification.new do |s|
       s.add_development_dependency(%q<jeweler>, ["~> 1.6.4"])
       s.add_development_dependency(%q<rspec>, ["= 2.6.0"])
       s.add_development_dependency(%q<flexmock>, ["> 0.8.6"])
-      s.add_development_dependency(%q<rcov>, [">= 0"])
       s.add_development_dependency(%q<rdoc>, [">= 0"])
+      s.add_development_dependency(%q<pry>)
     else
       s.add_dependency(%q<amee>, ["~> 4.1.5"])
       s.add_dependency(%q<uuidtools>, ["= 2.1.2"])
@@ -97,7 +97,6 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<jeweler>, ["~> 1.6.4"])
       s.add_dependency(%q<rspec>, ["= 2.6.0"])
       s.add_dependency(%q<flexmock>, ["> 0.8.6"])
-      s.add_dependency(%q<rcov>, [">= 0"])
       s.add_dependency(%q<rdoc>, [">= 0"])
     end
   else
@@ -108,7 +107,6 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<jeweler>, ["~> 1.6.4"])
     s.add_dependency(%q<rspec>, ["= 2.6.0"])
     s.add_dependency(%q<flexmock>, ["> 0.8.6"])
-    s.add_dependency(%q<rcov>, [">= 0"])
     s.add_dependency(%q<rdoc>, [">= 0"])
   end
 end
