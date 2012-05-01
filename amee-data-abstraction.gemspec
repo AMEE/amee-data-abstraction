@@ -20,7 +20,6 @@ Gem::Specification.new do |s|
     ".rvmrc",
     "CHANGELOG.txt",
     "Gemfile",
-    "Gemfile.lock",
     "LICENSE.txt",
     "README.txt",
     "Rakefile",
