@@ -2,6 +2,7 @@
 /doc/
 /pkg/
 .gitignore
+Gemfile.lock
 /nbproject
 *.gem
 /.Gemfile.swp
