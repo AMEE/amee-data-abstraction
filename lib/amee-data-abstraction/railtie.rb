@@ -1,4 +1,4 @@
-#require 'amee-data-abstraction'
+require 'amee-data-abstraction'
 require 'rails'
 
 module AMEE::DataAbstraction
