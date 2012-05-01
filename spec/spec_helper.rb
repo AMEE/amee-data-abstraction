@@ -1,6 +1,7 @@
 require 'rubygems'
 require 'rspec'
 require 'amee-data-abstraction'
+require 'pry'
 
 RSpec.configure do |config|
   config.mock_with :flexmock

@@ -20,11 +20,12 @@ class Hash
   # sub-hashes - in to symbols
   #
   def recursive_symbolize_keys!
+    items = {}
     self.each_pair do |k,v|
       value = delete(k)
-      self[k.to_sym] = value_or_symbolize_value(value)
+      items[k] = value_or_symbolize_value(value)
     end
-    self
+    items
   end
 
   private

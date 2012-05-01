@@ -96,8 +96,9 @@ describe Term do
   end
 
   it "should respond to unit methods" do
-    Term.new.methods.should include "unit","per_unit","default_unit","default_per_unit",
-                                    "alternative_units","alternative_per_units"
+    [ "unit", "per_unit", "default_unit", "default_per_unit", "alternative_units", "alternative_per_units" ].each do |meth|
+    Term.new.methods.should include meth.to_sym 
+  end
   end
 
   it "has no default unit if none declared" do

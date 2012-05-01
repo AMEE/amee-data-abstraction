@@ -85,16 +85,17 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<quantify>, [">= 2.2.0"])
       s.add_development_dependency(%q<bundler>, [">= 1.0.0"])
       s.add_development_dependency(%q<jeweler>, ["~> 1.6.4"])
-      s.add_development_dependency(%q<rspec>, ["= 1.3.0"])
+      s.add_development_dependency(%q<rspec>, [">= 1.3.0"])
       s.add_development_dependency(%q<rspec_spinner>, ["= 1.1.3"])
       s.add_development_dependency(%q<flexmock>, ["> 0.8.6"])
+      s.add_development_dependency(%q<pry>)
     else
       s.add_dependency(%q<amee>, ["~> 4.0"])
       s.add_dependency(%q<uuidtools>, ["= 2.1.2"])
       s.add_dependency(%q<quantify>, [">= 1.2.0"])
       s.add_dependency(%q<bundler>, [">= 1.0.0"])
       s.add_dependency(%q<jeweler>, ["~> 1.6.4"])
-      s.add_dependency(%q<rspec>, ["= 1.3.0"])
+      s.add_dependency(%q<rspec>, [">= 1.3.0"])
       s.add_dependency(%q<rspec_spinner>, ["= 1.1.3"])
       s.add_dependency(%q<flexmock>, ["> 0.8.6"])
     end
@@ -104,7 +105,7 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<quantify>, ["= 1.2.0"])
     s.add_dependency(%q<bundler>, [">= 1.0.0"])
     s.add_dependency(%q<jeweler>, ["~> 1.6.4"])
-    s.add_dependency(%q<rspec>, ["= 1.3.0"])
+    s.add_dependency(%q<rspec>, [">= 1.3.0"])
     s.add_dependency(%q<rspec_spinner>, ["= 1.1.3"])
     s.add_dependency(%q<flexmock>, ["> 0.8.6"])
   end

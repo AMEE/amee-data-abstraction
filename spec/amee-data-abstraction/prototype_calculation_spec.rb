@@ -139,8 +139,8 @@ describe PrototypeCalculation do
     mocker=AMEEMocker.new(self,:path=>'something')
     mocker.item_value_definitions.
       item_definition.data_category.
-      item_value_definition('first',['bybob'],[],'byfrank',[],nil,nil,true,false,nil,"TEXT").
-      item_value_definition('second',['bybob'],[],'byfrank',[],nil,nil,true,false,nil,"TEXT").
+      item_value_definition('first',['bybob'],[],['byfrank'],[],nil,nil,true,false,nil,"TEXT").
+      item_value_definition('second',['bybob'],[],['byfrank'],[],nil,nil,true,false,nil,"TEXT").
       item_value_definition('third',['byfrank'],[],['bybob'],[],nil,nil,true,false,nil,"TEXT")
     pc=PrototypeCalculation.new {path '/something'; all_profiles ; fixed_usage 'bybob'}
     pc.profiles.in_use.labels.should eql [:first,:second]
@@ -153,8 +153,8 @@ describe PrototypeCalculation do
     mocker=AMEEMocker.new(self,:path=>'something')
     mocker.item_value_definitions.
       item_definition.data_category.
-      item_value_definition('first',['bybob'],[],'byfrank',[],:kg,:mi,true,false,nil,"TEXT").
-      item_value_definition('second',['bybob'],[],'byfrank',[],:km,nil,true,false,nil,"TEXT").
+      item_value_definition('first',['bybob'],[],['byfrank'],[],:kg,:mi,true,false,nil,"TEXT").
+      item_value_definition('second',['bybob'],[],['byfrank'],[],:km,nil,true,false,nil,"TEXT").
       item_value_definition('third',['byfrank'],[],['bybob'],[],:lb,:h,true,false,nil,"TEXT")
     pc=PrototypeCalculation.new {path '/something'; usage{ value 'bybob'}}
     pc.profiles.labels.should eql [:first,:second,:third]
@@ -193,8 +193,8 @@ describe PrototypeCalculation do
       item_value_definition('first',['bybob','byfrank'],[],[],[],nil,nil,false,true,nil,"TEXT").
       item_value_definition('second',['bybob','byfrank'],[],[],[],nil,nil,false,true,nil,"TEXT").
       item_value_definition('third',['bybob','byfrank'],[],[],[],nil,nil,false,true,nil,"TEXT").
-      item_value_definition('fourth',['bybob'],[],'byfrank',[],nil,nil,true,false,nil,"TEXT").
-      item_value_definition('fifth',['bybob'],[],'byfrank',[],:lb,nil,true,false,nil,"TEXT").
+      item_value_definition('fourth',['bybob'],[],['byfrank'],[],nil,nil,true,false,nil,"TEXT").
+      item_value_definition('fifth',['bybob'],[],['byfrank'],[],:lb,nil,true,false,nil,"TEXT").
       item_value_definition('sixth',['byfrank'],[],['bybob'],[],nil,nil,true,false,nil,"TEXT").
       return_value_definition('seventh').
       return_value_definition('eighth').
