@@ -29,6 +29,8 @@ module AMEE::DataAbstraction
   mattr_accessor :connection
   
   if defined?(Rails)
+  	require File.dirname(__FILE__) + '/amee-data-abstraction/railtie'
+
     def self.connection
       AMEE::Rails.connection
     end
