@@ -1,8 +1,10 @@
 require 'rubygems'
 require 'rspec'
-
 $:.unshift(File.dirname(__FILE__) + '/../lib')
+
 require 'amee-data-abstraction'
+require 'pry'
+
 
 # Fake up Rails.root to be fixtures directory
 class Rails

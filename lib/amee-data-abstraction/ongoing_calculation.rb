@@ -144,7 +144,7 @@ module AMEE
       def choose_without_validation!(choice)
         # Make sure choice keys are symbols since they are mapped to term labels
         # Uses extension methods for Hash defined in /core_extensions
-        choice.recursive_symbolize_keys!
+        choice = choice.recursive_symbolize_keys
 
         new_profile_uid= choice.delete(:profile_uid)
         self.profile_uid=new_profile_uid if new_profile_uid

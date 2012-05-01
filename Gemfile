@@ -9,8 +9,8 @@ group :development do
   gem "jeweler", "~> 1.6.4"
   gem 'rspec', '2.6.0'
   gem 'flexmock', '> 0.8.6'
-  gem 'rcov'
   gem 'rdoc'
+  gem 'pry'
 end
 
 group :test do

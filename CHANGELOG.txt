@@ -1,5 +1,10 @@
 = Changelog
 
+== 2.3.0
+  * Updates for Ruby 1.9 support
+  * Add lock file rake tasks
+  * Update amee and quantify gem dependency versions
+
 == 1.3.0
   * Reconfigure storage and API for Calculation Sets
 
