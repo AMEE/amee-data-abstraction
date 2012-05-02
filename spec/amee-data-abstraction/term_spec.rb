@@ -106,7 +106,7 @@ describe Term do
 
   it "should respond to unit methods" do
     [ "unit", "per_unit", "default_unit", "default_per_unit", "alternative_units", "alternative_per_units" ].each do |meth|
-    Term.new.methods.should include meth.to_sym
+    Term.new.methods.should include RUBY_VERSION.to_f < 1.9 ? meth : meth.to_sym
   end
   end
 
